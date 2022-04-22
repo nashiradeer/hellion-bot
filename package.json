@@ -1,6 +1,6 @@
 {
   "name": "hellion-warden",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Discord Music Bot with support to YouTube.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,7 +38,6 @@
     "erlpack": "github:discord/erlpack",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.9",
-    "winston": "^3.7.2",
     "ytdl-core": "^4.11.0",
     "ytpl": "^2.3.0",
     "ytsr": "^3.7.0",

@@ -1,4 +1,4 @@
-exports.run = (client, message, args, ext) => {
+export function run(client, message, args, ext) {
     if (!message.member.voice.channel)
     {
         message.channel.send("You aren't in a voice chat.");
@@ -51,7 +51,7 @@ exports.run = (client, message, args, ext) => {
     }
 };
 
-exports.command = {
+export var command = {
     names: [ "loop" ],
     description: "Place playlist on a loop."
 };
