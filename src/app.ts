@@ -8,15 +8,17 @@ const argparser = new argparse.ArgumentParser({
 
 argparser.add_argument('-p', '--prefix', {
    metavar: 'PREFIX',
-   type: 'string',
+   type: 'str',
    help: 'Override the default bot prefix',
    default: 'h!'
 });
 
 argparser.add_argument('--logfile', {
    metavar: 'FILE',
-   type: 'string',
+   type: 'str',
    help: 'Create and add a file to the logger'
 });
 
 argparser.add_argument('--noconsole', {
+   help: 'Create and add a file to the logger'
+});
