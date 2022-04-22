@@ -1,0 +1,38 @@
+{
+  "name": "hellion-warden",
+  "version": "0.0.1-alpha.1",
+  "description": "Discord Music Bot with support to YouTube.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NashiraDeer/Discord-HellionWarden.git"
+  },
+  "keywords": [
+    "music",
+    "discord",
+    "youtube",
+    "nashira"
+  ],
+  "author": "Nashira Deer",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/NashiraDeer/Discord-HellionWarden/issues"
+  },
+  "homepage": "https://github.com/NashiraDeer/Discord-HellionWarden#readme",
+  "dependencies": {
+    "@discordjs/opus": "^0.5.3",
+    "@discordjs/voice": "^0.9.0",
+    "bufferutil": "^4.0.6",
+    "discord.js": "^13.6.0",
+    "erlpack": "github:discord/erlpack",
+    "sodium": "^3.0.2",
+    "utf-8-validate": "^5.0.9",
+    "ytdl-core": "^4.11.0",
+    "ytpl": "^2.3.0",
+    "ytsr": "^3.7.0",
+    "zlib-sync": "^0.1.7"
+  }
+}
