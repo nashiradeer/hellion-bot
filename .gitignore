@@ -1,5 +1,9 @@
 # Hellion Warden
-config.loaded.json
+data/
+
+# TypeScript Declaration Files
+typings/
+sourcemaps/
 
 # Logs
 logs
