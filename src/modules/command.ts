@@ -1,79 +1,287 @@
-import { Client, Message } from 'discord.js';
-import { HellionWardenExtensions } from '../index';
+import { Client, User, Message, TextChannel, GuildMember, Guild, ApplicationCommandOptionType, DMChannel, PartialDMChannel, NewsChannel, ThreadChannel, CommandInteraction } from 'discord.js';
+import { discord } from '..';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
+import { APIInteractionGuildMember } from 'discord.js/node_modules/discord-api-types';
+import { parse } from 'shell-quote';
+import { Routes, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { REST } from '@discordjs/rest';
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 export declare interface HellionCommandHandler
 {
     on(event: 'ready', listener: () => void): this;
-    on(event: 'discover', listener: (commandName: string) => void): this;
-    on(event: 'error', listener: (err: Error) => void): this;
-    on(event: 'cmdError', listener: (commandName: string, err: Error) => void): this;
-}
+    once(event: 'ready', listener: () => void): this;
 
-export interface HellionCommandArray
-{
-    [index: string]: HellionCommand;
+    on(event: 'error', listener: (err: Error) => void): this;
+    once(event: 'error', listener: (err: Error) => void): this;
+
+    on(event: 'debug', listener: (type: 'info'|'debug'|'warn', message: string) => void): this;
+    once(event: 'debug', listener: (type: 'info'|'debug'|'warn', message: string) => void): this;
+
+    on(event: 'cmdError', listener: (command: string, err: Error) => void): this;
+    once(event: 'cmdError', listener: (command: string, err: Error) => void): this;
+
+    on(event: 'cmdDebug', listener: (command: string, type: 'info'|'debug'|'warn', message: string) => void): this;
+    once(event: 'cmdDebug', listener: (command: string, type: 'info'|'debug'|'warn', message: string) => void): this;
 }
 
 export class HellionCommandHandler extends EventEmitter
 {
-    private commands: HellionCommandArray;
-    private ready: boolean;
+    private _client: Client;
+    private _commands: HellionCommandListeners;
 
-    constructor()
+    constructor(client: Client, commanddir: string)
     {
-        console.log("[COMMAND HANDLER]: Initializing...");
-
         super();
-        
-        this.commands = {};
+    
+        this.emit('debug', 'info', "Initializing...");
 
-        this.ready = false;
+        this._client = client;
+        this._commands = {};
+
+        this._init(commanddir)
+        .then(() => {
+            this.emit('ready');
+        })
+        .catch((err) => {
+            this.emit('error', err);
+        });
     }
 
-    public async init(commanddir: string): Promise<void>
+    private async _init(commanddir: string): Promise<void>
     {
-        console.log("[COMMAND HANDLER] Loading the directory...");
+        this.emit('debug', 'info', "Scanning for commands...");
+        let slashCommands: RESTPostAPIApplicationCommandsJSONBody[] = [];
 
-        if (this.ready) throw new Error("CommandHandler is already ready to be used");
-
-        for (let p of readdirSync(commanddir)) {
+        for (let p of readdirSync(commanddir))
+        {
             try
             {
-                let hellionCommand: HellionCommand = (await import(resolve(commanddir, p))).hellionCommand;
+                this.emit('debug', 'debug', `Importing ${p}...`);
+
+                let hellionCommand: HellionCommandListener = new (await import(resolve(commanddir, p))).HellionCommand;
                 
-                this.emit('discover', hellionCommand.name);
+                if (!hellionCommand.name)
+                    throw new Error("HellionCommand name can't be empty");
 
-                this.commands[hellionCommand.name] = hellionCommand;
-                console.log("[COMMAND HANDLER] Registered command '" + hellionCommand.name + "'...");
+                this.emit('debug', 'debug', `Command imported: ${hellionCommand.name}`);
 
+                this._commands[hellionCommand.name] = hellionCommand;
+                
                 for (let name of hellionCommand.alias)
                 {
-                    this.commands[name] = hellionCommand;
-                    console.log("[COMMAND HANDLER] Registered alias '" + name + "' for command '" + hellionCommand.name + "'...");
+                    this.emit('debug', 'debug', `Registering alias ${name} for ${hellionCommand.name}...`);
+                    this._commands[name] = hellionCommand;
                 }
+
+                this.emit('debug', 'debug', `Creating Slash Command ${p}...`);
+                let command = new SlashCommandBuilder()
+                    .setName(hellionCommand.name)
+                    .setDescription(hellionCommand.description);
+                
+                for (let arg of hellionCommand.usage)
+                {
+                    switch (arg.type)
+                    {
+                        case 'STRING':
+                            command.addStringOption(option => option.setName(arg.name)
+                                .setDescription(arg.description)
+                                .setRequired(arg.required));
+                            break;
+                        case 'NUMBER':
+                            command.addNumberOption(option => option.setName(arg.name)
+                                .setDescription(arg.description)
+                                .setRequired(arg.required));
+                            break;
+                        case 'BOOLEAN':
+                            command.addBooleanOption(option => option.setName(arg.name)
+                                .setDescription(arg.description)
+                                .setRequired(arg.required));
+                            break;
+                        default:
+                            this.emit('debug', 'warn', `Unknown argument type '${arg.type}' in '${p}'`);
+                    }
+                }
+                
+                slashCommands.push(command.toJSON());
             }
             catch (e)
             {
-                this.emit('error', e);
+                this.emit('debug', 'warn', `Load error in the command '${p}': ${e}`);
             }
         }
 
-        console.log("[COMMAND HANDLER] Initialized.");
+        let rest = new REST({ version: '9' }).setToken(this._client.token);
 
-        this.ready = true;
-
+        this.emit('debug', 'info', "Registering commands in Discord...");
+        await rest.put(
+			Routes.applicationCommands(this._client.application.id),
+			{ body: slashCommands },
+		);
+        
         this.emit('ready');
+    }
+
+    public async run(message: Message, prefix: string, data: discord.HellionWardenData)
+    {
+        let args = parse(message.content.trim().slice(prefix.length)) as string[];
+        this.runMessage(message, args.shift().toLowerCase(), args, data);
+    }
+
+    public async runMessage(message: Message, command: string, args: string[], data: discord.HellionWardenData)
+    {
+        this.emit('debug', 'debug', `Preparing message command '${command}'...`);
+        let cmd = this._commands[command];
+
+        if (!cmd)
+        {
+            this.emit('debug', 'warn', `Message command not found: '${command}'`);
+            return;
+        }
+
+        let hellionArgs: HellionCommandArgs = {};
+        
+        this.emit('debug', 'debug', `Parsing args for message command '${command}'...`);
+        for(let i = 0; i < args.length; i++)
+        {
+            hellionArgs[cmd.usage[i].name] = args[i];
+        }
+
+        this.emit('debug', 'debug', `Creating event for message command '${command}'...`);
+        let event = new HellionCommandEvent(this, hellionArgs, {
+            channel: message.channel,
+            user: message.author,
+            guild: message.guild,
+            member: message.member
+        });
+
+        this.emit('debug', 'info', `Running message command '${command}'...`);
+        cmd.run(this._client, event, data);
+    }
+
+    public async runInteraction(command: CommandInteraction, data: discord.HellionWardenData)
+    {
+        this.emit('debug', 'debug', `Preparing interaction command '${command.commandName}'...`);
+        let cmd = this._commands[command.commandName];
+
+        if (!cmd)
+        {
+            this.emit('debug', 'warn', `Interaction command not found: '${command.commandName}'`);
+            return;
+        }
+
+        let hellionArgs: HellionCommandArgs = {};
+        
+        this.emit('debug', 'debug', `Parsing args for interaction command '${command.commandName}'...`);
+        for(let i = 0; i < cmd.usage.length; i++)
+        {
+            let value = command.options.get(cmd.usage[i].name);
+
+            if (!value) continue;
+            if (!value.value) continue;
+
+            hellionArgs[cmd.usage[i].name] = value.value;
+        }
+
+        this.emit('debug', 'debug', `Creating event for interaction command '${command.commandName}'...`);
+        let event = new HellionCommandEvent(this, hellionArgs, {
+            channel: command.channel,
+            user: command.user,
+            guild: command.guild,
+            member: command.member
+        });
+
+        this.emit('debug', 'info', `Running interaction command '${command.commandName}'...`);
+        cmd.run(this._client, event, data);
     }
 }
 
-export interface HellionCommand
+export interface HellionCommandEventOptions
+{
+    user: User;
+    channel: TextChannel | DMChannel | PartialDMChannel | NewsChannel | ThreadChannel;
+    guild?: Guild;
+    member?: GuildMember | APIInteractionGuildMember;
+}
+
+export class HellionCommandEvent
+{
+    private _handler: HellionCommandHandler;
+
+    public args: HellionCommandArgs;
+    public user: User;
+    public channel: TextChannel | DMChannel | PartialDMChannel | NewsChannel | ThreadChannel;
+    public guild?: Guild;;
+    public member?: GuildMember | APIInteractionGuildMember;
+
+    constructor(handler: HellionCommandHandler, args: HellionCommandArgs, options: HellionCommandEventOptions)
+    {
+        this._handler = handler;
+        this.args = args;
+        this.user = options.user;
+        this.channel = options.channel;
+        this.guild = options.guild;
+        this.member = options.member;
+    }
+
+    public info(message: string): void
+    {
+        this._handler.emit('cmdDebug', 'info', message);
+    }
+
+    public warn(message: string): void
+    {
+        this._handler.emit('cmdDebug', 'warn', message);
+    }
+
+    public debug(message: string): void
+    {
+        this._handler.emit('cmdDebug', 'debug', message);
+    }
+
+    public error(err: Error): void
+    {
+        this._handler.emit('cmdError', err);
+    }
+}
+
+interface HellionCommandListeners
+{
+    [command: string]: HellionCommandListener;
+}
+
+export interface HellionCommandArgs
+{
+    [index: string]: string | number | boolean;
+}
+
+export interface HellionCommandParameter
 {
     name: string;
-    alias: string[];
+    required: boolean;
+    type: 'STRING' | 'NUMBER' | 'BOOLEAN';
     description: string;
-    usage: string;
-    run(client: Client, message: Message, args: string[], ext: HellionWardenExtensions): void;
+}
+
+export class HellionCommandListener
+{
+    public name: string;
+    public alias: string[];
+    public description: string;
+    public usage: HellionCommandParameter[];
+
+    constructor()
+    {
+        this.name = "";
+        this.alias = [];
+        this.description = "";
+        this.usage = [];
+    }
+
+    public async run(client: Client, event: HellionCommandEvent, data: discord.HellionWardenData): Promise<void>
+    {
+
+    }
 }
