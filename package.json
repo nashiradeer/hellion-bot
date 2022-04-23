@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node dist/app.js",
     "test": "npm run build && node dist/app.js ./data",
+    "debug": "npm run sourcemap && node dist/app.js ./data",
+    "sourcemap": "tsc --build --sourceMap --declarationMap",
     "build": "tsc --build",
     "clean": "tsc --build --clean"
   },
