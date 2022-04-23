@@ -1,21 +1,33 @@
-console.log("[APP]: Initializing Hellion Warden...");
-import * as winston from 'winston';
+console.log("[MAIN]: Initializing...");
 import { ArgumentParser } from 'argparse';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { resolve as pathResolve } from 'path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { resolve } from 'path';
+import { HellionWarden } from './index';
 
-interface HellionWardenArgs {
-   datadir: string
+interface HellionWardenArgs
+{
+   datadir: string;
 }
 
-interface HellionWardenConfig {
-   prefix: string,
-   token: string,
-   console: boolean,
-   logfile: string
+export interface PackageMeta
+{
+   name: string;
+   version: string;
 }
 
-console.log("[APP]: Parsing command line...");
+export interface HellionWardenConfig
+{
+   prefix: string;
+   token: string;
+   console: boolean;
+   logfile: string;
+}
+
+const PACKAGE: PackageMeta = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf-8'));
+
+console.log("[MAIN]: Hellion Warden version: " + PACKAGE.version);
+
+console.log("[MAIN]: Parsing command line...");
 const argparser = new ArgumentParser({
    description: 'Hellion Warden is a Discord Music Bot developed by Nashira Deer'
 });
@@ -26,32 +38,35 @@ argparser.add_argument('datadir', {
 });
 
 let args: HellionWardenArgs = argparser.parse_args();
-let datapath = pathResolve(args.datadir);
 
-console.log("[APP]: Loading...");
+console.log("[MAIN]: Loading...");
+
+let datapath = resolve(args.datadir);
+
 if (!existsSync(datapath))
 {
    mkdirSync(datapath);
-   console.warn("[APP]: Creating data directory...");
+   console.warn("[MAIN]: Creating data directory...");
 }
 
-let configpath = pathResolve(datapath, "config.json");
+let configpath = resolve(datapath, "config.json");
+
 if (!existsSync(configpath))
 {
-   console.error("[APP]: Configuration file don't exists, creating one...");
+   console.warn("[MAIN]: Configuration file don't exists, creating one...");
 
    writeFileSync(configpath, JSON.stringify({
       prefix: 'h!',
-      token: '',
-      console: true,
-      file: null
+      token: ''
    }, null, 4));
 
-   console.log(`[APP]: Edit '${configpath}' before running Hellion Warden again.`);
+   console.warn(`[MAIN]: Edit '${configpath}' before running Hellion Warden again.`);
    process.exit(1);
 }
 else
 {
-   const CONFIG: HellionWardenConfig = require(configpath);
+   const CONFIG: HellionWardenConfig = JSON.parse(readFileSync(configpath, 'utf-8'));
 
+   const DiscordBot = new HellionWarden(PACKAGE, CONFIG);
+   DiscordBot.login();
 }
