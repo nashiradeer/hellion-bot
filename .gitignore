@@ -1,9 +1,5 @@
 # Hellion Warden
-data/
-
-# TypeScript Declaration Files
-typings/
-sourcemaps/
+testdata/
 
 # Logs
 logs
