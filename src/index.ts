@@ -1,7 +1,7 @@
 import { PackageMeta, HellionWardenConfig } from './app';
+import { HellionCommandHandler } from './modules/command';
 import { Client, Message } from 'discord.js';
 
-import { readdirSync } from 'fs';
 import { resolve } from 'path';
 
 export interface HellionWardenExtensions
@@ -16,7 +16,7 @@ export class HellionWarden
     private readonly CONFIG: HellionWardenConfig;
 
     private ext: HellionWardenExtensions;
-    private commands: object;
+    private commandHandler: HellionCommandHandler; 
     private client: Client;
 
     constructor(info: PackageMeta, config: HellionWardenConfig)
@@ -34,25 +34,29 @@ export class HellionWarden
 
         this.client = new Client({ intents: [ "GUILD_MESSAGES", "GUILDS" ]});
 
-        console.log("[DISCORD]: Registering commands...");
-
-        for (let p of readdirSync(resolve(__dirname, "commands"))) {
-            let script = require(resolve(__dirname, "commands", p));
-
-            for (let name of script.command.names)
-            {
-                this.commands[name] = script.run;
-                console.log("[DISCORD] Registered command '" + name + "'...");
-            }
-        }       
-
-        console.log("[DISCORD]: Registering events...");
+        console.log("[DISCORD]: Registering events to Discord...");
 
         this.client.on('messageCreate', this.message);
 
         this.client.once('ready', () => {
             console.log("[DISCORD] Logged in '" + this.client.user.tag + "'");
         });
+
+        console.log("[DISCORD]: Creating the command handler...");
+
+        this.commandHandler = new HellionCommandHandler();
+
+        console.log("[DISCORD]: Registering events to command handler...");
+
+        this.commandHandler.once('ready', () => {
+            this.client.login(this.CONFIG.token);
+        });
+
+        this.commandHandler.on('error', (err) => {
+            console.error(err);
+        });
+
+        this.commandHandler.init(resolve(__dirname, "commands"));
     }
 
     private async message(message: Message)
