@@ -1,6 +1,5 @@
 import { Client, ClientOptions, CommandInteraction, Interaction, Message } from 'discord.js';
 import { EventEmitter } from 'events';
-import { resolve } from 'path';
 
 export interface HellionWardenData
 {
@@ -28,15 +27,14 @@ export class HellionWarden extends EventEmitter
     private _client: Client;
     private _token: string;
 
-    public readonly prefix: string;
-    public readonly commandHandler: commandHandler.HellionCommandHandler;
+    public prefix: string;
+    //public readonly commandHandler: commandHandler.HellionCommandHandler;
 
     constructor(token: string, prefix: string = "h!", options?: ClientOptions)
     {
         super();
 
         // Initialize
-        this.emit('debug', 'info', "Initializing...");
         this._token = token;
         this.prefix = prefix;
         this._data = {
@@ -44,11 +42,9 @@ export class HellionWarden extends EventEmitter
         };
 
         // Initialize Discord Client
-        this.emit('debug', 'info', "Initializing Discord Client...");
         this._client = new Client(options || { intents: [ 'GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES' ]});
 
         // Register Discord Client events
-        this.emit('debug', 'debug', "Registering Discord Client events...");
         this._client.on('messageCreate', (message) => this.message(message));
         this._client.on('interactionCreate', (interaction) => this.interaction(interaction));
         this._client.once('ready', () => {
@@ -56,7 +52,6 @@ export class HellionWarden extends EventEmitter
         });
 
         // Initialize Command Handler
-        this.emit('debug', 'info', "Initializing Command Handler...");
     }
 
     private async message(message: Message): Promise<void>
@@ -66,7 +61,7 @@ export class HellionWarden extends EventEmitter
         if (!message.guild) return;
         
         this.emit('debug', 'debug', 'Running command from a message.');
-        this.commandHandler.run(message, this.prefix, this._data);
+        //this.commandHandler.run(message, this.prefix, this._data);
     }
 
 
@@ -75,7 +70,7 @@ export class HellionWarden extends EventEmitter
         if (interaction.isCommand())
         {
             this.emit('debug', 'debug', 'Running command from a interaction.');
-            this.commandHandler.runInteraction(interaction as CommandInteraction, this._data);
+            //this.commandHandler.runInteraction(interaction as CommandInteraction, this._data);
         }
     }
 
