@@ -67,7 +67,7 @@ export class HellionLogger
     {
         this._label = label;
         let opt = options || {};
-        this._level = opt.level || 'info';
+        this._level = opt.level || 'debug';
         this._levelNumber = HellionLoggerFormatter.getLevelNumber(this._level);
         this._transporters = opt.transporters || {};
     }
