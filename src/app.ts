@@ -41,7 +41,8 @@ if (!existsSync(configpath))
 {
    writeFileSync(configpath, JSON.stringify({
       prefix: 'h!',
-      token: ''
+      token: '',
+      appId: ''
    }, null, 4));
 
    process.exit(1);
@@ -50,7 +51,7 @@ else
 {
    const CONFIG: HellionWardenConfig = JSON.parse(readFileSync(configpath, 'utf-8'));
 
-   const DiscordBot = new discord.HellionWarden(CONFIG.token, CONFIG.token);
+   const DiscordBot = new discord.HellionWarden(CONFIG.token, CONFIG.prefix);
 
    DiscordBot.once('ready', () => {
       DiscordBot.login();

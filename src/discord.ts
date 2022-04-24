@@ -5,6 +5,7 @@ import { resolve } from 'path';
 
 export interface HellionWardenData
 {
+    musicdata: Map<string, any>;
 }
 
 export declare interface HellionWarden
@@ -39,23 +40,26 @@ export class HellionWarden extends EventEmitter
         this.emit('debug', 'info', "Initializing...");
 
         this._token = token;
+        this.prefix = prefix;
 
         this._data = {
+            musicdata: new Map<string, any>()
         };
 
         // Initialize Discord Client
         this.emit('debug', 'info', "Initializing Discord Client...");
 
-        this._client = new Client(options || { intents: [ 'GUILDS', 'GUILD_MESSAGES' ]});
+        this._client = new Client(options || { intents: [ 'GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES' ]});
 
         // Register Discord Client events
         this.emit('debug', 'debug', "Registering Discord Client events...");
 
-        this._client.on('messageCreate', this.message);
+        this._client.on('messageCreate', (message) => this.message(message));
 
         this._client.on('interactionCreate', this.interaction);
 
         this._client.once('ready', () => {
+            this.commandHandler.registerSlash();
             this.emit('logged');
         });
 

@@ -1,4 +1,4 @@
-import { Client, User, Message, TextChannel, GuildMember, Guild, ApplicationCommandOptionType, DMChannel, PartialDMChannel, NewsChannel, ThreadChannel, CommandInteraction } from 'discord.js';
+import { Client, User, Message, TextChannel, GuildMember, Guild, DMChannel, PartialDMChannel, NewsChannel, ThreadChannel, CommandInteraction } from 'discord.js';
 import { discord } from '..';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
@@ -29,8 +29,9 @@ export declare interface HellionCommandHandler
 
 export class HellionCommandHandler extends EventEmitter
 {
-    private _client: Client;
     private _commands: HellionCommandListeners;
+    private _slashCommands: RESTPostAPIApplicationCommandsJSONBody[];
+    private _client: Client;
 
     constructor(client: Client, commanddir: string)
     {
@@ -40,6 +41,7 @@ export class HellionCommandHandler extends EventEmitter
 
         this._client = client;
         this._commands = {};
+        this._slashCommands = [];
 
         this._init(commanddir)
         .then(() => {
@@ -59,6 +61,12 @@ export class HellionCommandHandler extends EventEmitter
         {
             try
             {
+                if (!p.endsWith('.js'))
+                {
+                    this.emit('debug', 'warn', `File isn't a JavaScript '${p}'`);
+                    continue;
+                }
+
                 this.emit('debug', 'debug', `Importing ${p}...`);
 
                 let hellionCommand: HellionCommandListener = new (await import(resolve(commanddir, p))).HellionCommand;
@@ -75,7 +83,7 @@ export class HellionCommandHandler extends EventEmitter
                     this.emit('debug', 'debug', `Registering alias ${name} for ${hellionCommand.name}...`);
                     this._commands[name] = hellionCommand;
                 }
-
+                
                 this.emit('debug', 'debug', `Creating Slash Command ${p}...`);
                 let command = new SlashCommandBuilder()
                     .setName(hellionCommand.name)
@@ -112,16 +120,19 @@ export class HellionCommandHandler extends EventEmitter
                 this.emit('debug', 'warn', `Load error in the command '${p}': ${e}`);
             }
         }
+        
+        this.emit('ready');
+    }
 
+    public async registerSlash()
+    {
         let rest = new REST({ version: '9' }).setToken(this._client.token);
 
         this.emit('debug', 'info', "Registering commands in Discord...");
         await rest.put(
 			Routes.applicationCommands(this._client.application.id),
-			{ body: slashCommands },
+			{ body: this._slashCommands },
 		);
-        
-        this.emit('ready');
     }
 
     public async run(message: Message, prefix: string, data: discord.HellionWardenData)
