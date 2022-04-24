@@ -1,9 +1,12 @@
 import { Client, ClientOptions, CommandInteraction, Interaction, Message } from 'discord.js';
 import { EventEmitter } from 'events';
+import { commandHandler } from '.';
+import { resolve } from 'path';
 
 export interface HellionWardenData
 {
     musicdata: Map<string, any>;
+    prefix: string;
 }
 
 export declare interface HellionWarden
@@ -28,7 +31,7 @@ export class HellionWarden extends EventEmitter
     private _token: string;
 
     public prefix: string;
-    //public readonly commandHandler: commandHandler.HellionCommandHandler;
+    public handler: commandHandler.HellionCommandHandler;
 
     constructor(token: string, prefix: string = "h!", options?: ClientOptions)
     {
@@ -38,7 +41,8 @@ export class HellionWarden extends EventEmitter
         this._token = token;
         this.prefix = prefix;
         this._data = {
-            musicdata: new Map<string, any>()
+            musicdata: new Map<string, any>(),
+            prefix: prefix
         };
 
         // Initialize Discord Client
@@ -52,6 +56,7 @@ export class HellionWarden extends EventEmitter
         });
 
         // Initialize Command Handler
+        this.handler = new commandHandler.HellionCommandHandler();
     }
 
     private async message(message: Message): Promise<void>
@@ -61,20 +66,28 @@ export class HellionWarden extends EventEmitter
         if (!message.guild) return;
         
         this.emit('debug', 'debug', 'Running command from a message.');
-        //this.commandHandler.run(message, this.prefix, this._data);
+        this.handler.run(this._client, message, this.prefix, this._data);
     }
 
 
-    private async interaction(interaction: Interaction)
+    private async interaction(interaction: Interaction): Promise<void>
     {
         if (interaction.isCommand())
         {
             this.emit('debug', 'debug', 'Running command from a interaction.');
-            //this.commandHandler.runInteraction(interaction as CommandInteraction, this._data);
+            this.handler.runInteraction(this._client, interaction as CommandInteraction, this._data);
         }
     }
 
-    public async login(): Promise<void> {
+    public async start(): Promise<void>
+    {
+        this.emit('debug', 'info', "Initializing Command Handler...");
+        await this.handler.init(resolve(__dirname, 'commands'));
+
+        this.emit('debug', 'info', "Logging to Discord...");
         await this._client.login(this._token);
+
+        this.emit('debug', 'info', "Registering Slash Commands...");
+        await this.handler.initSlashCommand(this._client.user.id, this._token);
     }
 }
