@@ -1,5 +1,4 @@
 export * as discord from './discord';
-export * as commandHandler from './modules/command';
 
 export declare interface HellionWardenInformation
 {
