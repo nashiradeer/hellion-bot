@@ -72,8 +72,8 @@ export class HellionLoggerFormatter
 
     public formatTimestamp(date: Date): string
     {
-        return date.getUTCFullYear().toString().padStart(4, '0') + "/" +
-            date.getUTCMonth.toString().padStart(2, '0') + "/" +
+        return date.getUTCFullYear().toString().padStart(4, '0') + "-" +
+            date.getUTCMonth().toString().padStart(2, '0') + "-" +
             date.getUTCDate().toString().padStart(2, '0') + " " +
             date.getUTCHours().toString().padStart(2, '0') + ":" +
             date.getUTCMinutes().toString().padStart(2, '0') + ":" +
@@ -94,7 +94,7 @@ export class HellionLoggerFormatter
 
     public formatLevel(level: HellionLoggerLevel)
     {
-        switch(level)
+        switch(level.toLowerCase())
         {
             case "error": return "ERROR";
             case "warn": return "WARN";
