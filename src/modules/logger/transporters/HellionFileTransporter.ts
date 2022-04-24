@@ -1,7 +1,7 @@
 import { HellionLoggerTransporter, HellionLoggerFormatter, HellionLoggerLevel } from "..";
 import { createWriteStream, WriteStream } from 'fs';
 
-export class FileTransporter extends HellionLoggerTransporter
+export class HellionFileTransporter extends HellionLoggerTransporter
 {
     private _stream: WriteStream;
 

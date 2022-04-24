@@ -8,9 +8,9 @@ export const formatters = {
     HellionJSONFormatter
 };
 
-import { ConsoleTransporter } from './transporters/ConsoleTransporter';
-import { FileTransporter } from './transporters/FileTransporter';
+import { HellionConsoleTransporter } from './transporters/HellionConsoleTransporter';
+import { HellionFileTransporter } from './transporters/HellionFileTransporter';
 export const transporters = {
-    ConsoleTransporter,
-    FileTransporter
+    HellionConsoleTransporter,
+    HellionFileTransporter
 }

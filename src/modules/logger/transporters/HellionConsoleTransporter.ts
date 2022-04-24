@@ -1,8 +1,7 @@
 import { HellionLoggerTransporter, HellionLoggerFormatter, HellionLoggerLevel } from "..";
-import { Writable } from 'stream';
 import { HellionLoggerMessage } from "../base";
 
-export class ConsoleTransporter extends HellionLoggerTransporter
+export class HellionConsoleTransporter extends HellionLoggerTransporter
 {
     constructor(formatter: HellionLoggerFormatter, level: HellionLoggerLevel)
     {

@@ -68,37 +68,57 @@ else
    const CONFIG: HellionWardenConfig = JSON.parse(readFileSync(configpath, 'utf-8'));
 
    if (args.verbose == 'debug' || args.verbose == 'default')
-      logger.HellionLogger.addTransporter('console', new logger.transporters.ConsoleTransporter(
+      logger.HellionLogger.addTransporter('console', new logger.transporters.HellionConsoleTransporter(
          new logger.formatters.HellionColorizeFormatter(),
          (args.verbose == 'debug') ? 'debug' : 'info'
       ));
 
    if (CONFIG.logfile)
-   logger.HellionLogger.addTransporter('logfile', new logger.transporters.FileTransporter(resolve(datapath, CONFIG.logfile), new logger.HellionLoggerFormatter(), 'debug'));
+   logger.HellionLogger.addTransporter('logfile', new logger.transporters.HellionFileTransporter(resolve(datapath, CONFIG.logfile), new logger.HellionLoggerFormatter(), 'debug'));
 
    if (CONFIG.errorfile)
-   logger.HellionLogger.addTransporter('errorfile', new logger.transporters.FileTransporter(resolve(datapath, CONFIG.errorfile), new logger.HellionLoggerFormatter(), 'warn'));
+   logger.HellionLogger.addTransporter('errorfile', new logger.transporters.HellionFileTransporter(resolve(datapath, CONFIG.errorfile), new logger.HellionLoggerFormatter(), 'warn'));
 
-   const DiscordLogger = logger.HellionLogger.getLogger('Discord');
    const DiscordBot = new discord.HellionWarden(CONFIG.token, CONFIG.prefix);
 
    DiscordBot.once('ready', () => {
-      DiscordLogger.info("Discord bot is ready.");
-      //DiscordBot.login();
+      logger.HellionLogger.getLogger('Discord').info("Discord bot is ready.");
    });
 
    DiscordBot.once('logged', () => {
-      DiscordLogger.info("Discord bot has connected.");
+      logger.HellionLogger.getLogger('Discord').info("Discord bot has connected.");
    });
 
    DiscordBot.on('debug', (type: "debug" | "info" | "warn", message: string) => {
-      DiscordLogger.log(type, message);
+      logger.HellionLogger.getLogger('Discord').log(type, message);
    })
 
-   DiscordBot.on('error', (err) => {
-      DiscordLogger.error("A error has occoured: ", err);
+   DiscordBot.on('error', (err: Error) => {
+      logger.HellionLogger.getLogger('Discord').error("A error has occoured: ", err);
       process.exit(1);
    });
 
-   DiscordBot.login();
+   DiscordBot.handler.on('ready', () => {
+      logger.HellionLogger.getLogger('Command Handler').info("Command handler initialized.");
+   });
+
+   DiscordBot.handler.on('debug', (type: "debug" | "info" | "warn", message: string) => {
+      logger.HellionLogger.getLogger('Command Handler').log(type, message);
+   });
+
+   DiscordBot.handler.on('error', (err: Error) => {
+      logger.HellionLogger.getLogger('Command Handler').error("A error has occoured: ", err);
+   });
+
+   DiscordBot.handler.on('cmdDebug', (command: string, type: "debug" | "info" | "warn", message: string) => {
+      logger.HellionLogger.getLogger(`Command '${command}'`).log(type, message);
+   });
+
+   DiscordBot.handler.on('cmdError', (command: string, err: Error) => {
+      logger.HellionLogger.getLogger(`Command '${command}'`).error("A error has occoured: ", err);
+   });   
+
+   DiscordBot.start().catch((err) => {
+      logger.HellionLogger.getLogger('Discord').error("A error has occoured: ", err);
+   });
 }
