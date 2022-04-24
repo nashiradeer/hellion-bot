@@ -11,6 +11,7 @@
                 "run-script",
                 "test"
             ],
+            "outputCapture": "std",
             "runtimeExecutable": "npm",
             "sourceMaps": true,
             "skipFiles": [

@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "node dist/app.js",
-    "test": "npm run build && node dist/app.js ./testdata",
+    "test": "npm run build && node dist/app.js --verbose debug ./testdata",
     "build": "tsc --build",
     "clean": "tsc --build --clean"
   },

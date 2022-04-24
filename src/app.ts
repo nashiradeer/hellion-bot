@@ -2,19 +2,20 @@ console.log("Initializing...");
 import { ArgumentParser } from 'argparse';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve } from 'path';
-import { HellionWardenInformation, discord } from '.';
+import { HellionWardenInformation, discord, logger } from '.';
 
 interface HellionWardenArgs
 {
    datadir: string;
+   verbose: string;
 }
 
 export interface HellionWardenConfig
 {
    prefix: string;
    token: string;
-   console: boolean;
    logfile: string;
+   errorfile: string;
 }
 
 const argparser = new ArgumentParser({
@@ -24,6 +25,18 @@ const argparser = new ArgumentParser({
 argparser.add_argument('datadir', {
    type: 'str',
    help: 'Set a directory to be used to storage and load the configuration file.'
+});
+
+argparser.add_argument('--verbose', {
+   type: 'str',
+   help: 'Set the verbose level of the console logger',
+   choices: ['debug', 'default', 'none'],
+   default: 'default'
+});
+
+argparser.add_argument('-v', '--version', {
+   action: 'version',
+   version: HellionWardenInformation.VERSION
 });
 
 let args: HellionWardenArgs = argparser.parse_args();
@@ -42,22 +55,50 @@ if (!existsSync(configpath))
    writeFileSync(configpath, JSON.stringify({
       prefix: 'h!',
       token: '',
-      appId: ''
+      logfile: 'logfile.log',
+      errorfile: 'errorfile.log'
    }, null, 4));
 
+   console.warn("Config file doesn't exists, creating one...");
+   console.log("Please edit the config file before running Hellion Warden again.");
    process.exit(1);
 }
 else
 {
    const CONFIG: HellionWardenConfig = JSON.parse(readFileSync(configpath, 'utf-8'));
 
+   if (args.verbose == 'debug' || args.verbose == 'default')
+      logger.HellionLogger.addTransporter('console', new logger.transporters.ConsoleTransporter(
+         new logger.formatters.HellionColorizeFormatter(),
+         (args.verbose == 'debug') ? 'debug' : 'info'
+      ));
+
+   if (CONFIG.logfile)
+   logger.HellionLogger.addTransporter('logfile', new logger.transporters.FileTransporter(resolve(datapath, CONFIG.logfile), new logger.HellionLoggerFormatter(), 'debug'));
+
+   if (CONFIG.errorfile)
+   logger.HellionLogger.addTransporter('errorfile', new logger.transporters.FileTransporter(resolve(datapath, CONFIG.errorfile), new logger.HellionLoggerFormatter(), 'warn'));
+
+   const DiscordLogger = logger.HellionLogger.getLogger('Discord');
    const DiscordBot = new discord.HellionWarden(CONFIG.token, CONFIG.prefix);
 
    DiscordBot.once('ready', () => {
-      DiscordBot.login();
+      DiscordLogger.info("Discord bot is ready.");
+      //DiscordBot.login();
    });
 
+   DiscordBot.once('logged', () => {
+      DiscordLogger.info("Discord bot has connected.");
+   });
+
+   DiscordBot.on('debug', (type: "debug" | "info" | "warn", message: string) => {
+      DiscordLogger.log(type, message);
+   })
+
    DiscordBot.on('error', (err) => {
+      DiscordLogger.error("A error has occoured: ", err);
       process.exit(1);
    });
+
+   DiscordBot.login();
 }
