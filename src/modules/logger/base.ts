@@ -1,5 +1,3 @@
-import { StringMappedInteractionTypes } from "discord.js";
-
 export type HellionLoggerLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface HellionLoggerMessage
