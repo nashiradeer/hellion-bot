@@ -1,11 +1,11 @@
 import { Client, ClientOptions, CommandInteraction, Interaction, Message } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler } from '.';
+import { commandHandler, player } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenData
 {
-    musicdata: Map<string, any>;
+    music: Map<string, player.HellionMusicPlayer>;
     prefix: string;
 }
 
@@ -41,7 +41,7 @@ export class HellionWarden extends EventEmitter
         this._token = token;
         this.prefix = prefix;
         this._data = {
-            musicdata: new Map<string, any>(),
+            music: new Map<string, player.HellionMusicPlayer>(),
             prefix: prefix
         };
 
@@ -53,6 +53,7 @@ export class HellionWarden extends EventEmitter
         this._client.on('interactionCreate', (interaction) => this.interaction(interaction));
         this._client.once('ready', () => {
             this.emit('logged');
+            this._client.user.setActivity("with Nashira Deer", { type: 'LISTENING' });
         });
 
         // Initialize Command Handler

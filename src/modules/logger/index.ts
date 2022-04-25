@@ -13,4 +13,4 @@ import { HellionFileTransporter } from './transporters/HellionFileTransporter';
 export const transporters = {
     HellionConsoleTransporter,
     HellionFileTransporter
-}
+};

@@ -84,7 +84,7 @@ export class HellionLoggerFormatter
         {
             if (prop instanceof Error && prop.stack)
                 message += " " + prop.stack;
-            else 
+            else if (prop)
                 message += " " + prop.toString();
         }
         return message;

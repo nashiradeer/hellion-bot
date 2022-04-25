@@ -11,8 +11,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         this.description = "Get a short about of the bot.";
     }
 
-    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
-        
+    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
+    {
         event.reply({
             embeds: [
                 new MessageEmbed()

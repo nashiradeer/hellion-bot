@@ -142,7 +142,7 @@ export class HellionCommandHandler extends EventEmitter
 
     public async run(client: Client, message: Message, prefix: string, data: any)
     {
-        let args = parse(message.content.trim().slice(prefix.length)) as string[];
+        let args = message.content.trim().slice(prefix.length).split(' ');
         this.runMessage(client, message, args.shift().toLowerCase(), args, data);
     }
 
@@ -158,7 +158,7 @@ export class HellionCommandHandler extends EventEmitter
         }
 
         this.emit('debug', 'debug', `Creating event for message command '${command}'...`);
-        let event = new HellionCommandEvent(this, new HellionCommandArgs(args, cmd.usage), message, {
+        let event = new HellionCommandEvent(this, cmd.name, new HellionCommandArgs(args, cmd.usage), message, {
             client: client,
             channel: message.channel,
             user: message.author,
@@ -184,7 +184,7 @@ export class HellionCommandHandler extends EventEmitter
         }
 
         this.emit('debug', 'debug', `Creating event for interaction command '${command.commandName}'...`);
-        let event = new HellionCommandEvent(this, new HellionCommandArgs(command.options as CommandInteractionOptionResolver, cmd.usage), command as HellionCommandReply, {
+        let event = new HellionCommandEvent(this, cmd.name, new HellionCommandArgs(command.options as CommandInteractionOptionResolver, cmd.usage), command as HellionCommandReply, {
             client: client,
             channel: command.channel,
             user: command.user,
@@ -215,6 +215,7 @@ export class HellionCommandEvent
     private _handler: HellionCommandHandler;
     private _replyHandler: HellionCommandReply;
 
+    public command: string;
     public client: Client;
     public args: HellionCommandArgs;
     public user: User;
@@ -225,10 +226,11 @@ export class HellionCommandEvent
     public createdTimestamp: number;
     public createdAt: Date;
 
-    constructor(handler: HellionCommandHandler, args: HellionCommandArgs, reply: HellionCommandReply, options: HellionCommandEventOptions)
+    constructor(handler: HellionCommandHandler, command: string, args: HellionCommandArgs, reply: HellionCommandReply, options: HellionCommandEventOptions)
     {
         this._handler = handler;
         this.args = args;
+        this.command = command;
         this.client = options.client;
         this.user = options.user;
         this.channel = options.channel;
@@ -246,22 +248,22 @@ export class HellionCommandEvent
 
     public info(message: string): void
     {
-        this._handler.emit('cmdDebug', 'info', message);
+        this._handler.emit('cmdDebug', this.command, 'info', message);
     }
 
     public warn(message: string): void
     {
-        this._handler.emit('cmdDebug', 'warn', message);
+        this._handler.emit('cmdDebug', this.command, 'warn', message);
     }
 
     public debug(message: string): void
     {
-        this._handler.emit('cmdDebug', 'debug', message);
+        this._handler.emit('cmdDebug', this.command, 'debug', message);
     }
 
     public error(err: Error): void
     {
-        this._handler.emit('cmdError', err);
+        this._handler.emit('cmdError', this.command, err);
     }
 }
 
