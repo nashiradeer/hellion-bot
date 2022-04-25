@@ -1,4 +1,4 @@
-import { Client, ClientOptions, CommandInteraction, Interaction, Message } from 'discord.js';
+import { Client, ClientOptions, CommandInteraction, Interaction, Message, MessageEmbed } from 'discord.js';
 import { EventEmitter } from 'events';
 import { commandHandler, player } from '.';
 import { resolve } from 'path';
@@ -63,8 +63,23 @@ export class HellionWarden extends EventEmitter
     private async message(message: Message): Promise<void>
     {
         if (message.author.bot) return;
-        if (!message.content.startsWith(this.prefix)) return;
         if (!message.guild) return;
+        if (!message.content.startsWith(this.prefix))
+        {
+            if (message.content.trim() == `<@${this._client.user.id}>` || message.content.trim() == `<@!${this._client.user.id}>`)
+            {
+                message.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Mention")
+                            .setDescription(`My command prefix is \`\`${this.prefix}\`\`.`)
+                    ]
+                });
+            }
+            return;
+        }
         
         this.emit('debug', 'debug', 'Running command from a message.');
         this.handler.run(this._client, message, this.prefix, this._data);
