@@ -1,8 +1,11 @@
 import { GuildMember, MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
+import { setToken, getFreeClientID } from 'play-dl';
 import { commandHandler, discord, player } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener
 {
+    private _tokenCreated: boolean;
+
     constructor()
     {
         super();
@@ -18,11 +21,22 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 required: false,
                 type: 'STRING'
             }
-        ]
+        ];
+        this._tokenCreated = false;
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
     {
+        if (!this._tokenCreated)
+        {
+            await setToken({
+                soundcloud: {
+                    client_id: await getFreeClientID()
+                }
+            });
+            this._tokenCreated = true;
+        }
+
         let member = event.member as GuildMember;
         if (!member.voice.channel)
         {
@@ -44,11 +58,11 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         {
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
 
-            music.resolver = [
-                new player.resolvers.HellionYoutubedlResolver(),
-                new player.resolvers.HellionYtplResolver(),
-                new player.resolvers.HellionYtsrResolver()
-            ]
+            music.addResolver(new player.resolvers.playDL.HellionYTDLResolver());
+            music.addResolver(new player.resolvers.playDL.HellionYTPLResolver());
+            music.addResolver(new player.resolvers.playDL.HellionSODLResolver());
+            music.addResolver(new player.resolvers.playDL.HellionSOPLResolver());
+            music.addResolver(new player.resolvers.playDL.HellionYTSRResolver());
 
             music.on('play', (playing) => {
                 music.textChannel.send({
@@ -64,31 +78,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 });
             });
 
-            music.on('queue', (playing) => {
-                music.textChannel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
-                    ]
-                }).then((m) => setTimeout(() => m.delete(), 15000));
-            });
-
-            music.on('bulkQueue', (count) => {
-                music.textChannel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`Enqueued a total of ${count} musics.`)
-                    ]
-                }).then((m) => setTimeout(() => m.delete(), 15000));
-            });
-
             music.on('end', () => {
+                event.info("Music Player is ending...");
                 (data as discord.HellionWardenData).music.delete(event.guild.id);
             });
 
@@ -131,7 +122,48 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             return;
         }
 
-        music.play(link as string, event.member as GuildMember).catch((err) => {
+        try 
+        {
+            let res = await music.play(link as string, event.member as GuildMember);
+            if (res.count)
+            {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Enqueued")
+                            .setDescription(`Enqueued a total of ${res.count} musics.`)
+                    ]
+                });
+            }
+            else if (res.playing)
+            {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Playing now")
+                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                    ]
+                });
+            }
+            else
+            {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Enqueued")
+                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                    ]
+                })
+            }
+        }
+        catch (err)
+        {
             event.error(err);
             event.reply({
                 embeds: [
@@ -142,16 +174,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         .setDescription("I can't resolve this music.")
                 ]
             });
-        }).then(() => {
-            event.reply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Play")
-                        .setDescription("Success! Your music has already registered in the Music Player.")
-                ]
-            }).then((m) => setTimeout(() => m.delete(), 5000));
-        });
+        }
     }
 }

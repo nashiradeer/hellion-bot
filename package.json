@@ -41,7 +41,6 @@
     "play-dl": "^1.9.4",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.9",
-    "youtube-dl-exec": "^2.0.11",
     "ytdl-core": "^4.11.0",
     "ytpl": "^2.3.0",
     "ytsr": "^3.7.0",

@@ -3,7 +3,6 @@ import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
 import { APIInteractionGuildMember } from 'discord.js/node_modules/discord-api-types';
-import { parse } from 'shell-quote';
 import { Routes, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
 import { REST } from '@discordjs/rest';
 import { SlashCommandBuilder } from '@discordjs/builders';

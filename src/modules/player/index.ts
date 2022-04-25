@@ -1,9 +1,8 @@
 export * from './player';
 
-import { HellionYtdlResolver } from './resolvers/HellionYtdlResolver';
-import { HellionYtplResolver } from './resolvers/HellionYtplResolver';
-import { HellionYtsrResolver } from './resolvers/HellionYtsrResolver';
-import { HellionYoutubedlResolver } from './resolvers/HellionYoutubedlResolver';
+import * as ytdl from './resolvers/ytdl';
+import * as playDL from './resolvers/play-dl';
+
 export const resolvers = {
-    HellionYtdlResolver, HellionYtplResolver, HellionYtsrResolver, HellionYoutubedlResolver
+    ytdl, playDL
 };

@@ -1,5 +1,5 @@
 import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection } from "@discordjs/voice";
 import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 
@@ -14,12 +14,6 @@ export declare interface HellionMusicPlayer
     on(event: 'play', listener: (music: HellionMusic) => void): this;
     once(event: 'play', listener: (music: HellionMusic) => void): this;
 
-    on(event: 'queue', listener: (music: HellionMusic) => void): this;
-    once(event: 'queue', listener: (music: HellionMusic) => void): this;
-
-    on(event: 'bulkQueue', listener: (count: number) => void): this;
-    once(event: 'bulkQueue', listener: (count: number) => void): this;
-
     on(event: 'end', listener: () => void): this;
     once(event: 'end', listener: () => void): this;
 
@@ -28,7 +22,6 @@ export declare interface HellionMusicPlayer
 export class HellionMusicPlayer extends EventEmitter
 {
     public loop: HellionMusicLoop;
-    public resolver: HellionMusicResolver[];
     public voiceChannel: VoiceChannel;
     public textChannel: TextChannel;
 
@@ -36,11 +29,11 @@ export class HellionMusicPlayer extends EventEmitter
     private _queue: HellionQueuedMusic[];
     private _connection: VoiceConnection;
     private _player: AudioPlayer;
+    private _resolver: HellionMusicResolver[];
 
     constructor(voiceChannel: VoiceChannel, textChannel: TextChannel) {
         super();
         this.loop = 'none';
-        this.resolver = [];
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
 
@@ -48,6 +41,24 @@ export class HellionMusicPlayer extends EventEmitter
         this._queue = [];
         this._connection = null;
         this._player = null;
+        this._resolver = [];
+    }
+
+    public addResolver(resolver: HellionMusicResolver): number
+    {
+        return this._resolver.push(resolver) - 1;
+    }
+
+    public getResolver(index: number): HellionMusicResolver
+    {
+        return this._resolver[index];
+    }
+
+    public delResolver(index: number): HellionMusicResolver
+    {
+        let resolver = this._resolver[index];
+        this._resolver[index] = null;
+        return resolver;
     }
 
     public join(): void
@@ -62,7 +73,7 @@ export class HellionMusicPlayer extends EventEmitter
         this.emit('ready');
     }
 
-    public async play(music: string, user: GuildMember): Promise<void>
+    public async play(music: string, user: GuildMember): Promise<HellionPlayResult>
     {
         if (!this._connection)
             this.join();
@@ -78,7 +89,7 @@ export class HellionMusicPlayer extends EventEmitter
             });
             playingNow = true;
         }
-        await this.resolveAndPlay(music, user, playingNow);
+        return await this.resolve(music, user, playingNow);
     }
 
     public pause(): void
@@ -137,39 +148,52 @@ export class HellionMusicPlayer extends EventEmitter
         this.emit('end');
     }
 
-    private async resolveAndPlay(music: string, user: GuildMember, playingNow: boolean): Promise<void>
+    private async resolve(music: string, user: GuildMember, playingNow: boolean): Promise<HellionPlayResult>
     {
-        for (let i = 0; i < this.resolver.length; i++)
+        for (let i = 0; i < this._resolver.length; i++)
         {
-            if (this.resolver[i].isBulk) 
+            try
             {
-                let res = await this.resolver[i].bulk(music);
-                if (!res) continue;
-                for(let d of res)
+                if (this._resolver[i] instanceof HellionBulkMusic) 
                 {
-                    let k = {title: d.title, resolver: i, resolvable: d.resolvable, requestedBy: user};
-                    this._queue.push(k);
+                    let resolver = this._resolver[i] as HellionBulkMusic;
+                    let res = await resolver.bulk(music);
+                    if (!res) continue;
+                    let pos = -1;
+                    for(let d of res)
+                    {
+                        let k = {title: d.title, resolver: i, resolvable: d.resolvable, requestedBy: user};
+                        let index = this._queue.push(k);
+                        if (pos == -1)
+                            pos = index - 1;
+                    };
+                    this.emit('bulkQueue', res.length);
+                    if (playingNow)
+                    {
+                        let m = await resolver.get(this._queue[pos].resolvable);
+                        let resource = createAudioResource(m.stream, { inputType: m.type });
+                        this._player.play(resource);
+                    }
+                    return { playing: playingNow, requestedBy: user, count: res.length, pos: pos };
                 }
-                this.emit('bulkQueue', res.length);
-                if (playingNow)
+                else
                 {
-                    let resource = createAudioResource(await this.resolver[i].get(this._queue[0].resolvable));
-                    this._player.play(resource);
+                    let resolver = this._resolver[i] as HellionSingleMusic;
+                    let res = await resolver.resolve(music);
+                    if (!res) continue;
+                    let k = {title: res.title, resolver: i, resolvable: res.resolvable, requestedBy: user};
+                    let pos = this._queue.push(k) - 1;
+                    {
+                        let m = await resolver.get(this._queue[0].resolvable);
+                        let resource = createAudioResource(m.stream, { inputType: m.type });
+                        this._player.play(resource);
+                    }
+                    return { playing: playingNow, requestedBy: user, pos: pos, title: res.title };
                 }
-                return;
             }
-            else
+            catch (e)
             {
-                let res = await this.resolver[i].resolve(music);
-                if (!res) continue;
-                let k = {title: res.title, resolver: i, resolvable: res.resolvable, requestedBy: user};
-                this._queue.push(k);
-                this.emit((playingNow) ? 'play' : 'queue', {title: res.title, requestedBy: user});
-                {
-                    let resource = createAudioResource(await this.resolver[i].get(this._queue[0].resolvable));
-                    this._player.play(resource);
-                }
-                return;
+                this.emit('error', e);
             }
         }
         throw new Error("Can't resolve this music");
@@ -193,29 +217,44 @@ export class HellionMusicPlayer extends EventEmitter
         }
         let music = this._queue[this._playingNow];
         this.emit('play', {title: music.title, requestedBy: music.requestedBy});
-        let resource = createAudioResource(await this.resolver[music.resolver].get(music.resolvable));
+        let m = await this._resolver[music.resolver].get(music.resolvable);
+        let resource = createAudioResource(m.stream, { inputType: m.type });
         this._player.play(resource);
     }
 }
 
-export class HellionMusicResolver
+export class HellionSingleMusic
 {
-    public isBulk: boolean;
-
-    public  async bulk(resolvable: string): Promise<HellionMusicResolved[]>
-    {
-        throw new Error("Method not implemented");
-    }
-
     public async resolve(music: string): Promise<HellionMusicResolved>
     {
         throw new Error("Method not implemented");
     }
 
-    public async get(resolvable: string): Promise<Readable>
+    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream>
     {
         throw new Error("Method not implemented");
     }
+}
+
+export class HellionBulkMusic
+{
+    public  async bulk(music: string): Promise<HellionMusicResolved[]>
+    {
+        throw new Error("Method not implemented");
+    }
+
+    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream>
+    {
+        throw new Error("Method not implemented");
+    }
+}
+
+export type HellionMusicResolver = HellionBulkMusic | HellionSingleMusic;
+
+export interface HellionMusicStream
+{
+    stream: Readable;
+    type?: StreamType;
 }
 
 export interface HellionMusicResolved
@@ -235,6 +274,15 @@ export interface HellionQueuedMusic
     title: string;
     resolver: number;
     resolvable: string;
+    requestedBy: GuildMember;
+}
+
+export interface HellionPlayResult
+{
+    title?: string;
+    count?: number;
+    playing: boolean;
+    pos: number;
     requestedBy: GuildMember;
 }
 
