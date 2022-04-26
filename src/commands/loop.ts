@@ -15,8 +15,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 name: "type",
                 index: 0,
                 description: "Loop type to be used.",
-                required: false,
-                type: 'NUMBER',
+                required: true,
+                type: 'STRING',
                 choices: [
                     {
                         name: 'none',
@@ -86,7 +86,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             {
                 case 'q':
                 case 'queue':
-                    music.loop = "queue";
+                    music.setLoop('queue');
                     event.reply({
                         embeds: [
                             new MessageEmbed()
@@ -99,6 +99,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     break;
                 case 'm':
                 case 'music':
+                    music.setLoop('music');
                     event.reply({
                         embeds: [
                             new MessageEmbed()
@@ -111,6 +112,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     break;
                 case 'n':
                 case 'none':
+                    music.setLoop('none');
                     event.reply({
                         embeds: [
                             new MessageEmbed()
