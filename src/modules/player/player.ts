@@ -183,6 +183,7 @@ export class HellionMusicPlayer extends EventEmitter
                     if (!res) continue;
                     let k = {title: res.title, resolver: i, resolvable: res.resolvable, requestedBy: user};
                     let pos = this._queue.push(k) - 1;
+                    if (playingNow)
                     {
                         let m = await resolver.get(this._queue[0].resolvable);
                         let resource = createAudioResource(m.stream, { inputType: m.type });
