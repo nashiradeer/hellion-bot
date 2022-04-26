@@ -21,7 +21,6 @@ export declare interface HellionMusicPlayer
 
 export class HellionMusicPlayer extends EventEmitter
 {
-    public loop: HellionMusicLoop;
     public voiceChannel: VoiceChannel;
     public textChannel: TextChannel;
 
@@ -30,10 +29,10 @@ export class HellionMusicPlayer extends EventEmitter
     private _connection: VoiceConnection;
     private _player: AudioPlayer;
     private _resolver: HellionMusicResolver[];
+    private _loop: HellionMusicLoop;
 
     constructor(voiceChannel: VoiceChannel, textChannel: TextChannel) {
         super();
-        this.loop = 'none';
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
 
@@ -42,6 +41,7 @@ export class HellionMusicPlayer extends EventEmitter
         this._connection = null;
         this._player = null;
         this._resolver = [];
+        this._loop = 'none';
     }
 
     public addResolver(resolver: HellionMusicResolver): number
@@ -59,6 +59,16 @@ export class HellionMusicPlayer extends EventEmitter
         let resolver = this._resolver[index];
         this._resolver[index] = null;
         return resolver;
+    }
+
+    public setLoop(type: HellionMusicLoop): void
+    {
+        this._loop = type;
+    }
+
+    public getLoop(): HellionMusicLoop
+    {
+        return this._loop;
     }
 
     public getQueue(): HellionMusic[]
@@ -117,6 +127,8 @@ export class HellionMusicPlayer extends EventEmitter
 
     public async goto(index: number): Promise<HellionMusic>
     {
+        if (!this._player)
+            throw new Error("Player doesn't exists");
         return new Promise((res) => {
             this._playingNow = index - 1;
             this._player.once(AudioPlayerStatus.Playing, () => {
@@ -157,21 +169,30 @@ export class HellionMusicPlayer extends EventEmitter
 
     public shuffle(): void
     {
+        if (!this._player)
+            throw new Error("Player doesn't exists");
         for (var i = this._queue.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var temp = this._queue[i];
             this._queue[i] = this._queue[j];
             this._queue[j] = temp;
         }
+        this._playingNow = -1;
+        this._player.stop();
     }
 
     public remove(index: number): HellionMusic
     {
-        if (this._playingNow == index)
-            throw new Error("Can't remove the music that are playing now");
+        if (!this._player)
+            throw new Error("Player doesn't exists");
         let music = this._queue[index];
         this._queue.splice(index, 1);
-        if (this._playingNow > index)
+        if (this._playingNow == 0)
+        {
+            this._playingNow--;
+            this._player.stop();
+        }
+        else if (this._playingNow > index)
             this._playingNow--;
         return music;
     }
@@ -250,13 +271,13 @@ export class HellionMusicPlayer extends EventEmitter
             this.destroy();
             return;
         }
-        if (this.loop != 'music')
+        if (this._loop != 'music')
             this._playingNow++;
         if (this._playingNow < 0)
             this._playingNow = 0;
         if (this._playingNow >= this._queue.length)
         {
-            if (this.loop != 'queue')
+            if (this._loop != 'queue')
             {
                 this.destroy();
                 return;
