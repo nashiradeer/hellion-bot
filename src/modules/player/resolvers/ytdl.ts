@@ -9,7 +9,7 @@ export class HellionYTDLResolver extends HellionSingleMusic
     {
         if (!ytdl.validateURL(music)) return null;
         let info = await ytdl.getBasicInfo(music);
-        return { title: info.videoDetails.title, resolvable: music };
+        return { title: info.videoDetails.title, resolvable: music, duration: parseInt(info.videoDetails.lengthSeconds) * 1000 };
     }
 
     public async get(resolvable: string, seek?: number): Promise<HellionMusicStream>
@@ -27,7 +27,7 @@ export class HellionYTPLResolver extends HellionBulkMusic
         let res: HellionMusicResolved[] = [];
         for (let item of pl.items)
         {
-            res.push({ title: item.title, resolvable: item.url })
+            res.push({ title: item.title, resolvable: item.url, duration: item.durationSec * 1000 })
         }
         return res;
     }
@@ -43,7 +43,13 @@ export class HellionYTSRResolver extends HellionSingleMusic
     public async resolve(music: string): Promise<HellionMusicResolved>
     {
         let item = (await ytsr((await ytsr.getFilters(music)).get('Type').get('Video').url, { limit: 1})).items[0] as ytsr.Video;
-        return { title: item.title, resolvable: item.url };
+        let time = item.duration.split(':').reverse();
+        let totalSeconds = parseInt(time[0]);
+        if (time[1])
+            totalSeconds += parseInt(time[1]) * 60;
+        if (time[2])
+            totalSeconds += parseInt(time[2]) * 60 * 60;
+        return { title: item.title, resolvable: item.url, duration: totalSeconds * 1000 };
     }
 
     public async get(resolvable: string, seek?: number): Promise<HellionMusicStream>

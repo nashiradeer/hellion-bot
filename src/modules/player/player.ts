@@ -31,6 +31,9 @@ export class HellionMusicPlayer extends EventEmitter
     private _resolver: HellionMusicResolver[];
     private _loop: HellionMusicLoop;
 
+    private _lastTime: number;
+    private _playingTime: number;
+
     constructor(voiceChannel: VoiceChannel, textChannel: TextChannel) {
         super();
         this.voiceChannel = voiceChannel;
@@ -75,9 +78,19 @@ export class HellionMusicPlayer extends EventEmitter
     {
         let result: HellionMusic[] = [];
         for(let item of this._queue)
-            result.push({ title: item.title, requestedBy: item.requestedBy });
+            result.push({ title: item.title, requestedBy: item.requestedBy, duration: item.duration });
         return result;
-    }   
+    }
+
+    public nowPlaying(): HellionPlayingNow
+    {
+        return {
+            title: this._queue[this._playingNow].title,
+            requestedBy: this._queue[this._playingNow].requestedBy,
+            duration: this._queue[this._playingNow].duration,
+            current: this._playingTime
+        };
+    }
 
     public join(): void
     {
@@ -123,6 +136,8 @@ export class HellionMusicPlayer extends EventEmitter
         let m = await this._resolver[playingNow.resolver].get(playingNow.resolvable, seek);
         let resource = createAudioResource(m.stream, { inputType: m.type });
         this._player.play(resource);
+        this._playingTime = seek * 1000;
+        this._lastTime = Date.now();
     }
 
     public async goto(index: number): Promise<HellionMusic>
@@ -133,7 +148,7 @@ export class HellionMusicPlayer extends EventEmitter
             this._playingNow = index - 1;
             this._player.once(AudioPlayerStatus.Playing, () => {
                 let music = this._queue[this._playingNow];
-                res({title: music.title, requestedBy: music.requestedBy});
+                res({title: music.title, requestedBy: music.requestedBy, duration: music.duration});
             });
             this._player.stop();
         });
@@ -143,14 +158,20 @@ export class HellionMusicPlayer extends EventEmitter
     {
         if (!this._player)
             throw new Error("Player doesn't exists");
-        this._player.pause();
+        if (this._player.pause())
+        {
+            this._playingTime += Date.now() - this._lastTime; 
+        }
     }
 
     public resume(): void
     {
         if (!this._player)
             throw new Error("Player doesn't exists");
-        this._player.unpause();
+        if (this._player.unpause())
+        {
+            this._lastTime = Date.now();
+        }
     }
 
     public async skip(): Promise<HellionMusic>
@@ -160,7 +181,7 @@ export class HellionMusicPlayer extends EventEmitter
                 throw new Error("Player doesn't exists");
             this._player.once(AudioPlayerStatus.Playing, () => {
                 let music = this._queue[this._playingNow];
-                res({title: music.title, requestedBy: music.requestedBy});
+                res({title: music.title, requestedBy: music.requestedBy, duration: music.duration});
             });
             this._player.unpause();
             this._player.stop();
@@ -226,32 +247,35 @@ export class HellionMusicPlayer extends EventEmitter
                     let pos = -1;
                     for(let d of res)
                     {
-                        let k = {title: d.title, resolver: i, resolvable: d.resolvable, requestedBy: user};
+                        let k = {title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: user};
                         let index = this._queue.push(k);
                         if (pos == -1)
                             pos = index - 1;
                     };
-                    this.emit('bulkQueue', res.length);
                     if (playingNow)
                     {
                         let m = await resolver.get(this._queue[pos].resolvable);
                         let resource = createAudioResource(m.stream, { inputType: m.type });
                         this._player.play(resource);
+                        this._playingTime = 0;
+                        this._lastTime = Date.now();
                     }
-                    return { playing: playingNow, requestedBy: user, count: res.length, pos: pos };
+                    return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: res.length, pos: pos };
                 }
                 else
                 {
                     let resolver = this._resolver[i] as HellionSingleMusic;
                     let res = await resolver.resolve(music);
                     if (!res) continue;
-                    let k = {title: res.title, resolver: i, resolvable: res.resolvable, requestedBy: user};
+                    let k = {title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: user};
                     let pos = this._queue.push(k) - 1;
                     if (playingNow)
                     {
                         let m = await resolver.get(this._queue[0].resolvable);
                         let resource = createAudioResource(m.stream, { inputType: m.type });
                         this._player.play(resource);
+                        this._playingTime = 0;
+                        this._lastTime = Date.now();
                     }
                     return { playing: playingNow, requestedBy: user, pos: pos, title: res.title };
                 }
@@ -288,10 +312,12 @@ export class HellionMusicPlayer extends EventEmitter
             }
         }
         let music = this._queue[this._playingNow];
-        this.emit('play', {title: music.title, requestedBy: music.requestedBy});
+        this.emit('play', {title: music.title, requestedBy: music.requestedBy, duration: music.duration});
         let m = await this._resolver[music.resolver].get(music.resolvable);
         let resource = createAudioResource(m.stream, { inputType: m.type });
         this._player.play(resource);
+        this._playingTime = 0;
+        this._lastTime = Date.now();
     }
 }
 
@@ -332,12 +358,14 @@ export interface HellionMusicStream
 export interface HellionMusicResolved
 {
     title: string;
+    duration: number;
     resolvable: string;
 }
 
 export interface HellionMusic
 {
     title: string;
+    duration: number;
     requestedBy: GuildMember;
 }
 
@@ -345,17 +373,26 @@ export interface HellionQueuedMusic
 {
     title: string;
     resolver: number;
+    duration: number;
     resolvable: string;
+    requestedBy: GuildMember;
+}
+
+export interface HellionPlayingNow
+{
+    title: string;
+    current: number;
+    duration: number;
     requestedBy: GuildMember;
 }
 
 export interface HellionPlayResult
 {
-    title?: string;
-    count?: number;
+    title: string;
     playing: boolean;
     pos: number;
     requestedBy: GuildMember;
+    count?: number;
 }
 
 export type HellionMusicLoop = 'none' | 'queue' | 'music';
