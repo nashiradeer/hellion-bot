@@ -142,6 +142,7 @@ export class HellionMusicPlayer extends EventEmitter
                 let music = this._queue[this._playingNow];
                 res({title: music.title, requestedBy: music.requestedBy});
             });
+            this._player.unpause();
             this._player.stop();
         });
     }
