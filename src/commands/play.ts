@@ -124,7 +124,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
         try 
         {
-            let res = await music.play(link as string, event.member as GuildMember);
+            await event.replyHandler.defer();
+            let res = await music.play(link, event.member as GuildMember);
             if (res.count)
             {
                 event.reply({
@@ -135,6 +136,18 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                             .setTitle("Hellion Warden // Enqueued")
                             .setDescription(`Enqueued a total of ${res.count} musics to end of the queue.`)
                     ]
+                });
+
+                music.textChannel.send({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Playing now")
+                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                    ]
+                }).then((m) => {
+                    setTimeout(() => m.delete(), 30000);
                 });
             }
             else if (res.playing)
@@ -159,7 +172,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                             .setTitle("Hellion Warden // Enqueued")
                             .setDescription(`${res.title} **[${res.requestedBy.user.tag}]** at **#${res.pos + 1}**`)
                     ]
-                })
+                });
             }
         }
         catch (err)
