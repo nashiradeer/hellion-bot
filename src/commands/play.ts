@@ -133,7 +133,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                             .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`Enqueued a total of ${res.count} musics.`)
+                            .setDescription(`Enqueued a total of ${res.count} musics to end of the queue.`)
                     ]
                 });
             }
@@ -157,7 +157,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                             .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]** at **#${res.pos + 1}**`)
                     ]
                 })
             }
