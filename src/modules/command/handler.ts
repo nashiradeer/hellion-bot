@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
 import { APIInteractionGuildMember } from 'discord.js/node_modules/discord-api-types';
-import { Routes, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { Routes, RESTPostAPIApplicationCommandsJSONBody, APIApplicationCommandOptionChoice } from 'discord-api-types/v9';
 import { REST } from '@discordjs/rest';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { discord } from '../..';
@@ -107,9 +107,14 @@ export class HellionCommandHandler extends EventEmitter
                 switch (arg.type)
                 {
                     case 'STRING':
+                        let choicesStr: APIApplicationCommandOptionChoice<string>[] = [];
+                        if (arg.choices)
+                                for (let choice of arg.choices)
+                                    choicesStr.push({ name: choice.name, value: choice.value as string });
                         command.addStringOption(option => option.setName(arg.name)
                             .setDescription(arg.description)
-                            .setRequired(arg.required));
+                            .setRequired(arg.required)
+                            .addChoices(...choicesStr));
                         break;
                     case 'NUMBER':
                         command.addNumberOption(option => option.setName(arg.name)
@@ -118,6 +123,37 @@ export class HellionCommandHandler extends EventEmitter
                         break;
                     case 'BOOLEAN':
                         command.addBooleanOption(option => option.setName(arg.name)
+                            .setDescription(arg.description)
+                            .setRequired(arg.required));
+                        break;
+                    case 'INTEGER':
+                        let choicesInt: APIApplicationCommandOptionChoice<number>[] = [];
+                        if (arg.choices)
+                                for (let choice of arg.choices)
+                                    choicesInt.push({ name: choice.name, value: choice.value as number });
+                        command.addIntegerOption(option => option.setName(arg.name)
+                            .setDescription(arg.description)
+                            .setRequired(arg.required)
+                            .addChoices(...choicesInt));
+                        break;
+                    case 'USER':
+                        command.addUserOption(option => option.setName(arg.name)
+                            .setDescription(arg.description)
+                            .setRequired(arg.required));
+                        break;
+                    case 'CHANNEL':
+                        command.addChannelOption(option => option.setName(arg.name)
+                            .setDescription(arg.description)
+                            .setRequired(arg.required));
+                        break;
+                    case 'ROLE':
+                        command.addRoleOption(option => option.setName(arg.name)
+                            .setDescription(arg.description)
+                            .setRequired(arg.required));
+
+                        break;
+                    case 'MENTIONABLE':
+                        command.addMentionableOption(option => option.setName(arg.name)
                             .setDescription(arg.description)
                             .setRequired(arg.required));
                         break;
@@ -306,6 +342,13 @@ export interface HellionCommandUsage
     description: string;
     required: boolean;
     type: HellionCommandType;
+    choices?: HellionCommandChoice[];
 }
 
-export type HellionCommandType = 'STRING' | 'NUMBER' | 'BOOLEAN';
+export interface HellionCommandChoice
+{
+    name: string;
+    value: string | number;
+}
+
+export type HellionCommandType = 'STRING' | 'NUMBER' | 'BOOLEAN' | 'INTEGER' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE';
