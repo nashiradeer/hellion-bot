@@ -19,8 +19,8 @@ export class HellionCommandArgs
     {
         for (let i = 0; i < usage.length; i++)
         {
-            if (usage[i].index >= 0 && usage[i].required && !args[usage[i].index])
-                throw new Error("Required argument isn't provided");
+            if (usage[i].index >= 0 && !args[usage[i].index])
+                continue;
             this._args.push({
                 index: ((usage[i].index < 0) ? 0 : usage[i].index),
                 name: usage[i].name,
@@ -34,11 +34,14 @@ export class HellionCommandArgs
     {
         for (let i = 0; i < usage.length; i++)
         {
+            let arg = args.get(usage[i].name);
+            if (!arg)
+                continue;
             this._args.push({
                 index: (usage[i].index < 0) ? 0 : usage[i].index,
                 name: usage[i].name,
                 type: usage[i].type,
-                value: `${args.get(usage[i].name).value}`
+                value: `${arg.value}`
             });
         }
     }
