@@ -1,5 +1,5 @@
 import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 
@@ -69,6 +69,13 @@ export class HellionMusicPlayer extends EventEmitter
             channelId: this.voiceChannel.id,
             guildId: this.voiceChannel.guildId,
             adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
+        })
+        .on(VoiceConnectionStatus.Disconnected, () => {
+            this.destroy();
+        })
+        .on('error', (err) => {
+            this.emit('error', err);
+            this.destroy();
         });
         this.emit('ready');
     }
