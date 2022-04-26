@@ -202,8 +202,13 @@ export class HellionMusicPlayer extends EventEmitter
 
     private async next(): Promise<void>
     {
-        if (!this._connection || !this._player) return;
-        if (this.loop != 'music') this._playingNow++;
+        if (!this._connection || !this._player)
+        {
+            this.destroy();
+            return;
+        }
+        if (this.loop != 'music')
+            this._playingNow++;
         if (this._playingNow >= this._queue.length)
         {
             if (this.loop != 'queue')
