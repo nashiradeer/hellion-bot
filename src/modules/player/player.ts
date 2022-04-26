@@ -99,6 +99,26 @@ export class HellionMusicPlayer extends EventEmitter
         return await this.resolve(music, user, playingNow);
     }
 
+    public async seek(seek: number): Promise<void>
+    {
+        let playingNow = this._queue[this._playingNow];
+        let m = await this._resolver[playingNow.resolver].get(playingNow.resolvable, seek);
+        let resource = createAudioResource(m.stream, { inputType: m.type });
+        this._player.play(resource);
+    }
+
+    public async goto(index: number): Promise<HellionMusic>
+    {
+        return new Promise((res) => {
+            this._playingNow = index - 1;
+            this._player.once(AudioPlayerStatus.Playing, () => {
+                let music = this._queue[this._playingNow];
+                res({title: music.title, requestedBy: music.requestedBy});
+            });
+            this._player.stop();
+        });
+    }
+
     public pause(): void
     {
         if (!this._player)
@@ -113,13 +133,17 @@ export class HellionMusicPlayer extends EventEmitter
         this._player.unpause();
     }
 
-    public skip(): HellionMusic
+    public async skip(): Promise<HellionMusic>
     {
-        if (!this._player)
-            throw new Error("Player doesn't exists");
-        this._player.stop();
-        let music = this._queue[this._playingNow];
-        return {title: music.title, requestedBy: music.requestedBy};
+        return new Promise((res) => {
+            if (!this._player)
+                throw new Error("Player doesn't exists");
+            this._player.once(AudioPlayerStatus.Playing, () => {
+                let music = this._queue[this._playingNow];
+                res({title: music.title, requestedBy: music.requestedBy});
+            });
+            this._player.stop();
+        });
     }
 
     public shuffle(): void
@@ -134,9 +158,12 @@ export class HellionMusicPlayer extends EventEmitter
 
     public remove(index: number): HellionMusic
     {
+        if (this._playingNow == index)
+            throw new Error("Can't remove the music that are playing now");
         let music = this._queue[index];
         this._queue.splice(index, 1);
-        this._playingNow--;
+        if (this._playingNow > index)
+            this._playingNow--;
         return music;
     }
 
@@ -216,6 +243,8 @@ export class HellionMusicPlayer extends EventEmitter
         }
         if (this.loop != 'music')
             this._playingNow++;
+        if (this._playingNow < 0)
+            this._playingNow = 0;
         if (this._playingNow >= this._queue.length)
         {
             if (this.loop != 'queue')
