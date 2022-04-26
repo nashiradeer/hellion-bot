@@ -61,6 +61,14 @@ export class HellionMusicPlayer extends EventEmitter
         return resolver;
     }
 
+    public getQueue(): HellionMusic[]
+    {
+        let result: HellionMusic[] = [];
+        for(let item of this._queue)
+            result.push({ title: item.title, requestedBy: item.requestedBy });
+        return result;
+    }   
+
     public join(): void
     {
         if (this._connection)
