@@ -1,4 +1,4 @@
-import { Client, User, Message, TextChannel, GuildMember, Guild, DMChannel, PartialDMChannel, NewsChannel, ThreadChannel, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions } from 'discord.js';
+import { Client, User, Message, TextChannel, GuildMember, Guild, DMChannel, PartialDMChannel, NewsChannel, ThreadChannel, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions } from 'discord.js';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
@@ -183,54 +183,69 @@ export class HellionCommandHandler extends EventEmitter
 
     public async runMessage(client: Client, message: Message, command: string, args: string[], data: any)
     {
-        this.emit('debug', 'debug', `Preparing message command '${command}'...`);
-        let cmd = this._commands[command];
-
-        if (!cmd)
+        try
         {
-            this.emit('debug', 'warn', `Message command not found: '${command}'`);
-            return;
+            this.emit('debug', 'debug', `Preparing message command '${command}'...`);
+            let cmd = this._commands[command];
+
+            if (!cmd)
+            {
+                this.emit('debug', 'warn', `Message command not found: '${command}'`);
+                return;
+            }
+
+            this.emit('debug', 'debug', `Creating event for message command '${command}'...`);
+            let event = new HellionCommandEvent(this, cmd.name, new HellionCommandArgs(args, cmd.usage), new HellionReplyHandler(message), {
+                client: client,
+                channel: message.channel,
+                user: message.author,
+                guild: message.guild,
+                member: message.member,
+                createdAt: message.createdAt,
+                createdTimestamp: message.createdTimestamp
+            });
+
+            this.emit('debug', 'info', `Running message command '${command}'...`);
+            cmd.run(event, data);
         }
-
-        this.emit('debug', 'debug', `Creating event for message command '${command}'...`);
-        let event = new HellionCommandEvent(this, cmd.name, new HellionCommandArgs(args, cmd.usage), message, {
-            client: client,
-            channel: message.channel,
-            user: message.author,
-            guild: message.guild,
-            member: message.member,
-            createdAt: message.createdAt,
-            createdTimestamp: message.createdTimestamp
-        });
-
-        this.emit('debug', 'info', `Running message command '${command}'...`);
-        cmd.run(event, data);
+        catch (e)
+        {
+            this.emit('cmdError', command, e);
+        }
     }
 
     public async runInteraction(client: Client, command: CommandInteraction, data: discord.HellionWardenData)
     {
-        this.emit('debug', 'debug', `Preparing interaction command '${command.commandName}'...`);
-        let cmd = this._commands[command.commandName];
-
-        if (!cmd)
+        try
         {
-            this.emit('debug', 'warn', `Interaction command not found: '${command.commandName}'`);
-            return;
+            this.emit('debug', 'debug', `Preparing interaction command '${command.commandName}'...`);
+            let cmd = this._commands[command.commandName];
+
+            if (!cmd)
+            {
+                this.emit('debug', 'warn', `Interaction command not found: '${command.commandName}'`);
+                return;
+            }
+
+            this.emit('debug', 'debug', `Creating event for interaction command '${command.commandName}'...`);
+            let event = new HellionCommandEvent(this, cmd.name, new HellionCommandArgs(command.options as CommandInteractionOptionResolver, cmd.usage), new HellionReplyHandler(command),
+            {
+                client: client,
+                channel: command.channel,
+                user: command.user,
+                guild: command.guild,
+                member: command.member,
+                createdAt: command.createdAt,
+                createdTimestamp: command.createdTimestamp
+            });
+
+            this.emit('debug', 'info', `Running interaction command '${command.commandName}'...`);
+            cmd.run(event, data);
         }
-
-        this.emit('debug', 'debug', `Creating event for interaction command '${command.commandName}'...`);
-        let event = new HellionCommandEvent(this, cmd.name, new HellionCommandArgs(command.options as CommandInteractionOptionResolver, cmd.usage), command as HellionCommandReply, {
-            client: client,
-            channel: command.channel,
-            user: command.user,
-            guild: command.guild,
-            member: command.member,
-            createdAt: command.createdAt,
-            createdTimestamp: command.createdTimestamp
-        });
-
-        this.emit('debug', 'info', `Running interaction command '${command.commandName}'...`);
-        cmd.run(event, data);
+        catch (e)
+        {
+            this.emit('cmdError', command, e);
+        }
     }
 }
 
@@ -248,7 +263,8 @@ export interface HellionCommandEventOptions
 export class HellionCommandEvent
 {
     private _handler: HellionCommandHandler;
-    private _replyHandler: HellionCommandReply;
+
+    public replyHandler: HellionReplyHandler;
 
     public command: string;
     public client: Client;
@@ -261,7 +277,7 @@ export class HellionCommandEvent
     public createdTimestamp: number;
     public createdAt: Date;
 
-    constructor(handler: HellionCommandHandler, command: string, args: HellionCommandArgs, reply: HellionCommandReply, options: HellionCommandEventOptions)
+    constructor(handler: HellionCommandHandler, command: string, args: HellionCommandArgs, reply: HellionReplyHandler, options: HellionCommandEventOptions)
     {
         this._handler = handler;
         this.args = args;
@@ -273,12 +289,12 @@ export class HellionCommandEvent
         this.member = options.member;
         this.createdTimestamp = options.createdTimestamp;
         this.createdAt = this.createdAt;
-        this._replyHandler = reply;
+        this.replyHandler = reply;
     }
 
-    public reply(options: string|MessagePayload|InteractionReplyOptions|ReplyMessageOptions): Promise<Message>
+    public reply(options: string|MessagePayload|ReplyMessageOptions|InteractionReplyOptions): Promise<Message>
     {
-        return this._replyHandler.reply(options);  
+        return this.replyHandler.reply(options);  
     }
 
     public info(message: string): void
@@ -302,9 +318,64 @@ export class HellionCommandEvent
     }
 }
 
-export interface HellionCommandReply
+export class HellionReplyHandler
 {
-    reply(options: string|MessagePayload|InteractionReplyOptions|ReplyMessageOptions): Promise<Message>;
+    private _handler: Message|CommandInteraction;
+    private _deferred: boolean;
+    private _message: Message;
+
+    constructor(handler: Message|CommandInteraction)
+    {
+        this._handler = handler;
+        this._deferred = false;
+    }
+
+    public async defer(options?: InteractionDeferReplyOptions): Promise<void>
+    {
+        if (this._handler instanceof CommandInteraction)
+        {
+            await this._handler.deferReply(options);
+            this._deferred = true;
+        }
+    }
+
+    public async reply(message: string|MessagePayload|ReplyMessageOptions|InteractionReplyOptions): Promise<Message>
+    {
+        if (!this._deferred)
+        {
+            let msg = await this._handler.reply(message);
+            if (msg instanceof Message)
+            {
+                this._message = msg;
+                return msg;
+            }
+        }
+        else
+        {
+            await (this._handler as CommandInteraction).editReply(message);
+        }
+        return null;
+    }
+
+    public async edit(message: string|MessagePayload): Promise<Message>
+    {
+        if (this._message)
+        {   
+            return await this._message.edit(message);
+        }
+        else if (this._handler instanceof CommandInteraction)
+        {
+            let msg = await this._handler.editReply(message);
+            if (msg instanceof Message)
+                return msg;
+            else
+                return null;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }   
 
 interface HellionCommandListeners
