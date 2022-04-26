@@ -35,10 +35,10 @@ export class HellionCommandArgs
         for (let i = 0; i < usage.length; i++)
         {
             this._args.push({
-                index: ((usage[i].index < 0) ? 0 : usage[i].index),
+                index: (usage[i].index < 0) ? 0 : usage[i].index,
                 name: usage[i].name,
                 type: usage[i].type,
-                value: (args.get(usage[i].name).value)
+                value: `${args.get(usage[i].name).value}`
             });
         }
     }
@@ -69,5 +69,5 @@ export interface HellionCommandParsedArgs
     index: number;
     name: string;
     type: HellionCommandType;
-    value: string|number|boolean;
+    value: string;
 }   
