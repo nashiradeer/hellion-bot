@@ -43,7 +43,7 @@ export class HellionCommandArgs
         }
     }
 
-    public getByName(name: string): string|number|boolean
+    public getByName(name: string): string
     {
         for(let arg of this._args)
         {
@@ -53,7 +53,7 @@ export class HellionCommandArgs
         return null;
     }
 
-    public getByIndex(index: number): string|number|boolean
+    public getByIndex(index: number): string
     {
         for(let arg of this._args)
         {
