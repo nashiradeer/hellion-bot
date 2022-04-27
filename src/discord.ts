@@ -1,4 +1,4 @@
-import { Client, ClientOptions, CommandInteraction, Interaction, Message, MessageEmbed } from 'discord.js';
+import { Client, ClientOptions, CommandInteraction, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
 import { commandHandler, player } from '.';
 import { resolve } from 'path';
@@ -51,6 +51,7 @@ export class HellionWarden extends EventEmitter
         // Register Discord Client events
         this._client.on('messageCreate', (message) => this.message(message));
         this._client.on('interactionCreate', (interaction) => this.interaction(interaction));
+        this._client.on('voiceStateUpdate', (oldState, newState) => this.autoexit(oldState, newState));
         this._client.once('ready', () => {
             this.emit('logged');
             this._client.user.setActivity("with Nashira Deer", { type: 'LISTENING' });
@@ -92,6 +93,27 @@ export class HellionWarden extends EventEmitter
         {
             this.emit('debug', 'debug', 'Running command from a interaction.');
             this.handler.runInteraction(this._client, interaction as CommandInteraction, this._data);
+        }
+    }
+
+    private async autoexit(oldState: VoiceState, newState: VoiceState)
+    {
+        let player = this._data.music.get(oldState.guild.id);
+        if (player && player.voiceChannel.id == oldState.channelId && player.voiceChannel.id != newState.channelId)
+        {
+            if (oldState.channel.members.size == 1)
+            {
+                player.textChannel.send({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Music Player")
+                            .setDescription("I'm disconnecting from a empty voice channel.")
+                    ]
+                });
+                player.destroy();
+            }
         }
     }
 

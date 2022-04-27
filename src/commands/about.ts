@@ -33,7 +33,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         `Version: ${version}\n` +
                         `Uptime: ${Math.floor(event.client.uptime / 1000 / 60)} mins\n` +
                         `API Latency: ${event.client.ws.ping}ms\n` + 
-                        `Latency: ${event.createdTimestamp - Date.now()}ms`
+                        `Latency: ${Date.now() - event.createdTimestamp}ms`
                         , true)
             ]
         });
