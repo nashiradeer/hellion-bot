@@ -6,10 +6,10 @@ export class HellionCommand extends commandHandler.HellionCommandListener
     constructor()
     {
         super();
-        this.name = "skip";
+        this.name = "playingnow";
         this.category = "Music";
-        this.description = "Skip the current music playing.";
-        this.alias = [ "s" ];
+        this.description = "Show the music playing and the time.";
+        this.alias = [ "np", "now" ];
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
@@ -22,7 +22,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     new MessageEmbed()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Skip")
+                        .setTitle("Hellion Warden // Playing Now")
                         .setDescription("You aren't in a voice channel.")
                 ]
             });
@@ -38,7 +38,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     new MessageEmbed()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Skip")
+                        .setTitle("Hellion Warden // Playing Now")
                         .setDescription("I aren't playing anything.")
                 ]
             });
@@ -52,24 +52,28 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         new MessageEmbed()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Skip")
+                            .setTitle("Hellion Warden // Playing Now")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
                 });
                 return;
             }
-            
-            await event.replyHandler.defer();
-            let m = await music.skip();
+
+            let m = music.nowPlaying();
             event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Skip")
-                        .setDescription(`Skipped to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                        .setTitle("Hellion Warden // Playing Now")
+                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.requestedBy.user.tag})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration)}\`\``)
                 ]
             });
         }
+    }
+
+    private time2string(ms: number): string
+    {
+        return `${(Math.floor(ms / (1000 * 60 * 60))).toString().padStart(2, '0')}:${(Math.floor(ms / (1000 * 60)) % 60).toString().padStart(2, '0')}:${(Math.floor(ms / 1000) % 60).toString().padStart(2, '0')}`;
     }
 }

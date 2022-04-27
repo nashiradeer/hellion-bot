@@ -19,16 +19,16 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 type: 'STRING',
                 choices: [
                     {
-                        name: 'none',
-                        value: "None"
+                        name: 'None',
+                        value: "none"
                     },
                     {
-                        name: 'music',
-                        value: "Music"
+                        name: 'Music',
+                        value: "music"
                     },
                     {
-                        name: 'queue',
-                        value: "Queue"
+                        name: 'Queue',
+                        value: "queue"
                     }
                 ]
             }
@@ -82,7 +82,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 return;
             }
 
-            switch (event.args.getByIndex(0))
+            switch (event.args.getByIndex(0).trim().toLowerCase())
             {
                 case 'q':
                 case 'queue':

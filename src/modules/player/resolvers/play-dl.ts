@@ -22,7 +22,7 @@ export class HellionYTPLResolver extends HellionBulkMusic
     public async bulk(music: string): Promise<HellionMusicResolved[]> {
         if (yt_validate(music) != "playlist")
             return null;
-        let pl = await playlist_info(music);
+        let pl = await playlist_info(music, { incomplete: true });
         let res: HellionMusicResolved[] = [];
         for (let item of await pl.all_videos())
         {

@@ -6,17 +6,17 @@ export class HellionCommand extends commandHandler.HellionCommandListener
     constructor()
     {
         super();
-        this.name = "queue";
+        this.name = "playnow";
         this.category = "Music";
-        this.description = "Show the Music Player queue.";
-        this.alias = [ "q" ];
+        this.description = "Play the music now.";
+        this.alias = [ "pn" ];
         this.usage = [
             {
-                name: "page",
-                index: 0,
-                description: "Queue page number.",
-                required: false,
-                type: 'NUMBER'
+                name: "music",
+                index: -1,
+                description: "Music or playlist to be played.",
+                required: true,
+                type: 'STRING'
             }
         ];
     }
@@ -31,7 +31,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     new MessageEmbed()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Queue")
+                        .setTitle("Hellion Warden // Play Now")
                         .setDescription("You aren't in a voice channel.")
                 ]
             });
@@ -47,7 +47,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     new MessageEmbed()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Queue")
+                        .setTitle("Hellion Warden // Play Now")
                         .setDescription("I aren't playing anything.")
                 ]
             });
@@ -61,53 +61,58 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         new MessageEmbed()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Queue")
+                            .setTitle("Hellion Warden // Play Now")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
                 });
                 return;
             }
 
-            
             await event.replyHandler.defer();
-            let pagenum = parseInt(event.args.getByIndex(0));
-            let msg = "";
-            var offset = 0;
-            if (!isNaN(pagenum) && isFinite(pagenum))
-                offset = 10 * (pagenum - 1);
+            let link = event.args.getByIndex(0);
 
-            let queue = music.getQueue();
-            var limit = queue.length;
-            if (offset + 10 < limit)
-                limit = offset + 10;
-
-            for(var i = offset; i < limit; i++)
-                msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].requestedBy.user.tag})**\n`;
-
-            if (msg == "")
+            if (!link)
             {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Queue")
-                            .setDescription(`The queue page number **${pagenum}** is empty.`)
+                            .setTitle("Hellion Warden // Play Now")
+                            .setDescription("I can't play a empty music.")
                     ]
                 });
                 return;
             }
 
-            event.reply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Queue")
-                        .setDescription(msg.slice(0, 2000))
-                ]
-            });
-        }
+            let m = await music.play(link, event.member as GuildMember);
 
+            try
+            {
+                let mu = await music.goto(m.pos);
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Play Now")
+                            .setDescription(`${mu.title} **[${mu.requestedBy.user.tag}]**`)
+                    ]
+                });
+            }
+            catch (e)
+            {
+                event.error(e);
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Play Now")
+                            .setDescription("I can't resolve this music.")
+                    ]
+                });
+            }
+        }
     }
 }

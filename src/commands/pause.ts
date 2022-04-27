@@ -59,7 +59,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 return;
             }
 
-            let m = music.pause();
+            music.pause();
             event.reply({
                 embeds: [
                     new MessageEmbed()

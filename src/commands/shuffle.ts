@@ -59,7 +59,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 return;
             }
 
-            let m = music.shuffle();
+            music.shuffle();
             event.reply({
                 embeds: [
                     new MessageEmbed()

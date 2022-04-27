@@ -337,6 +337,10 @@ export class HellionReplyHandler
             await this._handler.deferReply(options);
             this._deferred = true;
         }
+        else
+        {
+            await this._handler.channel.sendTyping();
+        }
     }
 
     public async reply(message: string|MessagePayload|ReplyMessageOptions|InteractionReplyOptions): Promise<Message>

@@ -6,10 +6,19 @@ export class HellionCommand extends commandHandler.HellionCommandListener
     constructor()
     {
         super();
-        this.name = "skip";
+        this.name = "remove";
         this.category = "Music";
-        this.description = "Skip the current music playing.";
-        this.alias = [ "s" ];
+        this.description = "Remove a music from the queue.";
+        this.alias = [ "rm" ];
+        this.usage = [
+            {
+                index: 0,
+                name: "queue",
+                description: "Item number from the queue.",
+                required: true,
+                type: "INTEGER"
+            }
+        ];
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
@@ -22,7 +31,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     new MessageEmbed()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Skip")
+                        .setTitle("Hellion Warden // Remove")
                         .setDescription("You aren't in a voice channel.")
                 ]
             });
@@ -38,7 +47,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     new MessageEmbed()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Skip")
+                        .setTitle("Hellion Warden // Remove")
                         .setDescription("I aren't playing anything.")
                 ]
             });
@@ -52,22 +61,53 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         new MessageEmbed()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Skip")
+                            .setTitle("Hellion Warden // Remove")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
                 });
                 return;
             }
-            
+
             await event.replyHandler.defer();
-            let m = await music.skip();
+            let queuenum = parseInt(event.args.getByIndex(0)) - 1;
+
+            if (isNaN(queuenum) || !isFinite(queuenum))
+            {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Remove")
+                            .setDescription("You aren't using a valid number.")
+                    ]
+                });
+                return;
+            }
+
+            let m = music.remove(queuenum);
+
+            if (!m)
+            {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Remove")
+                            .setDescription("Don't have a item with this number in the queue.")
+                    ]
+                });
+                return;
+            }
+
             event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                        .setTitle("Hellion Warden // Skip")
-                        .setDescription(`Skipped to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                        .setTitle("Hellion Warden // Remove")
+                        .setDescription(`Removed: ${m.title} **[${m.requestedBy.user.tag}]**`)
                 ]
             });
         }

@@ -27,6 +27,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
     {
+        await event.replyHandler.defer();
         if (!this._tokenCreated)
         {
             await setToken({
@@ -70,7 +71,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         new MessageEmbed()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Playing now")
+                            .setTitle("Hellion Warden // Playing Now")
                             .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
                     ]
                 }).then((m) => {
@@ -121,10 +122,9 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             });
             return;
         }
-
+        
         try 
         {
-            await event.replyHandler.defer();
             let res = await music.play(link, event.member as GuildMember);
             if (res.count)
             {
@@ -143,7 +143,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         new MessageEmbed()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Playing now")
+                            .setTitle("Hellion Warden // Playing Now")
                             .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                     ]
                 }).then((m) => {
@@ -157,7 +157,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         new MessageEmbed()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Playing now")
+                            .setTitle("Hellion Warden // Playing Now")
                             .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                     ]
                 });

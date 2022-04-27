@@ -88,7 +88,8 @@ export class HellionMusicPlayer extends EventEmitter
             title: this._queue[this._playingNow].title,
             requestedBy: this._queue[this._playingNow].requestedBy,
             duration: this._queue[this._playingNow].duration,
-            current: this._playingTime
+            current: this._playingTime,
+            pos: this._playingNow
         };
     }
 
@@ -207,6 +208,8 @@ export class HellionMusicPlayer extends EventEmitter
         if (!this._player)
             throw new Error("Player doesn't exists");
         let music = this._queue[index];
+        if (!music)
+            return;
         this._queue.splice(index, 1);
         if (this._playingNow == 0)
         {
@@ -384,6 +387,7 @@ export interface HellionPlayingNow
     current: number;
     duration: number;
     requestedBy: GuildMember;
+    pos: number;
 }
 
 export interface HellionPlayResult
