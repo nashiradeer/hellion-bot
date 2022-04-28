@@ -138,17 +138,20 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     ]
                 });
 
-                music.textChannel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
-                            .setTitle("Hellion Warden // Playing Now")
-                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
-                    ]
-                }).then((m) => {
-                    setTimeout(() => m.delete(), 30000);
-                });
+                if (res.playing)
+                {
+                    music.textChannel.send({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(0x260041)
+                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                                .setTitle("Hellion Warden // Playing Now")
+                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                        ]
+                    }).then((m) => {
+                        setTimeout(() => m.delete(), 30000);
+                    });
+                }
             }
             else if (res.playing)
             {
