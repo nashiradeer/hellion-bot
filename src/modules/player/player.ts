@@ -89,7 +89,7 @@ export class HellionMusicPlayer extends EventEmitter
             requestedBy: this._queue[this._playingNow].requestedBy,
             duration: this._queue[this._playingNow].duration,
             current: this._playingTime,
-            pos: this._playingNow
+            pos: (Date.now() - this._lastTime) + this._playingNow
         };
     }
 
