@@ -1,4 +1,3 @@
-import { inlineCode } from '@discordjs/builders';
 import { stream, yt_validate, video_basic_info, playlist_info, SoundCloudPlaylist, so_validate, soundcloud, search } from 'play-dl';
 import { HellionMusicResolved, HellionSingleMusic, HellionBulkMusic, HellionMusicStream } from "..";
 
