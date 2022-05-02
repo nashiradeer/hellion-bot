@@ -1,12 +1,17 @@
 {
   "name": "hellion-warden",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Discord Music Bot with support to YouTube.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "hellion": "./dist/app.js"
+  },
+  "private": true,
   "scripts": {
     "start": "node dist/app.js",
     "test": "npm run build && node dist/app.js --verbose debug ./testdata",
+    "prepare": "npm run build",
     "build": "tsc --build",
     "clean": "tsc --build --clean"
   },
