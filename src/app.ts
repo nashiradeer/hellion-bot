@@ -1,4 +1,4 @@
-#!/bin/node
+#!/usr/bin/env node
 
 console.log("Initializing...");
 import { ArgumentParser } from 'argparse';
