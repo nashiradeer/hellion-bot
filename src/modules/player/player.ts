@@ -119,7 +119,13 @@ export class HellionMusicPlayer extends EventEmitter {
             });
             playingNow = true;
         }
-        return await this.resolve(music, user, playingNow);
+        try {
+            return await this.resolve(music, user, playingNow);
+        } catch (e) {
+            if (playingNow)
+                this.destroy();
+            throw e;
+        }
     }
 
     public async seek(seek: number): Promise<void> {
@@ -290,6 +296,7 @@ export class HellionMusicPlayer extends EventEmitter {
         } catch (e) {
             let music = this._queue[this._playingNow];
             this.remove(this._playingNow);
+            this.next();
             this.emit('queueError', { title: music.title, requestedBy: music.requestedBy, duration: music.duration }, e);
         }
     }
