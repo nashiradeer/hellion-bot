@@ -59,7 +59,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                         .setTitle("Hellion Warden // Playing Now")
-                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.requestedBy.user.tag})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration * 1000)}\`\``)
+                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.requestedBy.user.tag})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration)}\`\``)
                 ]
             });
         }
