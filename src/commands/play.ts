@@ -86,7 +86,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                             .setTitle("Hellion Warden // Queue Error")
-                            .setDescription(`Removing: ${music.title} **[${music.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
+                            .setDescription(`Removing: \`${music.title}\` **[${music.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
                     ]
                 });
             });
