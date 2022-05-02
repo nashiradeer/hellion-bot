@@ -1,6 +1,6 @@
 {
   "name": "hellion-warden",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Discord Music Bot with support to YouTube.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
