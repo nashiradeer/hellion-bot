@@ -15,7 +15,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             {
                 name: "music",
                 index: -1,
-                description: "Music or playlist to be played.",
+                description: "A song or playlist from YouTube or SoundCloud.",
                 required: false,
                 type: 'STRING'
             }
@@ -123,7 +123,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                             .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`Enqueued a total of ${res.count} musics to end of the queue.`)
+                            .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
                     ]
                 });
 
@@ -172,7 +172,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                         .setTitle("Hellion Warden // Play")
-                        .setDescription(`I can't resolve this music.\n\`\`\`${err}\`\`\``)
+                        .setDescription("I can't resolve this music.\nPlease check if the music exists and if isn't age restricted.")
                 ]
             });
         }
