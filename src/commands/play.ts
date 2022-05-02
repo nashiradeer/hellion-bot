@@ -78,6 +78,19 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 (data as discord.HellionWardenData).music.delete(event.guild.id);
             });
 
+            music.on('queueError', (music, err) => {
+                event.error(err);
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setTitle("Hellion Warden // Queue Error")
+                            .setDescription(`Removing: ${music.title} **[${music.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
+                    ]
+                });
+            });
+
             music.on('error', (err) => {
                 event.error(err);
             });
@@ -172,7 +185,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                         .setTitle("Hellion Warden // Play")
-                        .setDescription("I can't resolve this music.\nPlease check if the music exists and if isn't age restricted.")
+                        .setDescription("I can't resolve this music.\nPlease check if the music exists, is public and if isn't age restricted.")
                 ]
             });
         }

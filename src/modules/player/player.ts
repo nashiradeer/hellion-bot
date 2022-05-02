@@ -10,12 +10,14 @@ export declare interface HellionMusicPlayer {
     on(event: 'error', listener: (err: Error) => void): this;
     once(event: 'error', listener: (err: Error) => void): this;
 
+    on(event: 'queueError', listener: (music: HellionMusic, err: Error) => void): this;
+    once(event: 'queueError', listener: (music: HellionMusic, err: Error) => void): this;
+
     on(event: 'play', listener: (music: HellionMusic) => void): this;
     once(event: 'play', listener: (music: HellionMusic) => void): this;
 
     on(event: 'end', listener: () => void): this;
     once(event: 'end', listener: () => void): this;
-
 }
 
 export class HellionMusicPlayer extends EventEmitter {
@@ -260,30 +262,36 @@ export class HellionMusicPlayer extends EventEmitter {
     }
 
     private async next(): Promise<void> {
-        if (!this._connection || !this._player) {
-            this.destroy();
-            return;
-        }
-        if (this._loop != 'music')
-            this._playingNow++;
-        if (this._playingNow < 0)
-            this._playingNow = 0;
-        if (this._playingNow >= this._queue.length) {
-            if (this._loop != 'queue') {
+        try {
+            if (!this._connection || !this._player) {
                 this.destroy();
                 return;
             }
-            else {
+            if (this._loop != 'music')
+                this._playingNow++;
+            if (this._playingNow < 0)
                 this._playingNow = 0;
+            if (this._playingNow >= this._queue.length) {
+                if (this._loop != 'queue') {
+                    this.destroy();
+                    return;
+                }
+                else {
+                    this._playingNow = 0;
+                }
             }
+            let music = this._queue[this._playingNow];
+            this.emit('play', { title: music.title, requestedBy: music.requestedBy, duration: music.duration });
+            let m = await this._resolver[music.resolver].get(music.resolvable);
+            let resource = createAudioResource(m.stream, { inputType: m.type });
+            this._player.play(resource);
+            this._playingTime = 0;
+            this._lastTime = Date.now();
+        } catch (e) {
+            let music = this._queue[this._playingNow];
+            this.remove(this._playingNow);
+            this.emit('queueError', { title: music.title, requestedBy: music.requestedBy, duration: music.duration }, e);
         }
-        let music = this._queue[this._playingNow];
-        this.emit('play', { title: music.title, requestedBy: music.requestedBy, duration: music.duration });
-        let m = await this._resolver[music.resolver].get(music.resolvable);
-        let resource = createAudioResource(m.stream, { inputType: m.type });
-        this._player.play(resource);
-        this._playingTime = 0;
-        this._lastTime = Date.now();
     }
 }
 
