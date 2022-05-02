@@ -8,5 +8,5 @@ export declare interface HellionWardenInformation {
 }
 
 export const HellionWardenInformation = {
-    VERSION: "v1.0.1"
+    VERSION: "v1.0.2"
 };
