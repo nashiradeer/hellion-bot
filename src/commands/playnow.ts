@@ -1,31 +1,27 @@
 import { GuildMember, MessageEmbed } from "discord.js";
 import { commandHandler, discord } from "..";
 
-export class HellionCommand extends commandHandler.HellionCommandListener
-{
-    constructor()
-    {
+export class HellionCommand extends commandHandler.HellionCommandListener {
+    constructor() {
         super();
         this.name = "playnow";
         this.category = "Music";
-        this.description = "Play the music now.";
-        this.alias = [ "pn" ];
+        this.description = "Play the music now, skipping all the others.";
+        this.alias = ["pn"];
         this.usage = [
             {
                 name: "music",
                 index: -1,
-                description: "Music or playlist to be played.",
+                description: "A song or playlist from YouTube or SoundCloud.",
                 required: true,
                 type: 'STRING'
             }
         ];
     }
 
-    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
-    {
+    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
-        if (!member.voice.channel)
-        {
+        if (!member.voice.channel) {
             event.reply({
                 embeds: [
                     new MessageEmbed()
@@ -40,8 +36,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
         let music = (data as discord.HellionWardenData).music.get(event.guild.id);
 
-        if (!music)
-        {
+        if (!music) {
             event.reply({
                 embeds: [
                     new MessageEmbed()
@@ -52,10 +47,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 ]
             });
         }
-        else
-        {
-            if (music.voiceChannel.id != member.voice.channelId)
-            {
+        else {
+            if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -71,8 +64,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             await event.replyHandler.defer();
             let link = event.args.getByIndex(0);
 
-            if (!link)
-            {
+            if (!link) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -87,8 +79,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
             let m = await music.play(link, event.member as GuildMember);
 
-            try
-            {
+            try {
                 let mu = await music.goto(m.pos);
                 event.reply({
                     embeds: [
@@ -100,8 +91,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     ]
                 });
             }
-            catch (e)
-            {
+            catch (e) {
                 event.error(e);
                 event.reply({
                     embeds: [
