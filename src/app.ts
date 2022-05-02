@@ -1,17 +1,17 @@
+#!/bin/node
+
 console.log("Initializing...");
 import { ArgumentParser } from 'argparse';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { HellionWardenInformation, discord, logger } from '.';
 
-interface HellionWardenArgs
-{
+interface HellionWardenArgs {
    datadir: string;
    verbose: string;
 }
 
-export interface HellionWardenConfig
-{
+export interface HellionWardenConfig {
    prefix: string;
    token: string;
    logfile: string;
@@ -43,15 +43,13 @@ let args: HellionWardenArgs = argparser.parse_args();
 
 let datapath = resolve(args.datadir);
 
-if (!existsSync(datapath))
-{
+if (!existsSync(datapath)) {
    mkdirSync(datapath);
 }
 
 let configpath = resolve(datapath, "config.json");
 
-if (!existsSync(configpath))
-{
+if (!existsSync(configpath)) {
    writeFileSync(configpath, JSON.stringify({
       prefix: 'h!',
       token: '',
@@ -63,8 +61,7 @@ if (!existsSync(configpath))
    console.log("Please edit the config file before running Hellion Warden again.");
    process.exit(1);
 }
-else
-{
+else {
    const CONFIG: HellionWardenConfig = JSON.parse(readFileSync(configpath, 'utf-8'));
 
    if (args.verbose == 'debug' || args.verbose == 'default')
@@ -74,10 +71,10 @@ else
       ));
 
    if (CONFIG.logfile)
-   logger.HellionLogger.addTransporter('logfile', new logger.transporters.HellionFileTransporter(resolve(datapath, CONFIG.logfile), new logger.HellionLoggerFormatter(), 'debug'));
+      logger.HellionLogger.addTransporter('logfile', new logger.transporters.HellionFileTransporter(resolve(datapath, CONFIG.logfile), new logger.HellionLoggerFormatter(), 'debug'));
 
    if (CONFIG.errorfile)
-   logger.HellionLogger.addTransporter('errorfile', new logger.transporters.HellionFileTransporter(resolve(datapath, CONFIG.errorfile), new logger.HellionLoggerFormatter(), 'warn'));
+      logger.HellionLogger.addTransporter('errorfile', new logger.transporters.HellionFileTransporter(resolve(datapath, CONFIG.errorfile), new logger.HellionLoggerFormatter(), 'warn'));
 
    const DiscordBot = new discord.HellionWarden(CONFIG.token, CONFIG.prefix);
 
@@ -116,7 +113,7 @@ else
 
    DiscordBot.handler.on('cmdError', (command: string, err: Error) => {
       logger.HellionLogger.getLogger(`Command '${command}'`).error("A error has occoured: ", err);
-   });   
+   });
 
    DiscordBot.start().catch((err) => {
       logger.HellionLogger.getLogger('Discord').error("A error has occoured: ", err);
