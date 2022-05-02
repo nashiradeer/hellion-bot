@@ -1,2 +1,5 @@
+# TypeScript dist files
+!dist/
+
 # systemd
 services/
