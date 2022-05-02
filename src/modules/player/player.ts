@@ -216,40 +216,44 @@ export class HellionMusicPlayer extends EventEmitter {
 
     private async resolve(music: string, user: GuildMember, playingNow: boolean): Promise<HellionPlayResult> {
         for (let i = 0; i < this._resolver.length; i++) {
-            if (this._resolver[i] instanceof HellionBulkMusic) {
-                let resolver = this._resolver[i] as HellionBulkMusic;
-                let res = await resolver.bulk(music);
-                if (!res) continue;
-                let pos = -1;
-                for (let d of res) {
-                    let k = { title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: user };
-                    let index = this._queue.push(k);
-                    if (pos == -1)
-                        pos = index - 1;
-                };
-                if (playingNow) {
-                    let m = await resolver.get(this._queue[pos].resolvable);
-                    let resource = createAudioResource(m.stream, { inputType: m.type });
-                    this._player.play(resource);
-                    this._playingTime = 0;
-                    this._lastTime = Date.now();
+            try {
+                if (this._resolver[i] instanceof HellionBulkMusic) {
+                    let resolver = this._resolver[i] as HellionBulkMusic;
+                    let res = await resolver.bulk(music);
+                    if (!res) continue;
+                    let pos = -1;
+                    for (let d of res) {
+                        let k = { title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: user };
+                        let index = this._queue.push(k);
+                        if (pos == -1)
+                            pos = index - 1;
+                    };
+                    if (playingNow) {
+                        let m = await resolver.get(this._queue[pos].resolvable);
+                        let resource = createAudioResource(m.stream, { inputType: m.type });
+                        this._player.play(resource);
+                        this._playingTime = 0;
+                        this._lastTime = Date.now();
+                    }
+                    return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: res.length, pos: pos };
                 }
-                return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: res.length, pos: pos };
-            }
-            else {
-                let resolver = this._resolver[i] as HellionSingleMusic;
-                let res = await resolver.resolve(music);
-                if (!res) continue;
-                let k = { title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: user };
-                let pos = this._queue.push(k) - 1;
-                if (playingNow) {
-                    let m = await resolver.get(this._queue[0].resolvable);
-                    let resource = createAudioResource(m.stream, { inputType: m.type });
-                    this._player.play(resource);
-                    this._playingTime = 0;
-                    this._lastTime = Date.now();
+                else {
+                    let resolver = this._resolver[i] as HellionSingleMusic;
+                    let res = await resolver.resolve(music);
+                    if (!res) continue;
+                    let k = { title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: user };
+                    let pos = this._queue.push(k) - 1;
+                    if (playingNow) {
+                        let m = await resolver.get(this._queue[0].resolvable);
+                        let resource = createAudioResource(m.stream, { inputType: m.type });
+                        this._player.play(resource);
+                        this._playingTime = 0;
+                        this._lastTime = Date.now();
+                    }
+                    return { playing: playingNow, requestedBy: user, pos: pos, title: res.title };
                 }
-                return { playing: playingNow, requestedBy: user, pos: pos, title: res.title };
+            } catch (e) {
+                this.emit('error', e);
             }
         }
         throw new Error("Can't resolve this music");
