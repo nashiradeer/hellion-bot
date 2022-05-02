@@ -2,14 +2,15 @@
 Description=Hellion Warden Discord Bot
 After=network.target
 
+StartLimitInterval=60
+
 [Service]
 Type=simple
 
 Restart=always
 RestartSec=10
 
-User=public
-ExecStart=/usr/bin/env hellion --verbose none /etc/hellion-warden
+ExecStart=/usr/bin/hellion --verbose none /etc/hellion-warden
 
 [Install]
 WantedBy=multi-user.target
