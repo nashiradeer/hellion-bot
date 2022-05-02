@@ -195,7 +195,7 @@ export class HellionMusicPlayer extends EventEmitter {
         if (!music)
             return;
         this._queue.splice(index, 1);
-        if (this._playingNow == 0) {
+        if (this._playingNow == index) {
             this._playingNow--;
             this._player.stop();
         }
