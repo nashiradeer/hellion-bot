@@ -2,17 +2,15 @@ import { GuildMember, MessageEmbed, TextChannel, VoiceChannel } from "discord.js
 import { setToken, getFreeClientID } from 'play-dl';
 import { commandHandler, discord, player } from "..";
 
-export class HellionCommand extends commandHandler.HellionCommandListener
-{
+export class HellionCommand extends commandHandler.HellionCommandListener {
     private _tokenCreated: boolean;
 
-    constructor()
-    {
+    constructor() {
         super();
         this.name = "play";
         this.category = "Music";
         this.description = "Play a music or resume the player.";
-        this.alias = [ "p" ];
+        this.alias = ["p"];
         this.usage = [
             {
                 name: "music",
@@ -25,11 +23,9 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         this._tokenCreated = false;
     }
 
-    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
-    {
+    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         await event.replyHandler.defer();
-        if (!this._tokenCreated)
-        {
+        if (!this._tokenCreated) {
             await setToken({
                 soundcloud: {
                     client_id: await getFreeClientID()
@@ -39,8 +35,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         }
 
         let member = event.member as GuildMember;
-        if (!member.voice.channel)
-        {
+        if (!member.voice.channel) {
             event.reply({
                 embeds: [
                     new MessageEmbed()
@@ -55,8 +50,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
         let music = (data as discord.HellionWardenData).music.get(event.guild.id);
 
-        if (!music)
-        {
+        if (!music) {
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
 
             music.addResolver(new player.resolvers.playDL.HellionYTDLResolver());
@@ -90,10 +84,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
             (data as discord.HellionWardenData).music.set(event.guild.id, music);
         }
-        else
-        {
-            if (music.voiceChannel.id != member.voice.channelId)
-            {
+        else {
+            if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -108,8 +100,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         }
 
         let link = event.args.getByIndex(0);
-        if (!link)
-        {
+        if (!link) {
             music.resume();
             event.reply({
                 embeds: [
@@ -122,12 +113,10 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             });
             return;
         }
-        
-        try 
-        {
+
+        try {
             let res = await music.play(link, event.member as GuildMember);
-            if (res.count)
-            {
+            if (res.count) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -138,8 +127,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     ]
                 });
 
-                if (res.playing)
-                {
+                if (res.playing) {
                     music.textChannel.send({
                         embeds: [
                             new MessageEmbed()
@@ -153,8 +141,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     });
                 }
             }
-            else if (res.playing)
-            {
+            else if (res.playing) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -165,8 +152,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     ]
                 });
             }
-            else
-            {
+            else {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -178,8 +164,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 });
             }
         }
-        catch (err)
-        {
+        catch (err) {
             event.error(err);
             event.reply({
                 embeds: [
@@ -187,7 +172,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
                         .setTitle("Hellion Warden // Play")
-                        .setDescription("I can't resolve this music.")
+                        .setDescription(`I can't resolve this music.\n\`\`\`${err}\`\`\``)
                 ]
             });
         }
