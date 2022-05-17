@@ -10,10 +10,9 @@
   "private": true,
   "scripts": {
     "start": "node dist/app.js",
-    "test": "npm run build && node dist/app.js --verbose debug ./testdata",
-    "prepare": "npm run build",
-    "build": "tsc --build",
-    "clean": "tsc --build --clean"
+    "pretest": "tsc --build --clean && tsc --build",
+    "test": "node dist/app.js --verbose debug ./testdata",
+    "prepare": "tsc --build"
   },
   "repository": {
     "type": "git",
