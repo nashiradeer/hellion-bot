@@ -1,5 +1,12 @@
-# TypeScript
+# Development files
+.env
+
+# Compiled TypeScript files
 !dist/
 
-# systemd
+# systemd unit files
 services/
+
+# Docker
+Dockerfile
+.dockerignore

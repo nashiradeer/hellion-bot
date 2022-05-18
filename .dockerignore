@@ -1,0 +1,16 @@
+# Development files
+.vscode/
+.env
+
+# Compiled TypeScript files
+dist/
+
+# Dependency directories
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# NPM
+.npmignore

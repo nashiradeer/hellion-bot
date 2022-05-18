@@ -1,5 +1,5 @@
-# Hellion Warden
-testdata/
+# Development files
+.env
 
 # Logs
 logs
