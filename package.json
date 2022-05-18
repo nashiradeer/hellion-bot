@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node dist/app.js",
     "pretest": "tsc --build --clean && tsc --build",
-    "test": "node dist/app.js --verbose debug ./testdata",
+    "test": "node dist/app.js --verbose debug",
     "prepare": "tsc --build"
   },
   "repository": {
