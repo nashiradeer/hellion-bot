@@ -11,6 +11,7 @@
                 "run-script",
                 "test"
             ],
+            "envFile": "${workspaceFolder}/.env",
             "outputCapture": "std",
             "runtimeExecutable": "npm",
             "sourceMaps": true,
@@ -19,6 +20,5 @@
             ],
             "type": "pwa-node"
         }
-
     ]
 }
