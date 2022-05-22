@@ -43,6 +43,7 @@
     "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
     "erlpack": "github:discord/erlpack",
+    "fluent-ffmpeg": "^2.1.2",
     "play-dl": "^1.9.4",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.9",
