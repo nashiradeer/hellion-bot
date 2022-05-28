@@ -1,15 +1,13 @@
 import { GuildMember, MessageEmbed } from "discord.js";
 import { commandHandler, discord } from "..";
 
-export class HellionCommand extends commandHandler.HellionCommandListener
-{
-    constructor()
-    {
+export class HellionCommand extends commandHandler.HellionCommandListener {
+    constructor() {
         super();
         this.name = "remove";
         this.category = "Music";
         this.description = "Remove a music from the queue.";
-        this.alias = [ "rm" ];
+        this.alias = ["rm"];
         this.usage = [
             {
                 index: 0,
@@ -21,12 +19,11 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         ];
     }
 
-    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
-    {
+    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
-        if (!member.voice.channel)
-        {
+        if (!member.voice.channel) {
             event.reply({
+                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -40,9 +37,9 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
         let music = (data as discord.HellionWardenData).music.get(event.guild.id);
 
-        if (!music)
-        {
+        if (!music) {
             event.reply({
+                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -52,11 +49,10 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 ]
             });
         }
-        else
-        {
-            if (music.voiceChannel.id != member.voice.channelId)
-            {
+        else {
+            if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
+                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -71,9 +67,9 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             await event.replyHandler.defer();
             let queuenum = parseInt(event.args.getByIndex(0)) - 1;
 
-            if (isNaN(queuenum) || !isFinite(queuenum))
-            {
+            if (isNaN(queuenum) || !isFinite(queuenum)) {
                 event.reply({
+                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -87,9 +83,9 @@ export class HellionCommand extends commandHandler.HellionCommandListener
 
             let m = music.remove(queuenum);
 
-            if (!m)
-            {
+            if (!m) {
                 event.reply({
+                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -102,6 +98,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             }
 
             event.reply({
+                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)

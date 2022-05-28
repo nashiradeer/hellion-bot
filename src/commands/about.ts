@@ -1,19 +1,17 @@
 import { MessageEmbed, version } from "discord.js";
 import { commandHandler, HellionWardenInformation, discord } from "..";
 
-export class HellionCommand extends commandHandler.HellionCommandListener
-{
-    constructor()
-    {
+export class HellionCommand extends commandHandler.HellionCommandListener {
+    constructor() {
         super();
         this.name = "about";
         this.category = "Information";
         this.description = "Get a short about of the bot.";
     }
 
-    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
-    {
+    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         event.reply({
+            fetchEdit: true,
             embeds: [
                 new MessageEmbed()
                     .setColor(0x260041)
@@ -24,7 +22,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                         `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
                         `Version: ${HellionWardenInformation.VERSION}`)
                     .addField("NodeJS Information",
-                        `Version: ${process.version}\n` + 
+                        `Version: ${process.version}\n` +
                         `Uptime: ${Math.floor(process.uptime() / 60)} mins\n` +
                         `Operation System: ${process.platform}\n` +
                         `Architecture: ${process.arch}`
@@ -32,7 +30,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                     .addField("Discord.JS Information",
                         `Version: ${version}\n` +
                         `Uptime: ${Math.floor(event.client.uptime / 1000 / 60)} mins\n` +
-                        `API Latency: ${event.client.ws.ping}ms\n` + 
+                        `API Latency: ${event.client.ws.ping}ms\n` +
                         `Latency: ${Date.now() - event.createdTimestamp}ms`
                         , true)
             ]
