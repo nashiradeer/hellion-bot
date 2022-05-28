@@ -1,6 +1,6 @@
 {
   "name": "hellion-warden",
-  "version": "1.1.0-alpha.5",
+  "version": "1.1.0-alpha.6",
   "description": "Discord Music Bot with support to YouTube.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -39,18 +39,14 @@
     "@discordjs/voice": "^0.9.0",
     "@types/argparse": "^2.0.10",
     "argparse": "^2.0.1",
-    "bin-version-check-cli": "^3.0.0",
     "bufferutil": "^4.0.6",
     "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
     "erlpack": "github:discord/erlpack",
     "fluent-ffmpeg": "^2.1.2",
-    "play-dl": "^1.9.4",
+    "play-dl": "github:k2helix/play-dl-compiled",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.9",
-    "ytdl-core": "^4.11.0",
-    "ytpl": "^2.3.0",
-    "ytsr": "^3.7.0",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
