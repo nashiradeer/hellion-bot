@@ -5,8 +5,10 @@
         "target": "ES6",
         "module": "CommonJS",
         "declaration": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "strictNullChecks": true
     },
-    "include": [ "src/**/*" ]
+    "include": [
+        "src/**/*"
+    ]
 }
-

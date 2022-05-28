@@ -1,12 +1,10 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 import { HellionCommandUsage, HellionCommandType } from '.';
 
-export class HellionCommandArgs
-{
+export class HellionCommandArgs {
     private _args: HellionCommandParsedArgs[];
 
-    constructor(args: string[]|CommandInteractionOptionResolver, usage: HellionCommandUsage[])
-    {
+    constructor(args: string[] | CommandInteractionOptionResolver, usage: HellionCommandUsage[]) {
         this._args = [];
 
         if (args instanceof CommandInteractionOptionResolver)
@@ -15,10 +13,8 @@ export class HellionCommandArgs
             this.parseString(args, usage);
     }
 
-    private parseString(args: string[], usage: HellionCommandUsage[]): void
-    {
-        for (let i = 0; i < usage.length; i++)
-        {
+    private parseString(args: string[], usage: HellionCommandUsage[]): void {
+        for (let i = 0; i < usage.length; i++) {
             if (usage[i].index >= 0 && !args[usage[i].index])
                 continue;
             this._args.push({
@@ -30,10 +26,8 @@ export class HellionCommandArgs
         }
     }
 
-    private parseDiscordJS(args: CommandInteractionOptionResolver, usage: HellionCommandUsage[]): void
-    {
-        for (let i = 0; i < usage.length; i++)
-        {
+    private parseDiscordJS(args: CommandInteractionOptionResolver, usage: HellionCommandUsage[]): void {
+        for (let i = 0; i < usage.length; i++) {
             let arg = args.get(usage[i].name);
             if (!arg)
                 continue;
@@ -46,20 +40,16 @@ export class HellionCommandArgs
         }
     }
 
-    public getByName(name: string): string
-    {
-        for(let arg of this._args)
-        {
+    public getByName(name: string): string | null {
+        for (let arg of this._args) {
             if (arg.name == name)
                 return arg.value;
         }
         return null;
     }
 
-    public getByIndex(index: number): string
-    {
-        for(let arg of this._args)
-        {
+    public getByIndex(index: number): string | null {
+        for (let arg of this._args) {
             if (arg.index == index)
                 return arg.value;
         }
@@ -67,8 +57,7 @@ export class HellionCommandArgs
     }
 }
 
-export interface HellionCommandParsedArgs
-{
+export interface HellionCommandParsedArgs {
     index: number;
     name: string;
     type: HellionCommandType;

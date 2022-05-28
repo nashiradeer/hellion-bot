@@ -40,7 +40,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Play")
                         .setDescription("You aren't in a voice channel.")
                 ]
@@ -48,7 +48,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             return;
         }
 
-        let music = (data as discord.HellionWardenData).music.get(event.guild.id);
+        let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
         if (!music) {
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
@@ -60,11 +60,11 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music.addResolver(new player.resolvers.playDL.HellionYTSRResolver());
 
             music.on('play', (playing) => {
-                music.textChannel.send({
+                music?.textChannel.send({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Playing Now")
                             .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
                     ]
@@ -75,7 +75,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             music.on('end', () => {
                 event.info("Music Player is ending...");
-                (data as discord.HellionWardenData).music.delete(event.guild.id);
+                (data as discord.HellionWardenData).music.delete(event.guild?.id || '');
             });
 
             music.on('queueError', (music, err) => {
@@ -84,7 +84,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Queue Error")
                             .setDescription(`Removing: \`${music.title}\` **[${music.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
                     ]
@@ -95,7 +95,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 event.error(err);
             });
 
-            (data as discord.HellionWardenData).music.set(event.guild.id, music);
+            (data as discord.HellionWardenData).music.set(event.guild?.id || '', music);
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
@@ -103,7 +103,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Play")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
@@ -119,7 +119,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Play")
                         .setDescription("Resuming the music player.")
                 ]
@@ -134,7 +134,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Enqueued")
                             .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
                     ]
@@ -145,7 +145,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Playing Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                         ]
@@ -159,7 +159,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Playing Now")
                             .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                     ]
@@ -170,7 +170,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Enqueued")
                             .setDescription(`${res.title} **[${res.requestedBy.user.tag}]** at **#${res.pos + 1}**`)
                     ]
@@ -183,7 +183,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Play")
                         .setDescription("I can't resolve this music.\nPlease check if the music exists, is public and if isn't age restricted.")
                 ]

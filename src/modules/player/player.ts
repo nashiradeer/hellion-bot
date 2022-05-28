@@ -26,8 +26,8 @@ export class HellionMusicPlayer extends EventEmitter {
 
     private _playingNow: number;
     private _queue: HellionQueuedMusic[];
-    private _connection: VoiceConnection;
-    private _player: AudioPlayer;
+    private _connection: VoiceConnection | null;
+    private _player: AudioPlayer | null;
     private _resolver: HellionMusicResolver[];
     private _loop: HellionMusicLoop;
 
@@ -58,7 +58,7 @@ export class HellionMusicPlayer extends EventEmitter {
 
     public delResolver(index: number): HellionMusicResolver {
         let resolver = this._resolver[index];
-        this._resolver[index] = null;
+        delete this._resolver[index];
         return resolver;
     }
 
@@ -111,7 +111,7 @@ export class HellionMusicPlayer extends EventEmitter {
         let playingNow = false;
         if (!this._player) {
             this._player = createAudioPlayer();
-            this._connection.subscribe(this._player);
+            this._connection?.subscribe(this._player);
             this._player.on(AudioPlayerStatus.Idle, () => this.next());
             this._player.on('error', (err) => {
                 this.emit('error', err);
@@ -131,8 +131,10 @@ export class HellionMusicPlayer extends EventEmitter {
     public async seek(seek: number): Promise<void> {
         let playingNow = this._queue[this._playingNow];
         let m = await this._resolver[playingNow.resolver].get(playingNow.resolvable, seek);
+        if (!m)
+            throw new Error("Abnormal null during resolver get");
         let resource = createAudioResource(m.stream, { inputType: m.type });
-        this._player.play(resource);
+        this._player?.play(resource);
         this._playingTime = seek * 1000;
         this._lastTime = Date.now();
     }
@@ -142,11 +144,11 @@ export class HellionMusicPlayer extends EventEmitter {
             throw new Error("Player doesn't exists");
         return new Promise((res) => {
             this._playingNow = index - 1;
-            this._player.once(AudioPlayerStatus.Playing, () => {
+            this._player?.once(AudioPlayerStatus.Playing, () => {
                 let music = this._queue[this._playingNow];
                 res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
             });
-            this._player.stop();
+            this._player?.stop();
         });
     }
 
@@ -194,12 +196,12 @@ export class HellionMusicPlayer extends EventEmitter {
         this._player.stop();
     }
 
-    public remove(index: number): HellionMusic {
+    public remove(index: number): HellionMusic | null {
         if (!this._player)
             throw new Error("Player doesn't exists");
         let music = this._queue[index];
         if (!music)
-            return;
+            return null;
         this._queue.splice(index, 1);
         if (this._playingNow == index) {
             this._playingNow--;
@@ -238,8 +240,10 @@ export class HellionMusicPlayer extends EventEmitter {
                     };
                     if (playingNow) {
                         let m = await resolver.get(this._queue[pos].resolvable);
+                        if (!m)
+                            throw new Error("Abnormal null during resolver get");
                         let resource = createAudioResource(m.stream, { inputType: m.type });
-                        this._player.play(resource);
+                        this._player?.play(resource);
                         this._playingTime = 0;
                         this._lastTime = Date.now();
                     }
@@ -253,8 +257,10 @@ export class HellionMusicPlayer extends EventEmitter {
                     let pos = this._queue.push(k) - 1;
                     if (playingNow) {
                         let m = await resolver.get(this._queue[0].resolvable);
+                        if (!m)
+                            throw new Error("Abnormal null during resolver get");
                         let resource = createAudioResource(m.stream, { inputType: m.type });
-                        this._player.play(resource);
+                        this._player?.play(resource);
                         this._playingTime = 0;
                         this._lastTime = Date.now();
                     }
@@ -289,6 +295,8 @@ export class HellionMusicPlayer extends EventEmitter {
             let music = this._queue[this._playingNow];
             this.emit('play', { title: music.title, requestedBy: music.requestedBy, duration: music.duration });
             let m = await this._resolver[music.resolver].get(music.resolvable);
+            if (!m)
+                throw new Error("Abnormal null during resolver get");
             let resource = createAudioResource(m.stream, { inputType: m.type });
             this._player.play(resource);
             this._playingTime = 0;
@@ -303,21 +311,21 @@ export class HellionMusicPlayer extends EventEmitter {
 }
 
 export class HellionSingleMusic {
-    public async resolve(music: string): Promise<HellionMusicResolved> {
+    public async resolve(music: string): Promise<HellionMusicResolved | null> {
         throw new Error("Method not implemented");
     }
 
-    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream> {
+    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream | null> {
         throw new Error("Method not implemented");
     }
 }
 
 export class HellionBulkMusic {
-    public async bulk(music: string): Promise<HellionMusicResolved[]> {
+    public async bulk(music: string): Promise<HellionMusicResolved[] | null> {
         throw new Error("Method not implemented");
     }
 
-    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream> {
+    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream | null> {
         throw new Error("Method not implemented");
     }
 }

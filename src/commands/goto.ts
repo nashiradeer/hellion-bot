@@ -1,10 +1,8 @@
 import { GuildMember, MessageEmbed } from "discord.js";
 import { commandHandler, discord } from "..";
 
-export class HellionCommand extends commandHandler.HellionCommandListener
-{
-    constructor()
-    {
+export class HellionCommand extends commandHandler.HellionCommandListener {
+    constructor() {
         super();
         this.name = "goto";
         this.category = "Music";
@@ -20,16 +18,14 @@ export class HellionCommand extends commandHandler.HellionCommandListener
         ];
     }
 
-    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void>
-    {
+    public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
-        if (!member.voice.channel)
-        {
+        if (!member.voice.channel) {
             event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Goto")
                         .setDescription("You aren't in a voice channel.")
                 ]
@@ -37,29 +33,26 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             return;
         }
 
-        let music = (data as discord.HellionWardenData).music.get(event.guild.id);
+        let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
-        if (!music)
-        {
+        if (!music) {
             event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Goto")
                         .setDescription("I aren't playing anything.")
                 ]
             });
         }
-        else
-        {
-            if (music.voiceChannel.id != member.voice.channelId)
-            {
+        else {
+            if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Goto")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
@@ -68,15 +61,27 @@ export class HellionCommand extends commandHandler.HellionCommandListener
             }
 
             await event.replyHandler.defer();
-            let queuenum = parseInt(event.args.getByIndex(0)) - 1;
-
-            if (isNaN(queuenum) || !isFinite(queuenum))
-            {
+            let numstr = event.args.getByIndex(0);
+            if (!numstr) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Goto")
+                            .setDescription("You aren't using a valid number.")
+                    ]
+                });
+            }
+
+            let queuenum = parseInt(numstr as string) - 1;
+
+            if (isNaN(queuenum) || !isFinite(queuenum)) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Goto")
                             .setDescription("You aren't using a valid number.")
                     ]
@@ -90,7 +95,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user.avatarURL() })
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Goto")
                         .setDescription(`Going to: ${m.title} **[${m.requestedBy.user.tag}]**`)
                 ]
