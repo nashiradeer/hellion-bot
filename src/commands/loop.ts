@@ -13,7 +13,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 name: "type",
                 index: 0,
                 description: "Loop type to be used.",
-                required: true,
+                required: false,
                 type: 'STRING',
                 choices: [
                     {
