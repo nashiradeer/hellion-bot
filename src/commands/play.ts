@@ -130,15 +130,15 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 });
             });
 
-            music.on('queueError', (music, err) => {
+            music.on('queueError', (m, err) => {
                 event.error(err);
-                event.reply({
+                music?.textChannel.send({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Queue Error")
-                            .setDescription(`Removing: \`${music.title}\` **[${music.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
+                            .setDescription(`Removing: \`${m.title}\` **[${m.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
                     ]
                 });
             });
@@ -190,8 +190,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         setTimeout(() => m.delete(), 30000);
                     });
                 }
-            }
-            else if (res.playing) {
+            } else if (res.playing) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
@@ -201,8 +200,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                     ]
                 });
-            }
-            else {
+            } else {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
