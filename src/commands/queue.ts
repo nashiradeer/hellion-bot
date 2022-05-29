@@ -63,18 +63,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
 
             await event.replyHandler.defer();
-            let numstr = event.args.getByIndex(0);
-            if (!numstr) {
-                event.reply({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Queue")
-                            .setDescription("You aren't using a valid number.")
-                    ]
-                });
-            }
+            let numstr = event.args.getByIndex(0) || '1';
             let pagenum = parseInt(numstr as string);
             let msg = "";
             var offset = 0;
