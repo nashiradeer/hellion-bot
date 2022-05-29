@@ -47,9 +47,7 @@ export class HellionWarden extends EventEmitter {
         // Register Discord Client events
         this._client.on('messageCreate', (message) => this.message(message));
         this._client.on('interactionCreate', (interaction) => this.interaction(interaction));
-        this._client.on('voiceStateUpdate', (oldState, newState) => {
-            this.autoexit(oldState, newState);
-        });
+        this._client.on('voiceStateUpdate', (oldState, newState) => this.autoexit(oldState, newState));
         this._client.once('ready', () => {
             this.emit('logged');
             this._client.user?.setActivity("with Nashira Deer", { type: 'LISTENING' });
@@ -78,14 +76,14 @@ export class HellionWarden extends EventEmitter {
         }
 
         this.emit('debug', 'debug', 'Running command from a message.');
-        this.handler.run(this._client, message, this.prefix, this._data);
+        await this.handler.run(this._client, message, this.prefix, this._data);
     }
 
 
     private async interaction(interaction: Interaction): Promise<void> {
         if (interaction.isCommand()) {
             this.emit('debug', 'debug', 'Running command from a interaction.');
-            this.handler.runInteraction(this._client, interaction as CommandInteraction, this._data);
+            await this.handler.runInteraction(this._client, interaction as CommandInteraction, this._data);
         }
     }
 
