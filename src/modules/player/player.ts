@@ -93,6 +93,14 @@ export class HellionMusicPlayer extends EventEmitter {
         };
     }
 
+    public async playNow(music: string, user: GuildMember): Promise<HellionPlayResult> {
+        let musics = await this.resolve(music, user);
+        if (musics.length <= 0) throw new Error("Resolve returned a empty array");
+        this._queue.splice(this._playingNow + 1, 0, ...musics);
+        this.skip();
+        return { title: musics[0].title, count: musics.length, playing: true, pos: this._playingNow, requestedBy: musics[0].requestedBy };
+    }
+
     public join(): void {
         if (this._connection)
             this._connection.destroy();
@@ -129,7 +137,19 @@ export class HellionMusicPlayer extends EventEmitter {
             playingNow = true;
         }
         try {
-            return await this.resolve(music, user, playingNow);
+            let musics = await this.resolve(music, user);
+            if (music.length == 0) throw new Error("Resolve returned a empty array");
+            let pos = this._queue.length;
+            this._queue.push(...musics);
+            if (playingNow) {
+                let m = await this._resolver[this._queue[pos].resolver].get(this._queue[pos].resolvable);
+                if (!m) throw new Error("Abnormal null during resolver get");
+                let resource = createAudioResource(m.stream, { inputType: m.type });
+                this._player?.play(resource);
+                this._playingTime = 0;
+                this._lastTime = Date.now();
+            }
+            return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: musics.length, pos: pos };
         } catch (e) {
             if (playingNow)
                 this.destroy();
@@ -237,47 +257,26 @@ export class HellionMusicPlayer extends EventEmitter {
         this.emit('end');
     }
 
-    private async resolve(music: string, user: GuildMember, playingNow: boolean): Promise<HellionPlayResult> {
+    private async resolve(music: string, user: GuildMember): Promise<HellionQueuedMusic[]> {
         for (let i = 0; i < this._resolver.length; i++) {
             try {
                 if (this._resolver[i] instanceof HellionBulkMusic) {
                     let resolver = this._resolver[i] as HellionBulkMusic;
                     let res = await resolver.bulk(music);
                     if (!res) continue;
-                    let pos = -1;
+                    let result: HellionQueuedMusic[] = [];
                     for (let d of res) {
                         let k = { title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: user };
-                        let index = this._queue.push(k);
-                        if (pos == -1)
-                            pos = index - 1;
+                        result.push(k);
                     };
-                    if (playingNow) {
-                        let m = await resolver.get(this._queue[pos].resolvable);
-                        if (!m)
-                            throw new Error("Abnormal null during resolver get");
-                        let resource = createAudioResource(m.stream, { inputType: m.type });
-                        this._player?.play(resource);
-                        this._playingTime = 0;
-                        this._lastTime = Date.now();
-                    }
-                    return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: res.length, pos: pos };
+                    return result;
                 }
                 else {
                     let resolver = this._resolver[i] as HellionSingleMusic;
                     let res = await resolver.resolve(music);
                     if (!res) continue;
                     let k = { title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: user };
-                    let pos = this._queue.push(k) - 1;
-                    if (playingNow) {
-                        let m = await resolver.get(this._queue[0].resolvable);
-                        if (!m)
-                            throw new Error("Abnormal null during resolver get");
-                        let resource = createAudioResource(m.stream, { inputType: m.type });
-                        this._player?.play(resource);
-                        this._playingTime = 0;
-                        this._lastTime = Date.now();
-                    }
-                    return { playing: playingNow, requestedBy: user, pos: pos, title: res.title };
+                    return [k];
                 }
             } catch (e) {
                 this.emit('error', e);
@@ -383,7 +382,7 @@ export interface HellionPlayResult {
     playing: boolean;
     pos: number;
     requestedBy: GuildMember;
-    count?: number;
+    count: number;
 }
 
 export type HellionMusicLoop = 'none' | 'queue' | 'music';
