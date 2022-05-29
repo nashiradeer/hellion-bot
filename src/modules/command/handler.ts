@@ -223,6 +223,21 @@ export class HellionCommandHandler extends EventEmitter {
             this.emit('cmdError', command, e);
         }
     }
+
+    public searchCommands(searchTerm: string | null | undefined): HellionCommandListener[] {
+        let commands: HellionCommandListener[] = [];
+        for (let cmd in this._commands) {
+            if (cmd === this._commands[cmd].name) commands.push(this._commands[cmd]);
+        }
+        if (!searchTerm) return commands;
+        searchTerm = searchTerm.toLowerCase();
+        let command = this._commands[searchTerm];
+        if (!command) {
+            return commands.filter((v) => v.category.toLowerCase() == searchTerm);
+        } else {
+            return [command];
+        }
+    }
 }
 
 export interface HellionCommandEventOptions {
@@ -236,8 +251,7 @@ export interface HellionCommandEventOptions {
 }
 
 export class HellionCommandEvent {
-    private _handler: HellionCommandHandler;
-
+    public handler: HellionCommandHandler;
     public replyHandler: HellionReplyHandler;
 
     public command: string;
@@ -252,7 +266,7 @@ export class HellionCommandEvent {
     public createdAt: Date;
 
     constructor(handler: HellionCommandHandler, command: string, args: HellionCommandArgs, reply: HellionReplyHandler, options: HellionCommandEventOptions) {
-        this._handler = handler;
+        this.handler = handler;
         this.args = args;
         this.command = command;
         this.client = options.client;
@@ -270,19 +284,19 @@ export class HellionCommandEvent {
     }
 
     public info(message: string): void {
-        this._handler.emit('cmdDebug', this.command, 'info', message);
+        this.handler.emit('cmdDebug', this.command, 'info', message);
     }
 
     public warn(message: string): void {
-        this._handler.emit('cmdDebug', this.command, 'warn', message);
+        this.handler.emit('cmdDebug', this.command, 'warn', message);
     }
 
     public debug(message: string): void {
-        this._handler.emit('cmdDebug', this.command, 'debug', message);
+        this.handler.emit('cmdDebug', this.command, 'debug', message);
     }
 
     public error(err: Error): void {
-        this._handler.emit('cmdError', this.command, err);
+        this.handler.emit('cmdError', this.command, err);
     }
 }
 
@@ -337,7 +351,7 @@ export class HellionReplyHandler {
     }
 }
 
-interface HellionCommandListeners {
+export interface HellionCommandListeners {
     [command: string]: HellionCommandListener;
 }
 
