@@ -23,7 +23,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
             event.reply({
-                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -39,7 +38,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
         if (!music) {
             event.reply({
-                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -52,7 +50,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -94,7 +91,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             if (msg == "") {
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -107,7 +103,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
 
             event.reply({
-                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)

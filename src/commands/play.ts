@@ -37,7 +37,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
             event.reply({
-                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -82,7 +81,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music.on('queueError', (music, err) => {
                 event.error(err);
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -102,7 +100,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -119,7 +116,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!link) {
             music.resume();
             event.reply({
-                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
@@ -135,7 +131,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             let res = await music.play(link, event.member as GuildMember);
             if (res.count) {
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
@@ -161,7 +156,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
             else if (res.playing) {
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
@@ -173,7 +167,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
             else {
                 event.reply({
-                    fetchEdit: true,
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
@@ -187,7 +180,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         catch (err) {
             event.error(err);
             event.reply({
-                fetchEdit: true,
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
