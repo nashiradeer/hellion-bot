@@ -19,7 +19,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     .setTitle("Hellion Warden // About")
                     .setDescription(
                         `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
-                        `Version: ${HellionWardenInformation.VERSION}`)
+                        `Version: v${HellionWardenInformation.VERSION}`)
                     .addField("NodeJS Information",
                         `Version: ${process.version}\n` +
                         `Uptime: ${this.getTime(process.uptime())}\n` +
@@ -27,8 +27,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         `Architecture: ${process.arch}`
                         , true)
                     .addField("Discord.JS Information",
-                        `Version: ${version}\n` +
-                        `Uptime: ${this.getTime((event.client.uptime || 0) / 1000)} mins\n` +
+                        `Version: v${version}\n` +
+                        `Uptime: ${this.getTime((event.client.uptime || 0) / 1000)}\n` +
                         `API Latency: ${event.client.ws.ping}ms\n` +
                         `Latency: ${Date.now() - event.createdTimestamp}ms`
                         , true)
