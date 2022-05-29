@@ -7,7 +7,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         this.name = "disconnect";
         this.category = "Music";
         this.description = "Stop the Music Player and disconnect from the voice channel.";
-        this.alias = ["exit", "quit", "d"];
+        this.alias = ["exit", "quit", "d", "leave", "e"];
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
