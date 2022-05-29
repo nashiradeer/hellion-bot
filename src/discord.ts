@@ -1,6 +1,6 @@
 import { Client, ClientOptions, CommandInteraction, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler, player } from '.';
+import { commandHandler, HellionWardenInformation, player } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenData {
@@ -52,7 +52,10 @@ export class HellionWarden extends EventEmitter {
         });
         this._client.once('ready', () => {
             this.emit('logged');
-            this._client.user?.setActivity("with Nashira Deer", { type: 'LISTENING' });
+            setInterval(async () => {
+                let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
+                this._client.user?.setActivity(this.message[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
+            }, 60000);
         });
 
         // Initialize Command Handler
@@ -116,5 +119,9 @@ export class HellionWarden extends EventEmitter {
 
         this.emit('debug', 'info', "Registering Slash Commands...");
         await this.handler.initSlashCommand(this._client.user?.id || '', this._token);
+    }
+
+    private async guildSize(): Promise<number> {
+        return (await this._client.shard?.fetchClientValues('guilds.cache.size'))?.reduce((acc: number, cur: number) => acc + cur, 0) as number || this._client.guilds.cache.size;
     }
 }
