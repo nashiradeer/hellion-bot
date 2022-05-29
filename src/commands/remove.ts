@@ -73,6 +73,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setDescription("You aren't using a valid number.")
                     ]
                 });
+                return;
             }
             let queuenum = parseInt(numstr as string) - 1;
 

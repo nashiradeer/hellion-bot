@@ -72,6 +72,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setDescription("You aren't using a valid number.")
                     ]
                 });
+                return;
             }
             let seektime = parseInt(numstr as string) - 1;
 
