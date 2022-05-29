@@ -73,7 +73,7 @@ export class HellionWarden extends EventEmitter {
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Mention")
-                            .setDescription(`My command prefix is \`\`${this.prefix}\`\`.`)
+                            .setDescription(`My command prefix is: \`\`${this.prefix}\`\``)
                     ]
                 });
             }
