@@ -18,8 +18,10 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     .setThumbnail(event.client.user?.avatarURL() || '')
                     .setTitle("Hellion Warden // About")
                     .setDescription(
+                        `Software: Hellion Warden` +
                         `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
-                        `Version: v${HellionWardenInformation.VERSION}`)
+                        `Version: v${HellionWardenInformation.VERSION}\n` +
+                        `Support: https://discord.gg/n7MttxXQwa`)
                     .addField("NodeJS Information",
                         `Version: ${process.version}\n` +
                         `Uptime: ${this.getTime(process.uptime())}\n` +
