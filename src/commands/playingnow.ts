@@ -53,13 +53,15 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
 
             let m = music.nowPlaying();
+            let nib = Math.round(m.current / (m.duration / 40));
+            let progressbar = `╣${"▓".repeat(nib)}${"░".repeat(40 - nib)}╠`;
             event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Playing Now")
-                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.requestedBy.user.tag})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration)}\`\``)
+                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.requestedBy.user.tag})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration)}\`\`\n${progressbar}`)
                 ]
             });
         }
