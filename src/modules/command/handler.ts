@@ -162,7 +162,7 @@ export class HellionCommandHandler extends EventEmitter {
 
     public async run(client: Client, message: Message, prefix: string, data: any) {
         let args = message.content.trim().slice(prefix.length).split(' ');
-        this.runMessage(client, message, args.shift()?.toLowerCase() || '', args, data);
+        await this.runMessage(client, message, args.shift()?.toLowerCase() || '', args, data);
     }
 
     public async runMessage(client: Client, message: Message, command: string, args: string[], data: any) {
@@ -187,7 +187,7 @@ export class HellionCommandHandler extends EventEmitter {
             });
 
             this.emit('debug', 'info', `Running message command '${command}'...`);
-            cmd.run(event, data);
+            await cmd.run(event, data);
         }
         catch (e) {
             this.emit('cmdError', command, e);
@@ -217,7 +217,7 @@ export class HellionCommandHandler extends EventEmitter {
                 });
 
             this.emit('debug', 'info', `Running interaction command '${command.commandName}'...`);
-            cmd.run(event, data);
+            await cmd.run(event, data);
         }
         catch (e) {
             this.emit('cmdError', command, e);
