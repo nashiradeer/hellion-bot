@@ -166,7 +166,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
         try {
             let res = await music.play(link, event.member as GuildMember);
-            if (res.count) {
+            if (res.count > 1) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
