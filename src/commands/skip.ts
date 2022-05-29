@@ -54,15 +54,27 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             await event.replyHandler.defer();
             let m = await music.skip();
-            event.reply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Skip")
-                        .setDescription(`Skipped to: ${m.title} **[${m.requestedBy.user.tag}]**`)
-                ]
-            });
+            if (!m) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Skip")
+                            .setDescription(`Reached the end of the queue, disconnecting...`)
+                    ]
+                });
+            } else {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Skip")
+                            .setDescription(`Skipped to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                    ]
+                });
+            }
         }
     }
 }
