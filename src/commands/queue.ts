@@ -61,21 +61,35 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
 
-
             await event.replyHandler.defer();
-            let numstr = event.args.getByIndex(0) || '1';
-            let pagenum = parseInt(numstr as string);
-            let msg = "";
-            var offset = 0;
-            if (!isNaN(pagenum) && isFinite(pagenum))
-                offset = 10 * (pagenum - 1);
-
             let queue = music.getQueue();
-            var limit = queue.length;
+            let totalPages = Math.ceil(queue.length / 10);
+            let m = music.nowPlaying();
+            let numstr = event.args.getByIndex(0) || '1';
+            let curPage = parseInt(numstr as string);
+            if (isNaN(curPage) || !isFinite(curPage))
+                curPage = 1;
+
+            if (curPage > totalPages) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Queue")
+                            .setDescription(`Page number is greater than total pages: \`\`${totalPages}\`\``)
+                    ]
+                });
+                return;
+            }
+
+            let offset = 10 * (curPage - 1);
+            let limit = queue.length;
             if (offset + 10 < limit)
                 limit = offset + 10;
 
-            for (var i = offset; i < limit; i++)
+            let msg = `**${"━".repeat(20)}**\n**Playing:** [${m.pos + 1}] // **Page:** [${curPage} / ${totalPages}]\n**${"━".repeat(20)}**\n`;
+            for (let i = offset; i < limit; i++)
                 msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].requestedBy.user.tag})**\n`;
 
             if (msg == "") {
@@ -85,7 +99,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Queue")
-                            .setDescription(`The queue page number **${pagenum}** is empty.`)
+                            .setDescription(`The queue page number **${curPage}** is empty.`)
                     ]
                 });
                 return;
