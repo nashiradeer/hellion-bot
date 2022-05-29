@@ -71,35 +71,57 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Play Now")
-                            .setDescription("I can't play a empty music.")
+                            .setDescription("I can't play nothing.")
                     ]
                 });
                 return;
             }
-
-            let m = await music.play(link, event.member as GuildMember);
-
             try {
-                let mu = await music.goto(m.pos);
-                event.reply({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Play Now")
-                            .setDescription(`${mu.title} **[${mu.requestedBy.user.tag}]**`)
-                    ]
-                });
+                let res = await music.playNow(link, event.member as GuildMember);
+                if (res.count > 1) {
+                    event.reply({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(0x260041)
+                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                                .setTitle("Hellion Warden // Enqueued")
+                                .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
+                        ]
+                    });
+
+                    music.textChannel.send({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(0x260041)
+                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                                .setTitle("Hellion Warden // Play Now")
+                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                        ]
+                    }).then((m) => {
+                        setTimeout(() => m.delete(), 30000);
+                    });
+                }
+                else {
+                    event.reply({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(0x260041)
+                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                                .setTitle("Hellion Warden // Play Now")
+                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                        ]
+                    });
+                }
             }
-            catch (e) {
-                event.error(e);
+            catch (err) {
+                event.error(err);
                 event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Play Now")
-                            .setDescription("I can't resolve this music.")
+                            .setDescription("I can't resolve this music.\nPlease check if the music exists, is public and if isn't age restricted.")
                     ]
                 });
             }
