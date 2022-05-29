@@ -122,7 +122,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(0x260041)
                                 .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Loop")
-                                .setDescription("Loop type options: '`music`', '`queue`', '`none`'.")
+                                .setDescription(`**Queue loop type:** ${music.getLoop()}\n**Loop type options:** '\`music\`', '\`queue\`', '\`none\`'.`)
                         ]
                     });
                     break;
