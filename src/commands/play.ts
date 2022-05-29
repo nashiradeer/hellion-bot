@@ -49,6 +49,46 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
 
         let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
+        let link = event.args.getByIndex(0);
+
+
+        if (!link) {
+            if (!music) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Play")
+                            .setDescription("I aren't playing anything. You need provide a valid URL or search term after the play command.")
+                    ]
+                });
+                return;
+            }
+            if (music.voiceChannel.id != member.voice.channelId) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Play")
+                            .setDescription("You aren't in the same voice channel of me.")
+                    ]
+                });
+                return;
+            }
+            music?.resume();
+            event.reply({
+                embeds: [
+                    new MessageEmbed()
+                        .setColor(0x260041)
+                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                        .setTitle("Hellion Warden // Play")
+                        .setDescription("Resuming the music player.")
+                ]
+            });
+            return;
+        }
 
         if (!music) {
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
@@ -110,21 +150,6 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 });
                 return;
             }
-        }
-
-        let link = event.args.getByIndex(0);
-        if (!link) {
-            music.resume();
-            event.reply({
-                embeds: [
-                    new MessageEmbed()
-                        .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Play")
-                        .setDescription("Resuming the music player.")
-                ]
-            });
-            return;
         }
 
         try {
