@@ -118,6 +118,18 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 (data as discord.HellionWardenData).music.delete(event.guild?.id || '');
             });
 
+            music.on('disconnected', () => {
+                music?.textChannel.send({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Disconnected")
+                            .setDescription("A administrator has moved or kicked out me.")
+                    ]
+                });
+            });
+
             music.on('queueError', (music, err) => {
                 event.error(err);
                 event.reply({

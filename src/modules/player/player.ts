@@ -16,6 +16,9 @@ export declare interface HellionMusicPlayer {
     on(event: 'play', listener: (music: HellionMusic) => void): this;
     once(event: 'play', listener: (music: HellionMusic) => void): this;
 
+    on(event: 'disconnected', listener: () => void): this;
+    once(event: 'disconnected', listener: () => void): this;
+
     on(event: 'end', listener: () => void): this;
     once(event: 'end', listener: () => void): this;
 }
@@ -34,6 +37,7 @@ export class HellionMusicPlayer extends EventEmitter {
     private _lastTime: number;
     private _playingTime: number;
     private _paused: boolean;
+    private _destroyed: boolean;
 
     constructor(voiceChannel: VoiceChannel, textChannel: TextChannel) {
         super();
@@ -46,6 +50,8 @@ export class HellionMusicPlayer extends EventEmitter {
         this._player = null;
         this._resolver = [];
         this._loop = 'none';
+
+        this._destroyed = false;
     }
 
     public addResolver(resolver: HellionMusicResolver): number {
@@ -96,7 +102,10 @@ export class HellionMusicPlayer extends EventEmitter {
             adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
         })
             .on(VoiceConnectionStatus.Disconnected, () => {
-                this.destroy();
+                if (!this._destroyed) {
+                    this.destroy();
+                    this.emit('disconnected');
+                }
             })
             .on('error', (err) => {
                 this.emit('error', err);
@@ -170,14 +179,17 @@ export class HellionMusicPlayer extends EventEmitter {
         }
     }
 
-    public async skip(): Promise<HellionMusic> {
+    public async skip(): Promise<HellionMusic | null> {
         return new Promise((res) => {
             if (!this._player)
                 throw new Error("Player doesn't exists");
-            this._player.once(AudioPlayerStatus.Playing, () => {
-                let music = this._queue[this._playingNow];
-                res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
-            });
+            if (this._queue.length - 1 == this._playingNow && this._loop == 'none')
+                res(null);
+            else
+                this._player.once(AudioPlayerStatus.Playing, () => {
+                    let music = this._queue[this._playingNow];
+                    res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
+                });
             this._player.unpause();
             this._player.stop();
         });
@@ -213,6 +225,7 @@ export class HellionMusicPlayer extends EventEmitter {
     }
 
     public destroy(): void {
+        this._destroyed = true;
         if (this._connection) {
             this._connection.destroy();
             this._connection = null;
