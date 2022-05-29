@@ -1,10 +1,9 @@
 FROM node:16-alpine
-RUN apk add --no-cache alpine-sdk libtool autoconf automake python3
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-RUN apk del alpine-sdk libtool autoconf automake python3
 COPY . .
-RUN npm run build
-RUN npm prune --production
+RUN apk add --no-cache --virtual .build-deps alpine-sdk libtool autoconf automake python3 \
+    && npm install \
+    && apk del .build-deps \
+    && npm run build \
+    && npm prune --production
 CMD [ "npm", "start" ]
