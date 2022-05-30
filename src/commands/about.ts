@@ -18,7 +18,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     .setThumbnail(event.client.user?.avatarURL() || '')
                     .setTitle("Hellion Warden // About")
                     .setDescription(
-                        `Software: Hellion Warden` +
+                        `Software: Hellion Warden\n` +
                         `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
                         `Version: v${HellionWardenInformation.VERSION}\n` +
                         `Support: https://discord.gg/n7MttxXQwa`)
