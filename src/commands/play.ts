@@ -93,11 +93,11 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!music) {
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
 
-            music.addResolver(new player.resolvers.playDL.HellionYTDLResolver());
-            music.addResolver(new player.resolvers.playDL.HellionYTPLResolver());
-            music.addResolver(new player.resolvers.playDL.HellionSODLResolver());
-            music.addResolver(new player.resolvers.playDL.HellionSOPLResolver());
-            music.addResolver(new player.resolvers.playDL.HellionYTSRResolver());
+            music.addResolver(new (await player.resolvers.playDl()).HellionYTDLResolver());
+            music.addResolver(new (await player.resolvers.playDl()).HellionYTPLResolver());
+            music.addResolver(new (await player.resolvers.playDl()).HellionSODLResolver());
+            music.addResolver(new (await player.resolvers.playDl()).HellionSOPLResolver());
+            music.addResolver(new (await player.resolvers.playDl()).HellionYTSRResolver());
 
             music.on('play', (playing) => {
                 music?.textChannel.send({

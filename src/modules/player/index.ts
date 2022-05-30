@@ -1,8 +1,10 @@
 export * from './player';
 
-//import * as ytdl from './resolvers/ytdl';
-import * as playDL from './resolvers/play-dl';
-
 export const resolvers = {
-    playDL
-};
+    playDl: async () => {
+        return await import('./resolvers/play-dl');
+    },
+    ytdl: async () => {
+        return await import('./resolvers/ytdl');
+    }
+}
