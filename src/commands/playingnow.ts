@@ -53,8 +53,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
 
             let m = music.nowPlaying();
-            let nib = Math.round(m.current / (m.duration / 40));
-            let progressbar = `╣${"▓".repeat(nib)}${"░".repeat(40 - nib)}╠`;
+            let nib = Math.round(m.current / (m.duration / 30));
+            let progressbar = `╣${"▓".repeat(nib)}${"░".repeat(30 - nib)}╠`;
             event.reply({
                 embeds: [
                     new MessageEmbed()
