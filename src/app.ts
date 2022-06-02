@@ -7,6 +7,8 @@ import { HellionWardenInformation, discord, logger } from '.';
 interface HellionWardenArgs {
    token: string;
    prefix: string;
+   botowner: string;
+   public: string;
    verbose: logger.HellionLoggerLevel | 'none';
 }
 
@@ -33,6 +35,19 @@ argparser.add_argument('--verbose', {
    default: 'info'
 });
 
+argparser.add_argument('--public', {
+   type: 'str',
+   help: 'Enable the invite command',
+   choices: ['yes', 'no'],
+   default: process.env.BOT_PUBLIC || 'no'
+});
+
+argparser.add_argument('--botowner', {
+   type: 'str',
+   help: 'Set the bot owner ID.',
+   default: process.env.BOT_OWNER || ''
+})
+
 argparser.add_argument('-v', '--version', {
    action: 'version',
    version: HellionWardenInformation.VERSION
@@ -48,7 +63,11 @@ if (args.verbose && args.verbose != 'none')
    ));
 
 
-const DiscordBot = new discord.HellionWarden(args.token, args.prefix);
+const DiscordBot = new discord.HellionWarden(args.token, args.prefix, {
+   botpublic: args.public == "yes",
+   botowner: args.botowner,
+   intents: discord.HellionWarden.REQUIRED_INTENTS
+});
 
 DiscordBot.once('ready', () => {
    logger.HellionLogger.getLogger('Discord').info("Discord bot is ready.");

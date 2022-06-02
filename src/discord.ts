@@ -1,10 +1,17 @@
-import { Client, ClientOptions, CommandInteraction, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
+import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
 import { commandHandler, HellionWardenInformation, player } from '.';
 import { resolve } from 'path';
 
+export interface HellionWardenOptions {
+    botpublic?: boolean;
+    botowner?: string;
+}
+
 export interface HellionWardenData {
     music: Map<string, player.HellionMusicPlayer>;
+    botpublic: boolean;
+    botowner: string;
     prefix: string;
 }
 
@@ -23,26 +30,34 @@ export declare interface HellionWarden {
 }
 
 export class HellionWarden extends EventEmitter {
+    public static readonly REQUIRED_INTENTS: BitFieldResolvable<IntentsString, number> = ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'];
+
     private _data: HellionWardenData;
     private _client: Client;
     private _token: string;
 
     public prefix: string;
+    public botpublic: boolean;
+    public botowner: string;
     public handler: commandHandler.HellionCommandHandler;
 
-    constructor(token: string, prefix: string = "h!", options?: ClientOptions) {
+    constructor(token: string, prefix: string = "h!", options?: ClientOptions & HellionWardenOptions) {
         super();
 
         // Initialize
         this._token = token;
         this.prefix = prefix;
+        this.botpublic = options?.botpublic || false;
+        this.botowner = options?.botowner || '';
         this._data = {
             music: new Map<string, player.HellionMusicPlayer>(),
-            prefix: prefix
+            prefix: prefix,
+            botpublic: this.botpublic,
+            botowner: this.botowner
         };
 
         // Initialize Discord Client
-        this._client = new Client(options || { intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'] });
+        this._client = new Client(options || { intents: HellionWarden.REQUIRED_INTENTS });
 
         // Register Discord Client events
         this._client.on('messageCreate', (message) => this.message(message));
