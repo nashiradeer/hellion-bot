@@ -8,5 +8,5 @@ RUN apk add --no-cache --virtual .build-deps alpine-sdk libtool autoconf automak
 COPY . .
 RUN npm install --include=dev --include=optional \
     && npm run build \
-    && npm prune --omit=dev --include=optional
+    && npm prune --omit=dev --omit=optional
 CMD [ "npm", "start" ]
