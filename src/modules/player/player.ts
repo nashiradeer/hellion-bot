@@ -1,7 +1,8 @@
 import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
 import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { EventEmitter } from 'events';
-import { Readable } from 'stream';
+import { HellionResolverAdapter } from './resolver';
+import { HellionMusic, HellionQueueLoop } from "./base";
 
 export declare interface HellionMusicPlayer {
     on(event: 'ready', listener: () => void): this;
@@ -27,17 +28,21 @@ export class HellionMusicPlayer extends EventEmitter {
     public voiceChannel: VoiceChannel;
     public textChannel: TextChannel;
 
-    private _playingNow: number;
-    private _queue: HellionQueuedMusic[];
+    public playIndex: number;
+    public queue: HellionMusic[];
+    public loop: HellionQueueLoop;
+
     private _connection: VoiceConnection | null;
     private _player: AudioPlayer | null;
-    private _resolver: HellionMusicResolver[];
-    private _loop: HellionMusicLoop;
 
-    private _lastTime: number;
-    private _playingTime: number;
+    private _accumulativeTime: number;
+    private _lastPlayTime: number;
+
     private _paused: boolean;
+    private _
     private _destroyed: boolean;
+
+    private _adapter?: HellionResolverAdapter;
 
     constructor(voiceChannel: VoiceChannel, textChannel: TextChannel) {
         super();
@@ -49,7 +54,7 @@ export class HellionMusicPlayer extends EventEmitter {
         this._connection = null;
         this._player = null;
         this._resolver = [];
-        this._loop = 'none';
+        this.loop = HellionQueueLoop.None;
 
         this._destroyed = false;
     }
@@ -68,12 +73,32 @@ export class HellionMusicPlayer extends EventEmitter {
         return resolver;
     }
 
+    /**
+     * @deprecated string based loop types is deprecated since v1.2.0
+     */
     public setLoop(type: HellionMusicLoop): void {
-        this._loop = type;
+        switch (type) {
+            case "music":
+                this.loop = HellionQueueLoop.Music;
+                break;
+            case "queue":
+                this.loop = HellionQueueLoop.Queue;
+                break;
+            default:
+                this.loop = HellionQueueLoop.None;
+                break;
+        }
     }
 
+    /**
+     * @deprecated string based loop types is deprecated since v1.2.0
+     */
     public getLoop(): HellionMusicLoop {
-        return this._loop;
+        switch (this.loop) {
+            case HellionQueueLoop.Music: return "music";
+            case HellionQueueLoop.Queue: return "queue";
+            default: return "none";
+        }
     }
 
     public getQueue(): HellionMusic[] {
@@ -322,67 +347,7 @@ export class HellionMusicPlayer extends EventEmitter {
     }
 }
 
-export class HellionSingleMusic {
-    public async resolve(music: string): Promise<HellionMusicResolved | null> {
-        throw new Error("Method not implemented");
-    }
-
-    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream | null> {
-        throw new Error("Method not implemented");
-    }
-}
-
-export class HellionBulkMusic {
-    public async bulk(music: string): Promise<HellionMusicResolved[] | null> {
-        throw new Error("Method not implemented");
-    }
-
-    public async get(resolvable: string, seek?: number): Promise<HellionMusicStream | null> {
-        throw new Error("Method not implemented");
-    }
-}
-
-export type HellionMusicResolver = HellionBulkMusic | HellionSingleMusic;
-
-export interface HellionMusicStream {
-    stream: Readable;
-    type?: StreamType;
-}
-
-export interface HellionMusicResolved {
-    title: string;
-    duration: number;
-    resolvable: string;
-}
-
-export interface HellionMusic {
-    title: string;
-    duration: number;
-    requestedBy: GuildMember;
-}
-
-export interface HellionQueuedMusic {
-    title: string;
-    resolver: number;
-    duration: number;
-    resolvable: string;
-    requestedBy: GuildMember;
-}
-
-export interface HellionPlayingNow {
-    title: string;
-    current: number;
-    duration: number;
-    requestedBy: GuildMember;
-    pos: number;
-}
-
-export interface HellionPlayResult {
-    title: string;
-    playing: boolean;
-    pos: number;
-    requestedBy: GuildMember;
-    count: number;
-}
-
+/**
+ * @deprecated string based loop types is deprecated since v1.2.0
+ */
 export type HellionMusicLoop = 'none' | 'queue' | 'music';
