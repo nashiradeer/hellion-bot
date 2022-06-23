@@ -1,35 +1,35 @@
 import { HellionMusic, HellionMusicExtractor, HellionMusicLoader, HellionMusicStream } from "./base";
 
 export class HellionResolverExtractorAdapter extends HellionMusicExtractor {
-    private _resolver: HellionMusicResolver;
+    public resolver: HellionMusicResolver;
 
     constructor(extractor: string, resolver: HellionMusicResolver) {
         super(extractor);
-        this._resolver = resolver;
+        this.resolver = resolver;
     }
 
     public async get(resolvable: string, seek: number = 0): Promise<HellionMusicStream> {
-        let music = await this._resolver.get(resolvable, seek);
+        let music = await this.resolver.get(resolvable, seek);
         if (!music) throw new Error("Resolver has returned null");
         return music;
     }
 }
 
 export class HellionResolverLoaderAdapter extends HellionMusicLoader {
-    private _resolver: HellionMusicResolver;
+    public resolver: HellionMusicResolver;
 
     constructor(extractor: string, resolver: HellionMusicResolver) {
         super(extractor);
-        this._resolver = resolver;
+        this.resolver = resolver;
     }
 
     public async load(arg: string, user: string): Promise<HellionMusic[]> {
-        if (this._resolver instanceof HellionSingleMusic) {
-            let music = await this._resolver.resolve(arg);
+        if (this.resolver instanceof HellionSingleMusic) {
+            let music = await this.resolver.resolve(arg);
             if (!music) return [];
             else return [resolved2music(this.extractor, user, music)];
         } else {
-            let musics = await this._resolver.bulk(arg);
+            let musics = await this.resolver.bulk(arg);
             if (!musics) return [];
             let nam: HellionMusic[] = [];
             for (let item of musics)

@@ -62,3 +62,9 @@ export class HellionMusicSearcher {
         throw new Error("Not implemented");
     }
 }
+
+export interface HellionMusicPlayerOptions {
+    extractors?: HellionMusicExtractor[] | null;
+    loaders?: HellionMusicLoader[] | null;
+    searchers?: HellionMusicSearcher[] | null;
+}

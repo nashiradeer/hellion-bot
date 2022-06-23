@@ -1,8 +1,8 @@
 import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
 import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { EventEmitter } from 'events';
-import { HellionResolverAdapter } from './resolver';
-import { HellionMusic, HellionQueueLoop } from "./base";
+import { HellionMusic, HellionMusicExtractor, HellionMusicLoader, HellionMusicPlayerOptions, HellionMusicSearcher, HellionQueueLoop } from "./base";
+import { HellionMusicResolver, HellionResolverExtractorAdapter, HellionResolverLoaderAdapter } from "./resolver";
 
 export declare interface HellionMusicPlayer {
     on(event: 'ready', listener: () => void): this;
@@ -28,9 +28,13 @@ export class HellionMusicPlayer extends EventEmitter {
     public voiceChannel: VoiceChannel;
     public textChannel: TextChannel;
 
-    public playIndex: number;
+    public playing: number;
     public queue: HellionMusic[];
     public loop: HellionQueueLoop;
+
+    public extractors: HellionMusicExtractor[];
+    public loaders: HellionMusicLoader[];
+    public searchers: HellionMusicSearcher[];
 
     private _connection: VoiceConnection | null;
     private _player: AudioPlayer | null;
@@ -39,37 +43,67 @@ export class HellionMusicPlayer extends EventEmitter {
     private _lastPlayTime: number;
 
     private _paused: boolean;
-    private _
+    private _playing: boolean;
     private _destroyed: boolean;
 
-    private _adapter?: HellionResolverAdapter;
+    private _resolver: number;
 
-    constructor(voiceChannel: VoiceChannel, textChannel: TextChannel) {
+    constructor(voiceChannel: VoiceChannel, textChannel: TextChannel, options?: HellionMusicPlayerOptions | null) {
         super();
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
 
-        this._playingNow = 0;
-        this._queue = [];
-        this._connection = null;
-        this._player = null;
-        this._resolver = [];
+        this.playing = 0;
+        this.queue = [];
         this.loop = HellionQueueLoop.None;
 
+        this.extractors = options?.extractors || [];
+        this.loaders = options?.loaders || [];
+        this.searchers = options?.searchers || [];
+
+        this._connection = null;
+        this._player = null;
+
+        this._accumulativeTime = 0;
+        this._lastPlayTime = 0;
+
+        this._paused = false;
+        this._playing = false;
         this._destroyed = false;
+
+        this._resolver = 0;
     }
 
     public addResolver(resolver: HellionMusicResolver): number {
-        return this._resolver.push(resolver) - 1;
+        this.extractors.push(new HellionResolverExtractorAdapter("resolver-adapter-" + this._resolver, resolver));
+        this.loaders.push(new HellionResolverLoaderAdapter("resolver-adapter-" + this._resolver, resolver));
+        return this._resolver++;
     }
 
     public getResolver(index: number): HellionMusicResolver {
-        return this._resolver[index];
+        for (let extractor of this.extractors) {
+            if (extractor.extractor == "resolver-adapter-" + index && extractor instanceof HellionResolverExtractorAdapter) {
+                return extractor.resolver;
+            }
+        }
+        for (let loader of this.loaders) {
+            if (loader.extractor == "resolver-adapter-" + index && loader instanceof HellionResolverLoaderAdapter) {
+                return loader.resolver;
+            }
+        }
+        throw new RangeError("Don't have a resolver adapter with this index.");
     }
 
     public delResolver(index: number): HellionMusicResolver {
-        let resolver = this._resolver[index];
-        delete this._resolver[index];
+        let resolver = this.getResolver(index);
+        for (let i = 0; i < this.extractors.length; i++) {
+            if (this.extractors[i].extractor == "resolver-adapter-" + index && this.extractors[i] instanceof HellionResolverExtractorAdapter)
+                this.extractors.splice(i, 1);
+        }
+        for (let i = 0; i < this.loaders.length; i++) {
+            if (this.loaders[i].extractor == "resolver-adapter-" + index && this.loaders[i] instanceof HellionResolverLoaderAdapter)
+                this.loaders.splice(i, 1);
+        }
         return resolver;
     }
 
@@ -101,20 +135,23 @@ export class HellionMusicPlayer extends EventEmitter {
         }
     }
 
+    /**
+     * @deprecated since v1.2.0
+     */
     public getQueue(): HellionMusic[] {
-        let result: HellionMusic[] = [];
-        for (let item of this._queue)
-            result.push({ title: item.title, requestedBy: item.requestedBy, duration: item.duration });
-        return result;
+        return this.queue;
     }
 
+    /**
+     * @deprecated since v1.2.0
+     */
     public nowPlaying(): HellionPlayingNow {
         return {
-            title: this._queue[this._playingNow].title,
-            requestedBy: this._queue[this._playingNow].requestedBy,
-            duration: this._queue[this._playingNow].duration,
-            current: ((!this._paused) ? Date.now() - this._lastTime : 0) + this._playingTime,
-            pos: this._playingNow
+            title: this.queue[this.playing].title,
+            requestedBy: this.queue[this.playing].user,
+            duration: this.queue[this.playing].duration,
+            current: ((!this._paused) ? Date.now() - this._lastPlayTime : 0) + this._accumulativeTime,
+            pos: this.playing
         };
     }
 
@@ -269,19 +306,6 @@ export class HellionMusicPlayer extends EventEmitter {
         return music;
     }
 
-    public destroy(): void {
-        this._destroyed = true;
-        if (this._connection) {
-            this._connection.destroy();
-            this._connection = null;
-        }
-        if (this._player) {
-            this._player.stop();
-            this._player = null;
-        }
-        this.emit('end');
-    }
-
     private async resolve(music: string, user: GuildMember): Promise<HellionQueuedMusic[]> {
         for (let i = 0; i < this._resolver.length; i++) {
             try {
@@ -345,9 +369,37 @@ export class HellionMusicPlayer extends EventEmitter {
             this.emit('queueError', { title: music.title, requestedBy: music.requestedBy, duration: music.duration }, e);
         }
     }
+
+    private startPlay(seek: number = 0): void {
+
+    }
+
+    public destroy(): void {
+        this._destroyed = true;
+        if (this._connection) {
+            this._connection.destroy();
+            this._connection = null;
+        }
+        if (this._player) {
+            this._player.stop();
+            this._player = null;
+        }
+        this.emit('end');
+    }
 }
 
 /**
  * @deprecated string based loop types is deprecated since v1.2.0
  */
 export type HellionMusicLoop = 'none' | 'queue' | 'music';
+
+/**
+ * @deprecated since v1.2.0
+ */
+export interface HellionPlayingNow {
+    title: string;
+    current: number;
+    duration: number;
+    requestedBy: string;
+    pos: number;
+}
