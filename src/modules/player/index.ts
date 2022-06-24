@@ -1,4 +1,6 @@
 export * from './player';
+export * from './base';
+export * from './resolver';
 
 export const resolvers = {
     playDl: async () => {

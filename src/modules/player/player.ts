@@ -1,7 +1,7 @@
-import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
+import { TextChannel, VoiceChannel } from "discord.js";
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { EventEmitter } from 'events';
-import { HellionMusic, HellionMusicExtractor, HellionMusicLoader, HellionMusicPlayerOptions, HellionMusicSearcher, HellionQueueLoop } from "./base";
+import { HellionMusic, HellionMusicEnqueued, HellionMusicExtractor, HellionMusicLoader, HellionMusicPlayerOptions, HellionMusicSearcher, HellionMusicStream, HellionQueueLoop } from "./base";
 import { HellionMusicResolver, HellionResolverExtractorAdapter, HellionResolverLoaderAdapter } from "./resolver";
 
 export declare interface HellionMusicPlayer {
@@ -28,7 +28,7 @@ export class HellionMusicPlayer extends EventEmitter {
     public voiceChannel: VoiceChannel;
     public textChannel: TextChannel;
 
-    public playing: number;
+    public playIndex: number;
     public queue: HellionMusic[];
     public loop: HellionQueueLoop;
 
@@ -53,7 +53,7 @@ export class HellionMusicPlayer extends EventEmitter {
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
 
-        this.playing = 0;
+        this.playIndex = 0;
         this.queue = [];
         this.loop = HellionQueueLoop.None;
 
@@ -146,26 +146,49 @@ export class HellionMusicPlayer extends EventEmitter {
      * @deprecated since v1.2.0
      */
     public nowPlaying(): HellionPlayingNow {
+        if (this.queue.length <= 0)
+            return {
+                title: "",
+                requestedBy: "",
+                duration: 0,
+                current: 0,
+                pos: 0
+            };
+
+        let time = 0;
+        if (this._playing)
+            time = ((!this._paused) ? Date.now() - this._lastPlayTime : 0) + this._accumulativeTime;
+
         return {
-            title: this.queue[this.playing].title,
-            requestedBy: this.queue[this.playing].user,
-            duration: this.queue[this.playing].duration,
-            current: ((!this._paused) ? Date.now() - this._lastPlayTime : 0) + this._accumulativeTime,
-            pos: this.playing
+            title: this.queue[this.playIndex].title,
+            requestedBy: this.queue[this.playIndex].user,
+            duration: this.queue[this.playIndex].duration,
+            current: time,
+            pos: this.playIndex
         };
     }
 
-    public async playNow(music: string, user: GuildMember): Promise<HellionPlayResult> {
+    public async playNow(music: string, user: string): Promise<HellionMusicEnqueued> {
         let musics = await this.resolve(music, user);
-        if (musics.length <= 0) throw new Error("Resolve returned a empty array");
-        this._queue.splice(this._playingNow + 1, 0, ...musics);
-        this.skip();
-        return { title: musics[0].title, count: musics.length, playing: true, pos: this._playingNow, requestedBy: musics[0].requestedBy };
+        if (music.length == 0) throw new Error(`Music ${music} from ${user} has resolved to a empty array`);
+        let position = this.queue.length;
+        this.queue.splice(this.playIndex, 0, ...musics);
+        if (!this._connection || !this._player)
+            this.join();
+        this.start(this.playIndex, 0);
+        return {
+            items: musics,
+            playing: true,
+            position: position
+        };
     }
 
     public join(): void {
-        if (this._connection)
+        this._destroyed = true;
+        if (this._connection) {
             this._connection.destroy();
+            this._connection = null;
+        }
         this._connection = joinVoiceChannel({
             channelId: this.voiceChannel.id,
             guildId: this.voiceChannel.guildId,
@@ -181,201 +204,243 @@ export class HellionMusicPlayer extends EventEmitter {
                 this.emit('error', err);
                 this.destroy();
             });
+
+        if (!this._player) {
+            this._player = createAudioPlayer()
+                .on(AudioPlayerStatus.Idle, () => {
+                    this.next()
+                })
+                .on('error', (err) => {
+                    this.emit('error', err);
+                    this.next();
+                });
+        }
+        this._connection.subscribe(this._player);
         this.emit('ready');
     }
 
-    public async play(music: string, user: GuildMember): Promise<HellionPlayResult> {
-        if (!this._connection)
+    public async play(music: string, user: string): Promise<HellionMusicEnqueued> {
+        let musics = await this.resolve(music, user);
+        if (musics.length == 0) throw new Error(`Music ${music} from ${user} has resolved to a empty array`);
+        let position = this.queue.length;
+        this.queue.push(...musics);
+        let playing = false;
+        if (!this._connection || !this._player) {
             this.join();
-        let playingNow = false;
-        if (!this._player) {
-            this._player = createAudioPlayer();
-            this._connection?.subscribe(this._player);
-            this._player.on(AudioPlayerStatus.Idle, () => this.next());
-            this._player.on('error', (err) => {
-                this.emit('error', err);
-                this.next();
-            });
-            playingNow = true;
+            playing = true;
+            this.start(this.playIndex, 0);
         }
-        try {
-            let musics = await this.resolve(music, user);
-            if (music.length == 0) throw new Error("Resolve returned a empty array");
-            let pos = this._queue.length;
-            this._queue.push(...musics);
-            if (playingNow) {
-                let m = await this._resolver[this._queue[pos].resolver].get(this._queue[pos].resolvable);
-                if (!m) throw new Error("Abnormal null during resolver get");
-                let resource = createAudioResource(m.stream, { inputType: m.type });
-                this._player?.play(resource);
-                this._playingTime = 0;
-                this._lastTime = Date.now();
-            }
-            return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: musics.length, pos: pos };
-        } catch (e) {
-            if (playingNow)
-                this.destroy();
-            throw e;
+        return {
+            items: musics,
+            playing: playing,
+            position: position
+        };
+    }
+
+    public seek(seek: number): void {
+        if (this._paused) {
+            this.start(this.playIndex, seek);
+            this.pause();
+        } else {
+            this.start(this.playIndex, seek);
         }
     }
 
-    public async seek(seek: number): Promise<void> {
-        let playingNow = this._queue[this._playingNow];
-        let m = await this._resolver[playingNow.resolver].get(playingNow.resolvable, seek);
-        if (!m)
-            throw new Error("Abnormal null during resolver get");
-        let resource = createAudioResource(m.stream, { inputType: m.type });
-        this._player?.play(resource);
-        this._playingTime = seek * 1000;
-        this._lastTime = Date.now();
-    }
-
-    public async goto(index: number): Promise<HellionMusic> {
-        if (!this._player)
-            throw new Error("Player doesn't exists");
-        return new Promise((res) => {
-            this._playingNow = index - 1;
-            this._player?.once(AudioPlayerStatus.Playing, () => {
-                let music = this._queue[this._playingNow];
-                res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
-            });
-            this._player?.stop();
-        });
+    public goto(index: number): HellionMusic {
+        if (index < 0 && index >= this.queue.length)
+            throw new RangeError("Index out of bounds");
+        this.playIndex = index;
+        this.start(index, 0);
+        return this.queue[index];
     }
 
     public pause(): void {
-        if (!this._player)
-            throw new Error("Player doesn't exists");
-        if (this._player.pause()) {
-            this._playingTime += Date.now() - this._lastTime;
+        if (this._player && this._playing) {
+            if (this._player.pause()) {
+                this._accumulativeTime += Date.now() - this._accumulativeTime;
+                this._paused = true;
+            }
+        } else if (!this._playing) {
             this._paused = true;
         }
     }
 
     public resume(): void {
-        if (!this._player)
-            throw new Error("Player doesn't exists");
-        if (this._player.unpause()) {
-            this._lastTime = Date.now();
+        if (this._player && this._playing) {
+            if (this._player.unpause()) {
+                this._lastPlayTime = Date.now();
+                this._paused = false;
+            }
+        } else if (!this._playing && this._paused) {
+            this.start(this.playIndex, 0);
             this._paused = false;
         }
     }
 
-    public async skip(): Promise<HellionMusic | null> {
-        return new Promise((res) => {
-            if (!this._player)
-                throw new Error("Player doesn't exists");
-            if (this._queue.length - 1 == this._playingNow && this._loop == 'none')
-                res(null);
-            else
-                this._player.once(AudioPlayerStatus.Playing, () => {
-                    let music = this._queue[this._playingNow];
-                    res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
-                });
-            this._player.unpause();
-            this._player.stop();
-        });
+    public skip(): HellionMusic | null {
+        let result: HellionMusic | null = null;
+
+        if (this.playIndex >= this.queue.length - 1 && this.loop == HellionQueueLoop.Queue)
+            result = this.queue[0];
+        else if (this.playIndex < this.queue.length - 1 && this.loop != HellionQueueLoop.Queue)
+            result = this.queue[this.playIndex + 1];
+
+        let loop = this.loop;
+        if (this.loop == HellionQueueLoop.NoAutoplay || this.loop == HellionQueueLoop.Music)
+            this.loop = HellionQueueLoop.None;
+        this.next();
+        this.loop = loop;
+
+        return result;
     }
 
     public shuffle(): void {
-        if (!this._player)
-            throw new Error("Player doesn't exists");
-        for (var i = this._queue.length - 1; i > 0; i--) {
+        let music = this.queue.splice(this.playIndex, 1);
+        for (var i = this.queue.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
-            var temp = this._queue[i];
-            this._queue[i] = this._queue[j];
-            this._queue[j] = temp;
+            var temp = this.queue[i];
+            this.queue[i] = this.queue[j];
+            this.queue[j] = temp;
         }
-        this._playingNow = -1;
-        this._player.stop();
+        this.queue.splice(0, 0, ...music);
+        this.playIndex = 0;
     }
 
     public remove(index: number): HellionMusic | null {
-        if (!this._player)
-            throw new Error("Player doesn't exists");
-        let music = this._queue[index];
-        if (!music)
+        if (index < 0 && this.playIndex >= this.queue.length)
             return null;
-        this._queue.splice(index, 1);
-        if (this._playingNow == index) {
-            this._playingNow--;
-            this._player.stop();
-        }
-        else if (this._playingNow > index)
-            this._playingNow--;
+
+        let music = this.queue[index];
+
+        this.queue.splice(index, 1);
+
+        if (this.queue.length <= 0) {
+            this.pause();
+            this._playing = false;
+        } else if (this.playIndex == index) {
+            if (this.loop != HellionQueueLoop.Music)
+                this.playIndex--;
+            this.next();
+        } else if (this.playIndex > index)
+            this.playIndex--;
+
         return music;
     }
 
-    private async resolve(music: string, user: GuildMember): Promise<HellionQueuedMusic[]> {
-        for (let i = 0; i < this._resolver.length; i++) {
+    public async resolve(music: string, user: string): Promise<HellionMusic[]> {
+        try {
+            return await this.load(music, user);
+        } catch (e) {
+            this.emit('error', new Error(`All Loaders: '${music}' from '${user}' has throwed a error`, { cause: e }));
+        }
+        try {
+            return await this.search(music, user, 1);
+        } catch (e) {
+            this.emit('error', new Error(`All Searchers: '${music}' from '${user}' has throwed a error`, { cause: e }));
+        }
+        throw new Error(`Can't resolve the music ${music} from ${user}`);
+    }
+
+    public async load(music: string, user: string): Promise<HellionMusic[]> {
+        for (let i = 0; i < this.loaders.length; i++) {
             try {
-                if (this._resolver[i] instanceof HellionBulkMusic) {
-                    let resolver = this._resolver[i] as HellionBulkMusic;
-                    let res = await resolver.bulk(music);
-                    if (!res) continue;
-                    let result: HellionQueuedMusic[] = [];
-                    for (let d of res) {
-                        let k = { title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: user };
-                        result.push(k);
-                    };
-                    return result;
-                }
-                else {
-                    let resolver = this._resolver[i] as HellionSingleMusic;
-                    let res = await resolver.resolve(music);
-                    if (!res) continue;
-                    let k = { title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: user };
-                    return [k];
-                }
+                let result = await this.loaders[i].load(music, user);
+                if (result.length == 0) continue;
+                return result;
             } catch (e) {
-                this.emit('error', e);
+                this.emit('error', new Error(`Loader '${i}': '${music}' from '${user}' has throwed a error`, { cause: e }));
             }
         }
-        throw new Error("Can't resolve this music");
+        throw new Error(`None of the Loaders were able to load the music ${music} from ${user}`);
+    }
+
+    public async search(music: string, user: string, limit: number = 1): Promise<HellionMusic[]> {
+        for (let i = 0; i < this.searchers.length; i++) {
+            try {
+                let result = await this.searchers[i].search(music, user);
+                if (result.length == 0) continue;
+                return result;
+            } catch (e) {
+                this.emit('error', new Error(`Searcher '${i}': '${music}' from '${user}' has throwed a error`, { cause: e }));
+            }
+        }
+        throw new Error(`None of the Searchers were able to load the music ${music} from ${user}`);
+    }
+
+    public async extract(music: HellionMusic, seek: number = 0): Promise<HellionMusicStream> {
+        for (let i = 0; i < this.extractors.length; i++) {
+            try {
+                let extractor = this.extractors[i];
+                if (extractor.extractor != music.extractor) continue;
+                return await extractor.get(music.url, seek);
+            } catch (e) {
+                this.emit('error', new Error(`Extractor '${i}': '${music.url}' for '${music.extractor}' has throwed a error`, { cause: e }));
+            }
+        }
+        throw new Error(`Can't find the extractor for '${music.extractor}'`);
     }
 
     private async next(): Promise<void> {
-        try {
-            if (!this._connection || !this._player) {
-                this.destroy();
+        if (!this._connection || !this._player) {
+            this.destroy();
+            return;
+        }
+
+        if (this.queue.length <= 0) {
+            this.playIndex = 0;
+            this.pause();
+            this._playing = false;
+            return;
+        }
+
+        if (this.loop != HellionQueueLoop.Music)
+            this.playIndex++;
+
+        if (this.playIndex < 0)
+            this.playIndex = this.queue.length - 1;
+
+        if (this.playIndex >= this.queue.length) {
+            this.playIndex = 0;
+
+            if (this.loop != HellionQueueLoop.Queue) {
+                this.pause();
+                this._playing = false;
                 return;
             }
-            if (this._loop != 'music')
-                this._playingNow++;
-            if (this._playingNow < 0)
-                this._playingNow = 0;
-            if (this._playingNow >= this._queue.length) {
-                if (this._loop != 'queue') {
-                    this.destroy();
-                    return;
-                }
-                else {
-                    this._playingNow = 0;
-                }
-            }
-            let music = this._queue[this._playingNow];
-            this.emit('play', { title: music.title, requestedBy: music.requestedBy, duration: music.duration });
-            let m = await this._resolver[music.resolver].get(music.resolvable);
-            if (!m)
-                throw new Error("Abnormal null during resolver get");
-            let resource = createAudioResource(m.stream, { inputType: m.type });
-            this._player.play(resource);
-            this._playingTime = 0;
-            this._lastTime = Date.now();
-        } catch (e) {
-            let music = this._queue[this._playingNow];
-            this.remove(this._playingNow);
-            this.next();
-            this.emit('queueError', { title: music.title, requestedBy: music.requestedBy, duration: music.duration }, e);
         }
+        if (this.loop == HellionQueueLoop.NoAutoplay) {
+            this.pause();
+            this._playing = false;
+            return;
+        }
+
+        let music = this.queue[this.playIndex];
+        this.emit('play', music);
+        this.start(this.playIndex, 0);
     }
 
-    private startPlay(seek: number = 0): void {
-
+    private start(index: number, seek: number = 0): void {
+        this.extract(this.queue[index], seek)
+            .then((m) => {
+                if (this._player != null) {
+                    let resource = createAudioResource(m.stream, { inputType: m.type });
+                    this._player.play(resource);
+                    this._accumulativeTime = seek * 1000;
+                    this._lastPlayTime = Date.now();
+                    this._paused = false;
+                    this._playing = true;
+                }
+            })
+            .catch((e) => {
+                this.next();
+                this.emit('error', new Error("Can't start the Music Player", { cause: e }));
+            })
     }
 
     public destroy(): void {
         this._destroyed = true;
+        this._playing = false;
+        this._paused = false;
         if (this._connection) {
             this._connection.destroy();
             this._connection = null;
