@@ -1,4 +1,4 @@
-import { Client, User, Message, TextChannel, GuildMember, Guild, DMChannel, PartialDMChannel, NewsChannel, ThreadChannel, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions } from 'discord.js';
+import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions, TextBasedChannel } from 'discord.js';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
@@ -243,7 +243,7 @@ export class HellionCommandHandler extends EventEmitter {
 export interface HellionCommandEventOptions {
     client: Client;
     user: User;
-    channel: TextChannel | DMChannel | PartialDMChannel | NewsChannel | ThreadChannel | null;
+    channel: TextBasedChannel | null;
     guild?: Guild | null;
     member?: GuildMember | APIInteractionGuildMember | null;
     createdTimestamp: number;
@@ -258,7 +258,7 @@ export class HellionCommandEvent {
     public client: Client;
     public args: HellionCommandArgs;
     public user: User;
-    public channel: TextChannel | DMChannel | PartialDMChannel | NewsChannel | ThreadChannel | null;
+    public channel: TextBasedChannel | null;
     public guild?: Guild | null;
     public member?: GuildMember | APIInteractionGuildMember | null;
 
