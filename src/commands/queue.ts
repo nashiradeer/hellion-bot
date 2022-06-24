@@ -66,7 +66,22 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             let totalPages = Math.ceil(queue.length / 10);
             let m = music.nowPlaying();
             let numstr = event.args.getByIndex(0) || '1';
-            let curPage = parseInt(numstr as string);
+            let curPage = (queue.length <= 0) ? 0 : parseInt(numstr as string);
+            let msg = `**${"━".repeat(20)}**\n**Playing:** [${m.pos + 1}] // **Page:** [${curPage} / ${totalPages}]\n**${"━".repeat(20)}**\n`;
+
+            if (queue.length <= 0) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0x260041)
+                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                            .setTitle("Hellion Warden // Queue")
+                            .setDescription(msg)
+                    ]
+                });
+                return;
+            }
+
             if (isNaN(curPage) || !isFinite(curPage))
                 curPage = 1;
 
@@ -88,22 +103,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (offset + 10 < limit)
                 limit = offset + 10;
 
-            let msg = `**${"━".repeat(20)}**\n**Playing:** [${m.pos + 1}] // **Page:** [${curPage} / ${totalPages}]\n**${"━".repeat(20)}**\n`;
             for (let i = offset; i < limit; i++)
-                msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].requestedBy.user.tag})**\n`;
-
-            if (msg == "") {
-                event.reply({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Queue")
-                            .setDescription(`The queue page number **${curPage}** is empty.`)
-                    ]
-                });
-                return;
-            }
+                msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].user})**\n`;
 
             event.reply({
                 embeds: [

@@ -106,7 +106,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Playing Now")
-                            .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
+                            .setDescription(`${playing.title} **[${playing.user}]**`)
                     ]
                 }).then((m) => {
                     setTimeout(() => m.delete(), 30000);
@@ -138,7 +138,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Queue Error")
-                            .setDescription(`Removing: \`${m.title}\` **[${m.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
+                            .setDescription(`Removing: \`${m.title}\` **[${m.user}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
                     ]
                 });
             });
@@ -165,15 +165,15 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
 
         try {
-            let res = await music.play(link, event.member as GuildMember);
-            if (res.count > 1) {
+            let res = await music.play(link, (event.member as GuildMember).nickname || event.member?.user.username || "");
+            if (res.items.length > 1) {
                 event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
+                            .setDescription(`Enqueued a total of ${res.items.length} songs to end of the queue.`)
                     ]
                 });
 
@@ -184,7 +184,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(0x260041)
                                 .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Playing Now")
-                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                                .setDescription(`${res.items[0].title} **[${res.items[0].user}]**`)
                         ]
                     }).then((m) => {
                         setTimeout(() => m.delete(), 30000);
@@ -197,7 +197,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Playing Now")
-                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                            .setDescription(`${res.items[0].title} **[${res.items[0].user}]**`)
                     ]
                 });
             } else {
@@ -207,7 +207,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Enqueued")
-                            .setDescription(`${res.title} **[${res.requestedBy.user.tag}]** at **#${res.pos + 1}**`)
+                            .setDescription(`${res.items[0].title} **[${res.items[0].user}]** at **#${res.position + 1}**`)
                     ]
                 });
             }

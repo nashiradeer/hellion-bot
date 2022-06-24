@@ -53,7 +53,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
 
             await event.replyHandler.defer();
-            let m = await music.skip();
+            let m = music.skip();
             if (!m) {
                 event.reply({
                     embeds: [
@@ -71,7 +71,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Skip")
-                            .setDescription(`Skipped to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                            .setDescription(`Skipped to: ${m.title} **[${m.user}]**`)
                     ]
                 });
             }

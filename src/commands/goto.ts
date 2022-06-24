@@ -90,7 +90,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
 
-            let m = await music.goto(queuenum);
+            let m = music.goto(queuenum);
 
             event.reply({
                 embeds: [
@@ -98,7 +98,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Goto")
-                        .setDescription(`Going to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                        .setDescription(`Going to: ${m.title} **[${m.user}]**`)
                 ]
             });
         }

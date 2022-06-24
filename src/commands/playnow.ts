@@ -77,15 +77,15 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
             try {
-                let res = await music.playNow(link, event.member as GuildMember);
-                if (res.count > 1) {
+                let res = await music.playNow(link, (event.member as GuildMember).nickname || event.member?.user.username || "");
+                if (res.items.length > 1) {
                     event.reply({
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
                                 .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Enqueued")
-                                .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
+                                .setDescription(`Enqueued a total of ${res.items.length} songs to end of the queue.`)
                         ]
                     });
 
@@ -95,7 +95,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(0x260041)
                                 .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Play Now")
-                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                                .setDescription(`${res[0].title} **[${res[0].user}]**`)
                         ]
                     }).then((m) => {
                         setTimeout(() => m.delete(), 30000);
@@ -108,7 +108,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(0x260041)
                                 .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Play Now")
-                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                                .setDescription(`${res[0].title} **[${res[0].user}]**`)
                         ]
                     });
                 }
