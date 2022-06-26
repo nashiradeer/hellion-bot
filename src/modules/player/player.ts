@@ -231,9 +231,9 @@ export class HellionMusicPlayer extends EventEmitter {
     public remove(index: number): HellionMusic | null {
         if (!this._player)
             throw new Error("Player doesn't exists");
-        let music = this._queue[index];
-        if (!music)
+        if (this._queue.length == 1 || (index < 0 && index >= this._queue.length))
             return null;
+        let music = this._queue[index];
         this._queue.splice(index, 1);
         if (this._playingNow == index) {
             this._playingNow--;
