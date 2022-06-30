@@ -2,7 +2,7 @@ import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandI
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
-import { Routes, RESTPostAPIApplicationCommandsJSONBody, APIApplicationCommandOptionChoice, APIInteractionGuildMember } from 'discord-api-types/v9';
+import { Routes, RESTPostAPIApplicationCommandsJSONBody, APIApplicationCommandOptionChoice, APIInteractionGuildMember } from 'discord.js/node_modules/discord-api-types/v9';
 import { REST } from '@discordjs/rest';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { discord } from '../..';
