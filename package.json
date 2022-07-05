@@ -1,6 +1,6 @@
 {
   "name": "hellion-warden",
-  "version": "1.1.0-beta.2",
+  "version": "1.1.0-beta.3",
   "description": "Discord Music Bot with support to YouTube.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,7 +34,7 @@
   "homepage": "https://github.com/NashiraDeer/Discord-HellionWarden#readme",
   "dependencies": {
     "@discordjs/builders": "^0.15.0",
-    "@discordjs/opus": "^0.7.0",
+    "@discordjs/opus": "^0.8.0",
     "@discordjs/rest": "^0.5.0",
     "@discordjs/voice": "^0.10.0",
     "@types/argparse": "^2.0.10",
