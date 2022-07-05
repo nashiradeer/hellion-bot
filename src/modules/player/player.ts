@@ -111,8 +111,14 @@ export class HellionMusicPlayer extends EventEmitter {
         })
             .on(VoiceConnectionStatus.Disconnected, () => {
                 if (!this._destroyed) {
-                    this.destroy();
                     this.emit('disconnected');
+                    this.destroy();
+                }
+            })
+            .on(VoiceConnectionStatus.Destroyed, () => {
+                if (!this._destroyed) {
+                    this.emit('disconnected');
+                    this.destroy();
                 }
             })
             .on('error', (err) => {
