@@ -74,7 +74,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 });
                 return;
             }
-            let seektime = parseInt(numstr as string) - 1;
+            let seektime = parseInt(numstr as string);
 
             if (isNaN(seektime) || !isFinite(seektime)) {
                 event.reply({
