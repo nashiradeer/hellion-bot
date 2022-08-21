@@ -34,16 +34,16 @@
   },
   "homepage": "https://github.com/NashiraDeer/Discord-HellionWarden#readme",
   "dependencies": {
-    "@discordjs/builders": "^0.13.0",
-    "@discordjs/rest": "^0.4.1",
-    "@discordjs/voice": "^0.9.0",
+    "@discordjs/builders": "^1.1.0",
+    "@discordjs/rest": "^1.0.1",
+    "@discordjs/voice": "^0.11.0",
     "@types/argparse": "^2.0.10",
     "argparse": "^2.0.1",
     "bufferutil": "^4.0.6",
-    "discord-api-types": "^0.33.0",
-    "discord.js": "^13.6.0",
+    "discord-api-types": "^0.37.3",
+    "discord.js": "^14.2.0",
     "erlpack": "github:discord/erlpack",
-    "ffmpeg-static": "^4.4.1",
+    "ffmpeg-static": "^5.0.2",
     "play-dl": "^1.9.5",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.9",
@@ -56,11 +56,6 @@
     "eslint": "^8.22.0",
     "jest": "^28.1.3",
     "typescript": "^4.6.3"
-  },
-  "optionalDependencies": {
-    "ytdl-core": "^4.11.0",
-    "ytpl": "^2.3.0",
-    "ytsr": "^3.8.0"
   },
   "engines": {
     "node": ">=16"
