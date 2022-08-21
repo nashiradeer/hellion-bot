@@ -10,3 +10,9 @@ services/
 # Docker
 Dockerfile
 .dockerignore
+
+# Project Source
+src/
+
+# ESLint
+.eslintrc
