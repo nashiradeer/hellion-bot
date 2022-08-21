@@ -51,11 +51,6 @@
   "devDependencies": {
     "typescript": "^4.6.3"
   },
-  "optionalDependencies": {
-    "ytdl-core": "^4.11.0",
-    "ytpl": "^2.3.0",
-    "ytsr": "^3.8.0"
-  },
   "engines": {
     "node": ">=16"
   }
