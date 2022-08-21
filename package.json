@@ -10,10 +10,11 @@
   "private": true,
   "scripts": {
     "start": "node dist/app.js",
-    "pretest": "tsc --build --clean && tsc --build",
-    "test": "node dist/app.js --verbose debug",
-    "prepack": "tsc --build",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
+    "lint": "eslint",
+    "test": "jest",
+    "prepack": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -49,6 +50,11 @@
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.7",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "eslint": "^8.22.0",
+    "jest": "^28.1.3",
     "typescript": "^4.6.3"
   },
   "engines": {
