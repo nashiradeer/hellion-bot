@@ -1,19 +1,5 @@
 import randomNumber from 'random-number-csprng';
-
-export interface HellionKbPlayer {
-    userId: string;
-    userName: string;
-}
-
-export type HellionKbState = null | number;
-
-export type HellionKbColumn = 1 | 2 | 3;
-
-export enum HellionKbAddState {
-    Added = 0,
-    ColumnFull = 1,
-    TableFull = 2
-};
+import { HellionKbAddState, HellionKbPlayer, HellionKbColumn, HellionKbState } from './base';
 
 export class HellionKnucklebones {
     private _playerList: HellionKbPlayer[];
@@ -22,12 +8,11 @@ export class HellionKnucklebones {
 
     private _started: boolean;
 
-    constructor(players: HellionKbPlayer[])
-    {
+    constructor(players: HellionKbPlayer[]) {
         if (players.length != 2) {
             throw new Error("Can't play without exactly 2 players");
         }
-        
+
         this._started = false;
         this._playerList = players;
 
@@ -52,7 +37,7 @@ export class HellionKnucklebones {
                 return element;
         });
 
-        return {userId: "", userName: ""};
+        return { userId: "", userName: "" };
     }
 
     get players(): HellionKbPlayer[] {
@@ -76,7 +61,7 @@ export class HellionKnucklebones {
         throw new Error("Player not found");
     }
 
-    public  async rolld6(): Promise<number> {
+    public async rolld6(): Promise<number> {
         return await randomNumber(1, 6);
     }
 
@@ -84,8 +69,10 @@ export class HellionKnucklebones {
         if (this.checkColumnFull(column))
             return HellionKbAddState.ColumnFull;
 
-        if (this.checkTableFull())
-            return HellionKbAddState.TableFull;
+        for (const element of this._playerList) {
+            if (this.checkTableFull(element.userId))
+                return HellionKbAddState.TableFull;
+        }
 
         switch (column) {
             case 1:
@@ -128,12 +115,12 @@ export class HellionKnucklebones {
 
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
-        
+
         return HellionKbAddState.Added;
     }
 
-    public checkColumnFull(column: HellionKbColumn): boolean {
-        let table = this.table(this._curPlayerId);
+    public checkColumnFull(column: HellionKbColumn, playerId: string = this._curPlayerId): boolean {
+        let table = this.table(playerId);
         if (!table)
             throw new Error("Abnormal error, current player don't have a table");
 
@@ -145,17 +132,29 @@ export class HellionKnucklebones {
         }
     }
 
-    public checkTableFull(): boolean {
-        let table = this.table(this._curPlayerId);
+    public checkTableFull(playerId: string = this._curPlayerId): boolean {
+        let table = this.table(playerId);
         if (!table)
             throw new Error("Abnormal error, current player don't have a table");
 
         return table[0] != null && table[3] != null && table[6] != null &&
-               table[1] != null && table[4] != null && table[7] != null &&
-               table[2] != null && table[5] != null && table[8] != null;
+            table[1] != null && table[4] != null && table[7] != null &&
+            table[2] != null && table[5] != null && table[8] != null;
     }
 
-    public calculatePoints(): HellionKbState[] {
-        return [];
+    public calculatePoints(): number[] {
+        let res: number[] = [];
+
+        this._tableState.forEach((element) => {
+            let total = element.reduce((v: HellionKbState, c: HellionKbState): HellionKbState => {
+                if (v == null)
+                    v = 0;
+                return (c != null) ? v + c : v
+            });
+            if (total != null)
+                res.push(total);
+        });
+
+        return res;
     }
 }
