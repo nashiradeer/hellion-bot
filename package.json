@@ -38,6 +38,7 @@
     "@discordjs/rest": "^1.0.1",
     "@discordjs/voice": "^0.11.0",
     "@types/argparse": "^2.0.10",
+    "@types/random-number-csprng": "^1.0.0",
     "argparse": "^2.0.1",
     "bufferutil": "^4.0.6",
     "discord-api-types": "^0.37.3",
@@ -45,6 +46,7 @@
     "erlpack": "github:discord/erlpack",
     "ffmpeg-static": "^5.0.2",
     "play-dl": "^1.9.5",
+    "random-number-csprng": "^1.0.2",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.9",
     "zlib-sync": "^0.1.7"
