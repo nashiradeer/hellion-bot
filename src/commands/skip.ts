@@ -53,7 +53,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
 
             await event.replyHandler.defer();
-            let m = music.skip();
+            let m = await music.skip();
             if (!m) {
                 event.reply({
                     embeds: [

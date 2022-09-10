@@ -90,7 +90,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
 
-            let m = music.goto(queuenum);
+            let m = await music.goto(queuenum);
 
             event.reply({
                 embeds: [

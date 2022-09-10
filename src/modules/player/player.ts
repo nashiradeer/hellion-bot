@@ -168,6 +168,13 @@ export class HellionMusicPlayer extends EventEmitter {
         };
     }
 
+    public get time(): number {
+        let time = 0;
+        if (this._playing)
+            time = ((!this._paused) ? Date.now() - this._lastPlayTime : 0) + this._accumulativeTime;
+        return time;
+    }
+
     public async playNow(music: string, user: string): Promise<HellionMusicEnqueued> {
         let musics = await this.resolve(music, user);
         if (music.length == 0) throw new Error(`Music ${music} from ${user} has resolved to a empty array`);
@@ -175,7 +182,7 @@ export class HellionMusicPlayer extends EventEmitter {
         this.queue.splice(this.playIndex, 0, ...musics);
         if (!this._connection || !this._player)
             this.join();
-        this.start(this.playIndex, 0);
+        await this.start(this.playIndex, 0);
         return {
             items: musics,
             playing: true,
@@ -183,8 +190,19 @@ export class HellionMusicPlayer extends EventEmitter {
         };
     }
 
+    public async playNext(music: string, user: string): Promise<HellionMusicEnqueued> {
+        let musics = await this.resolve(music, user);
+        if (music.length == 0) throw new Error(`Music ${music} from ${user} has resolved to a empty array`);
+        let position = this.queue.length;
+        this.queue.splice(this.playIndex + 1, 0, ...musics);
+        return {
+            items: musics,
+            playing: false,
+            position: position
+        };
+    }
+
     public join(): void {
-        this._destroyed = true;
         if (this._connection) {
             this._connection.destroy();
             this._connection = null;
@@ -228,7 +246,7 @@ export class HellionMusicPlayer extends EventEmitter {
         if (!this._connection || !this._player) {
             this.join();
             playing = true;
-            this.start(this.playIndex, 0);
+            await this.start(this.playIndex, 0);
         }
         return {
             items: musics,
@@ -237,20 +255,20 @@ export class HellionMusicPlayer extends EventEmitter {
         };
     }
 
-    public seek(seek: number): void {
+    public async seek(seek: number): Promise<void> {
         if (this._paused) {
-            this.start(this.playIndex, seek);
+            await this.start(this.playIndex, seek);
             this.pause();
         } else {
-            this.start(this.playIndex, seek);
+            await this.start(this.playIndex, seek);
         }
     }
 
-    public goto(index: number): HellionMusic {
+    public async goto(index: number): Promise<HellionMusic> {
         if (index < 0 && index >= this.queue.length)
             throw new RangeError("Index out of bounds");
         this.playIndex = index;
-        this.start(index, 0);
+        await this.start(index, 0);
         return this.queue[index];
     }
 
@@ -277,7 +295,7 @@ export class HellionMusicPlayer extends EventEmitter {
         }
     }
 
-    public skip(): HellionMusic | null {
+    public async skip(): Promise<HellionMusic | null> {
         let result: HellionMusic | null = null;
 
         if (this.playIndex >= this.queue.length - 1 && this.loop == HellionQueueLoop.Queue)
@@ -288,7 +306,7 @@ export class HellionMusicPlayer extends EventEmitter {
         let loop = this.loop;
         if (this.loop == HellionQueueLoop.NoAutoplay || this.loop == HellionQueueLoop.Music)
             this.loop = HellionQueueLoop.None;
-        this.next();
+        await this.next();
         this.loop = loop;
 
         return result;
@@ -306,7 +324,7 @@ export class HellionMusicPlayer extends EventEmitter {
         this.playIndex = 0;
     }
 
-    public remove(index: number): HellionMusic | null {
+    public async remove(index: number): Promise<HellionMusic | null> {
         if (index < 0 && this.playIndex >= this.queue.length)
             return null;
 
@@ -320,7 +338,7 @@ export class HellionMusicPlayer extends EventEmitter {
         } else if (this.playIndex == index) {
             if (this.loop != HellionQueueLoop.Music)
                 this.playIndex--;
-            this.next();
+            await this.next();
         } else if (this.playIndex > index)
             this.playIndex--;
 
@@ -414,27 +432,35 @@ export class HellionMusicPlayer extends EventEmitter {
             return;
         }
 
-        let music = this.queue[this.playIndex];
-        this.emit('play', music);
-        this.start(this.playIndex, 0);
+        if (!this._paused) {
+            let music = this.queue[this.playIndex];
+            this.emit('play', music);
+            await this.start(this.playIndex, 0);
+        }
     }
 
-    private start(index: number, seek: number = 0): void {
-        this.extract(this.queue[index], seek)
-            .then((m) => {
-                if (this._player != null) {
-                    let resource = createAudioResource(m.stream, { inputType: m.type });
-                    this._player.play(resource);
-                    this._accumulativeTime = seek * 1000;
-                    this._lastPlayTime = Date.now();
-                    this._paused = false;
-                    this._playing = true;
-                }
-            })
-            .catch((e) => {
-                this.next();
-                this.emit('error', new Error("Can't start the Music Player", { cause: e }));
-            })
+    private start(index: number, seek: number = 0): Promise<void> {
+        return new Promise((resolve) => { 
+            this.extract(this.queue[index], seek)
+                .then((m) => {
+                    if (this._player != null) {
+                        let resource = createAudioResource(m.stream, { inputType: m.type });
+                        this._player.play(resource);
+                        this._accumulativeTime = seek * 1000;
+                        this._lastPlayTime = Date.now();
+                        this._paused = false;
+                        this._playing = true;
+                    }
+                    
+                    resolve();
+                })
+                .catch(async (e) => {
+                    await this.next();
+                    this.emit('error', new Error("Can't start the Music Player", { cause: e }));
+
+                    resolve();
+                })
+        });
     }
 
     public destroy(): void {
