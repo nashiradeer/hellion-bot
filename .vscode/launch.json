@@ -9,9 +9,10 @@
             "request": "launch",
             "runtimeArgs": [
                 "run-script",
-                "test"
+                "start"
             ],
             "envFile": "${workspaceFolder}/.env",
+            "preLaunchTask": "npm: build",
             "outputCapture": "std",
             "runtimeExecutable": "npm",
             "sourceMaps": true,

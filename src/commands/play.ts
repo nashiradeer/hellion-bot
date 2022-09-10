@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
+import { GuildMember, EmbedBuilder, TextChannel, VoiceChannel } from "discord.js";
 import { setToken, getFreeClientID } from 'play-dl';
 import { commandHandler, discord, player } from "..";
 
@@ -38,7 +38,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!member.voice.channel) {
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Play")
@@ -56,7 +56,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (!music) {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Play")
@@ -68,7 +68,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Play")
@@ -80,7 +80,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music?.resume();
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Play")
@@ -102,7 +102,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music.on('play', (playing) => {
                 music?.textChannel.send({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Playing Now")
@@ -121,7 +121,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music.on('disconnected', () => {
                 music?.textChannel.send({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Disconnected")
@@ -134,7 +134,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 event.error(err);
                 music?.textChannel.send({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Queue Error")
@@ -153,7 +153,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Play")
@@ -169,7 +169,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (res.items.length > 1) {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Enqueued")
@@ -180,7 +180,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 if (res.playing) {
                     music.textChannel.send({
                         embeds: [
-                            new MessageEmbed()
+                            new EmbedBuilder()
                                 .setColor(0x260041)
                                 .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                                 .setTitle("Hellion Warden // Playing Now")
@@ -193,7 +193,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             } else if (res.playing) {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Playing Now")
@@ -203,7 +203,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             } else {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Enqueued")
@@ -216,7 +216,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             event.error(err);
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Play")

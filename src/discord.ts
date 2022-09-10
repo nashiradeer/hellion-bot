@@ -1,6 +1,6 @@
-import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
+import { ActivityType, Client, ClientOptions, CommandInteraction, GatewayIntentBits, IntentsBitField, Interaction, Message, EmbedBuilder, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler, HellionWardenInformation, player } from '.';
+import { commandHandler, HellionWardenInformation, player, knuckle } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenOptions {
@@ -10,6 +10,7 @@ export interface HellionWardenOptions {
 
 export interface HellionWardenData {
     music: Map<string, player.HellionMusicPlayer>;
+    knuckle: Map<string, knuckle.HellionKnucklebones>;
     botpublic: boolean;
     botowner: string;
     prefix: string;
@@ -30,7 +31,7 @@ export declare interface HellionWarden {
 }
 
 export class HellionWarden extends EventEmitter {
-    public static readonly REQUIRED_INTENTS: BitFieldResolvable<IntentsString, number> = ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'];
+    public static readonly REQUIRED_INTENTS: GatewayIntentBits[] = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.MessageContent];
 
     private _data: HellionWardenData;
     private _client: Client;
@@ -51,6 +52,7 @@ export class HellionWarden extends EventEmitter {
         this.botowner = options?.botowner || '';
         this._data = {
             music: new Map<string, player.HellionMusicPlayer>(),
+            knuckle: new Map<string, knuckle.HellionKnucklebones>(),
             prefix: prefix,
             botpublic: this.botpublic,
             botowner: this.botowner
@@ -68,10 +70,10 @@ export class HellionWarden extends EventEmitter {
         this._client.once('ready', async () => {
             this.emit('logged');
             let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
+            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.Listening });
             setInterval(async () => {
                 let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-                this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
+                this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.Listening });
             }, 60000);
         });
 
@@ -86,7 +88,7 @@ export class HellionWarden extends EventEmitter {
             if (message.content.trim() == `<@${this._client.user?.id}>` || message.content.trim() == `<@!${this._client.user?.id}>`) {
                 message.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Mention")
@@ -115,7 +117,7 @@ export class HellionWarden extends EventEmitter {
             if (oldState.channel?.members.size == 1) {
                 player.textChannel.send({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0x260041)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Music Player")
