@@ -9,7 +9,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "knuckle";
         this.category = "Games";
-        this.description = "PLACEHOLDER.";
+        this.description = "Play the Knucklebones game from the Cult of the Lamb.";
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
@@ -62,7 +62,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Knucklebones")
-                        .setDescription(`**${(i.member as GuildMember)?.nickname || i.user.username} ** ACCEPTED THE CHALLANGE, STARTING THE GAME!.`)
+                        .setDescription(`**${(i.member as GuildMember)?.nickname || i.user.username}** ACCEPTED THE CHALLANGE, STARTING THE GAME!.`)
                 ],
                 components: [
                     new ActionRowBuilder<ButtonBuilder>()
@@ -112,7 +112,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Knucklebones")
-                            .setDescription(`Anyone has accepted the challange.D: `)
+                            .setDescription(`Anyone has accepted the challange. D:`)
                     ],
                     components: [
                         new ActionRowBuilder<ButtonBuilder>()
@@ -152,7 +152,7 @@ async function gameloop(kb: HellionKnucklebones, client: Client): Promise<boolea
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`Rolling a dice for ** ${kb.currentPlayer.username} **...`)
+                    .setDescription(`Rolling a dice for **${kb.currentPlayer.username}**...`)
                     .setAuthor({ name: kb.currentPlayer.username, iconURL: (kb.currentPlayer.avatar == null) ? undefined : kb.currentPlayer.avatar })
             ]
         });
@@ -201,7 +201,7 @@ async function announceWinner(kb: HellionKnucklebones, client: Client): Promise<
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`** ${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))} \n** ${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))} \n\n ** ${kb.players[0].username}:** ${points[0]} \n ** ${kb.players[1].username}:** ${points[1]} \nThe winner is **${winner.username}**!.`)
+                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))} \n**${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))}\n\n**${kb.players[0].username}:** ${points[0]}\n**${kb.players[1].username}:** ${points[1]}\nThe winner is **${winner.username}**!.`)
                     .setAuthor({ name: winner.username, iconURL: (winner.avatar == null) ? undefined : winner.avatar })
             ]
         });
@@ -212,7 +212,7 @@ async function announceWinner(kb: HellionKnucklebones, client: Client): Promise<
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`** ${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))} \n ** ${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))} \n\n ** ${kb.players[0].username}:** ${points[0]} \n ** ${kb.players[1].username}:** ${points[1]} \nThe match ended in a draw. : (`)
+                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))}\n**${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))}\n\n**${kb.players[0].username}:** ${points[0]}\n**${kb.players[1].username}:** ${points[1]} nThe match ended in a draw. :(`)
             ]
         });
 }
@@ -225,7 +225,7 @@ async function rollStage(d6: number, kb: HellionKnucklebones, client: Client): P
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`** ${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))} \n ** ${kb.players[1].username}:**\n${createTable(kb.table(kb.players[1].id))} \n\nIt's **${kb.currentPlayer.username}** turn!\nYou rolled a **${d6}**!`)
+                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))}\n**${kb.players[1].username}:**\n${createTable(kb.table(kb.players[1].id))}\n\nIt's **${kb.currentPlayer.username}** turn!\nYou rolled a **${d6}**!`)
                     .setAuthor({ name: kb.currentPlayer.username, iconURL: (kb.currentPlayer.avatar == null) ? undefined : kb.currentPlayer.avatar })
             ],
             components: [
