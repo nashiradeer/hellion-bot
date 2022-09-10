@@ -201,7 +201,7 @@ async function announceWinner(kb: HellionKnucklebones, client: Client): Promise<
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))} \n**${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))}\n\n**${kb.players[0].username}:** ${points[0]}\n**${kb.players[1].username}:** ${points[1]}\nThe winner is **${winner.username}**!.`)
+                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))} \n**${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))}\n\n**${kb.players[0].username}:** ${points[0]}\n**${kb.players[1].username}:** ${points[1]}\nThe winner is **${winner.username}**!`)
                     .setAuthor({ name: winner.username, iconURL: (winner.avatar == null) ? undefined : winner.avatar })
             ]
         });
