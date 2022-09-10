@@ -1,4 +1,4 @@
-import { MessageEmbed, version } from "discord.js";
+import { EmbedBuilder, version } from "discord.js";
 import { commandHandler, HellionWardenInformation, discord } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
@@ -24,7 +24,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (commands.length == 0) {
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Help")
@@ -44,7 +44,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (alias) alias = "\n**Aliases:** " + alias;
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Help")
@@ -68,7 +68,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Help")

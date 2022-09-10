@@ -1,4 +1,4 @@
-import { MessageEmbed, version } from "discord.js";
+import { EmbedBuilder, version } from "discord.js";
 import { commandHandler, HellionWardenInformation, discord } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
@@ -12,7 +12,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         event.reply({
             embeds: [
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                     .setThumbnail(event.client.user?.avatarURL() || '')
@@ -22,18 +22,24 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
                         `Version: v${HellionWardenInformation.VERSION}\n` +
                         `Support: https://discord.gg/n7MttxXQwa`)
-                    .addField("NodeJS Information",
-                        `Version: ${process.version}\n` +
-                        `Uptime: ${this.getTime(process.uptime())}\n` +
-                        `Operation System: ${process.platform}\n` +
-                        `Architecture: ${process.arch}`
-                        , true)
-                    .addField("Discord.JS Information",
-                        `Version: v${version}\n` +
-                        `Uptime: ${this.getTime((event.client.uptime || 0) / 1000)}\n` +
-                        `API Latency: ${event.client.ws.ping}ms\n` +
-                        `Latency: ${Date.now() - event.createdTimestamp}ms`
-                        , true)
+                    .addFields([
+                        {
+                            name: "NodeJS Information",
+                            value: `Version: ${process.version}\n` +
+                                `Uptime: ${this.getTime(process.uptime())}\n` +
+                                `Operation System: ${process.platform}\n` +
+                                `Architecture: ${process.arch}`,
+                            inline: true
+                        },
+                        {
+                            name: "Discord.JS Information",
+                            value: `Version: v${version}\n` +
+                                `Uptime: ${this.getTime((event.client.uptime || 0) / 1000)}\n` +
+                                `API Latency: ${event.client.ws.ping}ms\n` +
+                                `Latency: ${Date.now() - event.createdTimestamp}ms`,
+                            inline: true
+                        }
+                    ])
             ]
         });
     }

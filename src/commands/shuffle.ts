@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbed } from "discord.js";
+import { GuildMember, EmbedBuilder } from "discord.js";
 import { commandHandler, discord } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
@@ -15,7 +15,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!member.voice.channel) {
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Shuffle")
@@ -30,7 +30,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!music) {
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Shuffle")
@@ -42,7 +42,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (music.voiceChannel.id != member.voice.channelId) {
                 event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                             .setTitle("Hellion Warden // Shuffle")
@@ -55,7 +55,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music.shuffle();
             event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0x260041)
                         .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                         .setTitle("Hellion Warden // Shuffle")

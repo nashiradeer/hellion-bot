@@ -1,6 +1,6 @@
-import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
+import { ActivityType, BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler, HellionWardenInformation, player } from '.';
+import { commandHandler, HellionWardenInformation, player, knuckle } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenOptions {
@@ -10,6 +10,7 @@ export interface HellionWardenOptions {
 
 export interface HellionWardenData {
     music: Map<string, player.HellionMusicPlayer>;
+    knuckle: Map<string, knuckle.HellionKnucklebones>;
     botpublic: boolean;
     botowner: string;
     prefix: string;
@@ -51,6 +52,7 @@ export class HellionWarden extends EventEmitter {
         this.botowner = options?.botowner || '';
         this._data = {
             music: new Map<string, player.HellionMusicPlayer>(),
+            knuckle: new Map<string, knuckle.HellionKnucklebones>(),
             prefix: prefix,
             botpublic: this.botpublic,
             botowner: this.botowner
@@ -68,10 +70,10 @@ export class HellionWarden extends EventEmitter {
         this._client.once('ready', async () => {
             this.emit('logged');
             let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
+            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.LISTENING });
             setInterval(async () => {
                 let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-                this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
+                this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.LISTENING });
             }, 60000);
         });
 
