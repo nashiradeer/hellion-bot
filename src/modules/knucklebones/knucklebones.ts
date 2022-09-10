@@ -1,6 +1,6 @@
 import { TextBasedChannel } from 'discord.js';
 import randomNumber from 'random-number-csprng';
-import { HellionKbAddState, HellionKbColumn, HellionKbPlayer, HellionKbState } from './base';
+import { HellionKbAddState, HellionKbColumn, HellionKbPlayer, HellionKbPoint, HellionKbState } from './base';
 
 export class HellionKnucklebones {
     private _playerList: HellionKbPlayer[];
@@ -9,7 +9,7 @@ export class HellionKnucklebones {
 
     private _channel: TextBasedChannel | null;
 
-    constructor(players: HellionKbPlayer[], ready: () => {}, channel: TextBasedChannel | null) {
+    constructor(players: HellionKbPlayer[], channel: TextBasedChannel | null, ready: () => void) {
         if (players.length != 2) {
             throw new Error("Can't play without exactly 2 players");
         }
@@ -35,12 +35,16 @@ export class HellionKnucklebones {
         });
     }
 
-    get currentPlayer(): HellionKbPlayer {
+    public get currentPlayer(): HellionKbPlayer {
         return this._playerList[this._curPlayer];
     }
 
-    get players(): HellionKbPlayer[] {
+    public get players(): HellionKbPlayer[] {
         return this._playerList;
+    }
+
+    public get channel(): TextBasedChannel | null {
+        return this._channel;
     }
 
     public table(playerId: string): HellionKbState[] {
@@ -64,8 +68,8 @@ export class HellionKnucklebones {
         if (this.checkColumnFull(column))
             return HellionKbAddState.ColumnFull;
 
-        for (const element of this._playerList) {
-            if (this.checkTableFull(element.id))
+        for (let i = 0; i < this._playerList.length; i++) {
+            if (this.checkTableFull(i))
                 return HellionKbAddState.TableFull;
         }
 
@@ -84,9 +88,9 @@ export class HellionKnucklebones {
             this._tableState[this._curPlayer][row3] = number;
 
         if (this._curPlayer == 0)
-            this.removeColumnNum(number, column, this._playerList[1].id);
+            this.removeColumnNum(number, column, 1);
         else
-            this.removeColumnNum(number, column, this._playerList[0].id);
+            this.removeColumnNum(number, column, 0);
 
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
@@ -115,8 +119,8 @@ export class HellionKnucklebones {
         return table[row1] != null && table[row2] != null && table[row3] != null;
     }
 
-    public checkTableFull(): boolean {
-        let table = this._tableState[this._curPlayer];
+    public checkTableFull(index: number = this._curPlayer): boolean {
+        let table = this._tableState[index];
 
         for (let i = 0; i < table.length; i++) {
             if (table[i] == null)
@@ -126,7 +130,7 @@ export class HellionKnucklebones {
         return true;
     }
 
-    private removeColumnNum(num: number, column: HellionKbColumn, playerId: string): void {
+    private removeColumnNum(num: number, column: HellionKbColumn, playerIndex: number): void {
         if (column < 0 || column > 2)
             throw new Error("Invalid column");
 
@@ -134,28 +138,28 @@ export class HellionKnucklebones {
         let row2 = column + 3;
         let row3 = column + 6;
 
-        if (this._tableState[this._curPlayer][row3] == num)
-            this._tableState[this._curPlayer][row3] = null;
+        if (this._tableState[playerIndex][row3] == num)
+            this._tableState[playerIndex][row3] = null;
 
-        if (this._tableState[this._curPlayer][row2] == num) {
-            if (this._tableState[row3] != null) {
-                this._tableState[this._curPlayer][row2] = this._tableState[this._curPlayer][row3];
-                this._tableState[this._curPlayer][row3] = null;
+        if (this._tableState[playerIndex][row2] == num) {
+            if (this._tableState[playerIndex][row3] != null) {
+                this._tableState[playerIndex][row2] = this._tableState[playerIndex][row3];
+                this._tableState[playerIndex][row3] = null;
             } else {
-                this._tableState[this._curPlayer][row2] = null;
+                this._tableState[playerIndex][row2] = null;
             }
         }
 
-        if (this._tableState[this._curPlayer][row1] == num) {
-            if (this._tableState[row3] != null) {
-                this._tableState[this._curPlayer][row1] = this._tableState[this._curPlayer][row2];
-                this._tableState[this._curPlayer][row2] = this._tableState[this._curPlayer][row3];
-                this._tableState[this._curPlayer][row3] = null;
-            } else if (this._tableState[row2] != null) {
-                this._tableState[this._curPlayer][row1] = this._tableState[this._curPlayer][row2];
-                this._tableState[this._curPlayer][row2] = null;
+        if (this._tableState[playerIndex][row1] == num) {
+            if (this._tableState[playerIndex][row3] != null) {
+                this._tableState[playerIndex][row1] = this._tableState[playerIndex][row2];
+                this._tableState[playerIndex][row2] = this._tableState[playerIndex][row3];
+                this._tableState[playerIndex][row3] = null;
+            } else if (this._tableState[playerIndex][row2] != null) {
+                this._tableState[playerIndex][row1] = this._tableState[playerIndex][row2];
+                this._tableState[playerIndex][row2] = null;
             } else {
-                this._tableState[this._curPlayer][row1] = null;
+                this._tableState[playerIndex][row1] = null;
             }
         }
     }
@@ -166,14 +170,14 @@ export class HellionKnucklebones {
         for (let i = 0; i < this._tableState.length; i++) {
             let point: HellionKbPoint[] = [];
 
-            for (let column = 0; i <= 2; column++) {
+            for (let column = 0; column <= 2; column++) {
                 let row1 = column + 0;
                 let row2 = column + 3;
                 let row3 = column + 6;
 
                 point.push({
-                    value: this._tableState[i][row1] as number,
-                    repeated: 1
+                    value: this._tableState[i][row1] || -1,
+                    repeated: (this._tableState[i][row1] == null) ? 0 : 1
                 });
 
                 if (this._tableState[i][row2] == point[point.length - 1].value) {
@@ -185,7 +189,7 @@ export class HellionKnucklebones {
                     });
                 } else
                     point.push({
-                        value: this._tableState[i][row2] as number,
+                        value: this._tableState[i][row2] || -1,
                         repeated: 1
                     });
 
@@ -205,14 +209,15 @@ export class HellionKnucklebones {
                     });
                 } else
                     point.push({
-                        value: this._tableState[i][row2] as number,
+                        value: this._tableState[i][row3] || -1,
                         repeated: 1
                     });
             }
 
             let respoints = 0;
-            for (let o = 0; i < point.length; o++) {
-                respoints += point[o].value * point[o].repeated;
+            for (const element of point) {
+                if (element.value > -1 && element.repeated > 0)
+                    respoints += (element.value * element.repeated) * element.repeated;
             }
             points.push(respoints);
         }
