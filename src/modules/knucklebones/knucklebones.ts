@@ -1,51 +1,61 @@
+import { TextBasedChannel } from 'discord.js';
 import randomNumber from 'random-number-csprng';
-import { HellionKbAddState, HellionKbPlayer, HellionKbColumn, HellionKbState } from './base';
+import { HellionKbAddState, HellionKbColumn, HellionKbPlayer, HellionKbState } from './base';
 
 export class HellionKnucklebones {
     private _playerList: HellionKbPlayer[];
     private _curPlayerId: string;
     private _tableState: HellionKbState[][];
 
-    private _started: boolean;
+    private _channel: TextBasedChannel | null;
 
-    constructor(players: HellionKbPlayer[]) {
+    constructor(players: HellionKbPlayer[], channel: TextBasedChannel | null) {
         if (players.length != 2) {
             throw new Error("Can't play without exactly 2 players");
         }
 
-        this._started = false;
+        this._channel = channel;
         this._playerList = players;
 
-        this._tableState[0] = [
-            null, null, null,
-            null, null, null,
-            null, null, null
+        this._tableState = [
+            [
+                null, null, null,
+                null, null, null,
+                null, null, null
+            ], [
+                null, null, null,
+                null, null, null,
+                null, null, null
+            ]
         ];
 
-        this._tableState[1] = [
-            null, null, null,
-            null, null, null,
-            null, null, null
-        ];
-
-        this._curPlayerId = this._playerList[Math.round(Math.random())].userId;
+        this._curPlayerId = this._playerList[Math.round(Math.random())].id;
     }
 
     get currentPlayer(): HellionKbPlayer {
-        this._playerList.forEach(element => {
-            if (element.userId == this._curPlayerId)
-                return element;
-        });
+        for (let i = 0; i < this._playerList.length; i++) {
+            if (this._playerList[i].id === this._curPlayerId)
+                return this._playerList[i];
+        }
 
-        return { userId: "", userName: "" };
+        throw new Error("Abnormal current user aren't playing")
+    }
+
+    get enemyPlayer(): HellionKbPlayer {
+        for (let i = 0; i < this._playerList.length; i++) {
+            if (this._playerList[i].id !== this._curPlayerId)
+                return this._playerList[i];
+        }
+
+        throw new Error("Abnormal current user aren't playing")
+    }
+
+    get channel(): TextBasedChannel | null {
+        return this._channel;
     }
 
     get players(): HellionKbPlayer[] {
         return this._playerList;
-    }
-
-    get started(): boolean {
-        return this._started
     }
 
     public table(playerId: string): HellionKbState[] {
@@ -53,10 +63,10 @@ export class HellionKnucklebones {
     }
 
     private playerIndex(playerId: string): number {
-        this._playerList.forEach((element, index) => {
-            if (element.userId == playerId)
-                return index;
-        });
+        for (let i = 0; i < this._playerList.length; i++) {
+            if (this._playerList[i].id === playerId)
+                return i;
+        }
 
         throw new Error("Player not found");
     }
@@ -70,7 +80,7 @@ export class HellionKnucklebones {
             return HellionKbAddState.ColumnFull;
 
         for (const element of this._playerList) {
-            if (this.checkTableFull(element.userId))
+            if (this.checkTableFull(element.id))
                 return HellionKbAddState.TableFull;
         }
 
@@ -109,9 +119,9 @@ export class HellionKnucklebones {
             return HellionKbAddState.TableFull;
 
         if (this.playerIndex(this._curPlayerId) == 0)
-            this._curPlayerId = this._playerList[1].userId;
+            this._curPlayerId = this._playerList[1].id;
         else
-            this._curPlayerId = this._playerList[0].userId;
+            this._curPlayerId = this._playerList[0].id;
 
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
@@ -125,9 +135,9 @@ export class HellionKnucklebones {
             throw new Error("Abnormal error, current player don't have a table");
 
         switch (column) {
-            case 1: table[0] != null && table[3] != null && table[6] != null;
-            case 2: table[1] != null && table[4] != null && table[7] != null;
-            case 3: table[2] != null && table[5] != null && table[8] != null;
+            case 1: return table[0] != null && table[3] != null && table[6] != null;
+            case 2: return table[1] != null && table[4] != null && table[7] != null;
+            case 3: return table[2] != null && table[5] != null && table[8] != null;
             default: throw new Error("Invalid column");
         }
     }

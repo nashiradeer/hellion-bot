@@ -1,4 +1,4 @@
-import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions, TextBasedChannel } from 'discord.js';
+import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions, TextBasedChannel, MessageEditOptions, WebhookEditMessageOptions } from 'discord.js';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
@@ -334,7 +334,7 @@ export class HellionReplyHandler {
         return null;
     }
 
-    public async edit(message: string | MessagePayload): Promise<Message | null> {
+    public async edit(message: string | MessagePayload | WebhookEditMessageOptions): Promise<Message | null> {
         if (this._message) {
             return await this._message.edit(message);
         }
