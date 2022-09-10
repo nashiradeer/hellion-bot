@@ -90,7 +90,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
 
-            let m = music.remove(queuenum);
+            let m = await music.remove(queuenum);
 
             if (!m) {
                 event.reply({
