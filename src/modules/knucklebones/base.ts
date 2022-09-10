@@ -1,3 +1,12 @@
+export interface HellionKbPlayer {
+    id: string;
+    username: string;
+    avatar: string;
+}
+
+export type HellionKbState = null | number;
+
+export type HellionKbColumn = 0 | 1 | 2;
 import { User } from "discord.js";
 
 export type HellionKbState = null | number;
@@ -17,6 +26,7 @@ export enum HellionKbGameState {
     Win = 3
 }
 
-export type HellionKbPlayer = User & {
-    kbUsername: string;
-};
+export interface HellionKbPoint {
+    value: number;
+    repeated: number;
+}

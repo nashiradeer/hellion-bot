@@ -4,12 +4,12 @@ import { HellionKbAddState, HellionKbColumn, HellionKbPlayer, HellionKbState } f
 
 export class HellionKnucklebones {
     private _playerList: HellionKbPlayer[];
-    private _curPlayerId: string;
+    private _curPlayer: number;
     private _tableState: HellionKbState[][];
 
     private _channel: TextBasedChannel | null;
 
-    constructor(players: HellionKbPlayer[], channel: TextBasedChannel | null) {
+    constructor(players: HellionKbPlayer[], ready: () => {}, channel: TextBasedChannel | null) {
         if (players.length != 2) {
             throw new Error("Can't play without exactly 2 players");
         }
@@ -29,29 +29,14 @@ export class HellionKnucklebones {
             ]
         ];
 
-        this._curPlayerId = this._playerList[Math.round(Math.random())].id;
+        randomNumber(0, 1).then((n) => {
+            this._curPlayer = n;
+            ready();
+        });
     }
 
     get currentPlayer(): HellionKbPlayer {
-        for (let i = 0; i < this._playerList.length; i++) {
-            if (this._playerList[i].id === this._curPlayerId)
-                return this._playerList[i];
-        }
-
-        throw new Error("Abnormal current user aren't playing")
-    }
-
-    get enemyPlayer(): HellionKbPlayer {
-        for (let i = 0; i < this._playerList.length; i++) {
-            if (this._playerList[i].id !== this._curPlayerId)
-                return this._playerList[i];
-        }
-
-        throw new Error("Abnormal current user aren't playing")
-    }
-
-    get channel(): TextBasedChannel | null {
-        return this._channel;
+        return this._playerList[this._curPlayer];
     }
 
     get players(): HellionKbPlayer[] {
@@ -64,7 +49,7 @@ export class HellionKnucklebones {
 
     private playerIndex(playerId: string): number {
         for (let i = 0; i < this._playerList.length; i++) {
-            if (this._playerList[i].id === playerId)
+            if (this._playerList[i].id == playerId)
                 return i;
         }
 
@@ -84,44 +69,32 @@ export class HellionKnucklebones {
                 return HellionKbAddState.TableFull;
         }
 
-        switch (column) {
-            case 1:
-                if (this._tableState[this.playerIndex(this._curPlayerId)][0] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][0] = number;
-                else if (this._tableState[this.playerIndex(this._curPlayerId)][3] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][3] = number;
-                else
-                    this._tableState[this.playerIndex(this._curPlayerId)][6] = number;
+        if (column < 0 || column > 2)
+            throw new Error("Invalid column");
 
-                break;
-            case 2:
-                if (this._tableState[this.playerIndex(this._curPlayerId)][1] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][1] = number;
-                else if (this._tableState[this.playerIndex(this._curPlayerId)][4] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][4] = number;
-                else
-                    this._tableState[this.playerIndex(this._curPlayerId)][7] = number;
+        let row1 = column + 0;
+        let row2 = column + 3;
+        let row3 = column + 6;
 
-                break;
-            case 3:
-                if (this._tableState[this.playerIndex(this._curPlayerId)][2] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][2] = number;
-                else if (this._tableState[this.playerIndex(this._curPlayerId)][5] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][5] = number;
-                else
-                    this._tableState[this.playerIndex(this._curPlayerId)][8] = number;
+        if (this._tableState[this._curPlayer][row1] == null)
+            this._tableState[this._curPlayer][row1] = number;
+        else if (this._tableState[this._curPlayer][row2] == null)
+            this._tableState[this._curPlayer][row2] = number;
+        else
+            this._tableState[this._curPlayer][row3] = number;
 
-                break;
-            default: throw new Error("Invalid column");
-        }
+        if (this._curPlayer == 0)
+            this.removeColumnNum(number, column, this._playerList[1].id);
+        else
+            this.removeColumnNum(number, column, this._playerList[0].id);
 
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
 
-        if (this.playerIndex(this._curPlayerId) == 0)
-            this._curPlayerId = this._playerList[1].id;
+        if (this._curPlayer == 0)
+            this._curPlayer = 1;
         else
-            this._curPlayerId = this._playerList[0].id;
+            this._curPlayer = 0;
 
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
@@ -129,42 +102,121 @@ export class HellionKnucklebones {
         return HellionKbAddState.Added;
     }
 
-    public checkColumnFull(column: HellionKbColumn, playerId: string = this._curPlayerId): boolean {
-        let table = this.table(playerId);
-        if (!table)
-            throw new Error("Abnormal error, current player don't have a table");
+    public checkColumnFull(column: HellionKbColumn): boolean {
+        let table = this._tableState[this._curPlayer];
 
-        switch (column) {
-            case 1: return table[0] != null && table[3] != null && table[6] != null;
-            case 2: return table[1] != null && table[4] != null && table[7] != null;
-            case 3: return table[2] != null && table[5] != null && table[8] != null;
-            default: throw new Error("Invalid column");
+        if (column < 0 || column > 2)
+            throw new Error("Invalid column");
+
+        let row1 = column + 0;
+        let row2 = column + 3;
+        let row3 = column + 6;
+
+        return table[row1] != null && table[row2] != null && table[row3] != null;
+    }
+
+    public checkTableFull(): boolean {
+        let table = this._tableState[this._curPlayer];
+
+        for (let i = 0; i < table.length; i++) {
+            if (table[i] == null)
+                return false;
+        }
+
+        return true;
+    }
+
+    private removeColumnNum(num: number, column: HellionKbColumn, playerId: string): void {
+        if (column < 0 || column > 2)
+            throw new Error("Invalid column");
+
+        let row1 = column + 0;
+        let row2 = column + 3;
+        let row3 = column + 6;
+
+        if (this._tableState[this._curPlayer][row3] == num)
+            this._tableState[this._curPlayer][row3] = null;
+
+        if (this._tableState[this._curPlayer][row2] == num) {
+            if (this._tableState[row3] != null) {
+                this._tableState[this._curPlayer][row2] = this._tableState[this._curPlayer][row3];
+                this._tableState[this._curPlayer][row3] = null;
+            } else {
+                this._tableState[this._curPlayer][row2] = null;
+            }
+        }
+
+        if (this._tableState[this._curPlayer][row1] == num) {
+            if (this._tableState[row3] != null) {
+                this._tableState[this._curPlayer][row1] = this._tableState[this._curPlayer][row2];
+                this._tableState[this._curPlayer][row2] = this._tableState[this._curPlayer][row3];
+                this._tableState[this._curPlayer][row3] = null;
+            } else if (this._tableState[row2] != null) {
+                this._tableState[this._curPlayer][row1] = this._tableState[this._curPlayer][row2];
+                this._tableState[this._curPlayer][row2] = null;
+            } else {
+                this._tableState[this._curPlayer][row1] = null;
+            }
         }
     }
 
-    public checkTableFull(playerId: string = this._curPlayerId): boolean {
-        let table = this.table(playerId);
-        if (!table)
-            throw new Error("Abnormal error, current player don't have a table");
-
-        return table[0] != null && table[3] != null && table[6] != null &&
-            table[1] != null && table[4] != null && table[7] != null &&
-            table[2] != null && table[5] != null && table[8] != null;
-    }
-
     public calculatePoints(): number[] {
-        let res: number[] = [];
+        let points: number[] = [];
 
-        this._tableState.forEach((element) => {
-            let total = element.reduce((v: HellionKbState, c: HellionKbState): HellionKbState => {
-                if (v == null)
-                    v = 0;
-                return (c != null) ? v + c : v
-            });
-            if (total != null)
-                res.push(total);
-        });
+        for (let i = 0; i < this._tableState.length; i++) {
+            let point: HellionKbPoint[] = [];
 
-        return res;
+            for (let column = 0; i <= 2; column++) {
+                let row1 = column + 0;
+                let row2 = column + 3;
+                let row3 = column + 6;
+
+                point.push({
+                    value: this._tableState[i][row1] as number,
+                    repeated: 1
+                });
+
+                if (this._tableState[i][row2] == point[point.length - 1].value) {
+                    point[point.length - 1].repeated++;
+
+                    point.push({
+                        value: -1,
+                        repeated: 0
+                    });
+                } else
+                    point.push({
+                        value: this._tableState[i][row2] as number,
+                        repeated: 1
+                    });
+
+                if (this._tableState[i][row3] == point[point.length - 1].value) {
+                    point[point.length - 1].repeated++;
+
+                    point.push({
+                        value: -1,
+                        repeated: 0
+                    });
+                } else if (this._tableState[i][row3] == point[point.length - 2].value) {
+                    point[point.length - 2].repeated++;
+
+                    point.push({
+                        value: -1,
+                        repeated: 0
+                    });
+                } else
+                    point.push({
+                        value: this._tableState[i][row2] as number,
+                        repeated: 1
+                    });
+            }
+
+            let respoints = 0;
+            for (let o = 0; i < point.length; o++) {
+                respoints += point[o].value * point[o].repeated;
+            }
+            points.push(respoints);
+        }
+
+        return points;
     }
 }
