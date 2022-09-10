@@ -1,9 +1,5 @@
 import randomNumber from 'random-number-csprng';
-
-export interface HellionKbPlayer {
-    userId: string;
-    userName: string;
-}
+import { HellionKbPlayer } from './base';
 
 export type HellionKbState = null | number;
 
@@ -87,36 +83,43 @@ export class HellionKnucklebones {
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
 
+        let index = this.playerIndex(this._curPlayerId);
+
         switch (column) {
             case 1:
-                if (this._tableState[this.playerIndex(this._curPlayerId)][0] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][0] = number;
-                else if (this._tableState[this.playerIndex(this._curPlayerId)][3] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][3] = number;
+                if (this._tableState[index][0] == null)
+                    this._tableState[index][0] = number;
+                else if (this._tableState[index][3] == null)
+                    this._tableState[index][3] = number;
                 else
-                    this._tableState[this.playerIndex(this._curPlayerId)][6] = number;
+                    this._tableState[index][6] = number;
 
                 break;
             case 2:
-                if (this._tableState[this.playerIndex(this._curPlayerId)][1] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][1] = number;
-                else if (this._tableState[this.playerIndex(this._curPlayerId)][4] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][4] = number;
+                if (this._tableState[index][1] == null)
+                    this._tableState[index][1] = number;
+                else if (this._tableState[index][4] == null)
+                    this._tableState[index][4] = number;
                 else
-                    this._tableState[this.playerIndex(this._curPlayerId)][7] = number;
+                    this._tableState[index][7] = number;
 
                 break;
             case 3:
-                if (this._tableState[this.playerIndex(this._curPlayerId)][2] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][2] = number;
-                else if (this._tableState[this.playerIndex(this._curPlayerId)][5] == null)
-                    this._tableState[this.playerIndex(this._curPlayerId)][5] = number;
+                if (this._tableState[index][2] == null)
+                    this._tableState[index][2] = number;
+                else if (this._tableState[index][5] == null)
+                    this._tableState[index][5] = number;
                 else
-                    this._tableState[this.playerIndex(this._curPlayerId)][8] = number;
+                    this._tableState[index][8] = number;
 
                 break;
             default: throw new Error("Invalid column");
         }
+
+        if (this.playerIndex(this._curPlayerId) == 0)
+            this.removeColumnNum(number, column, this._playerList[1].id);
+        else
+            this.removeColumnNum(number, column, this._playerList[0].id);
 
         if (this.checkTableFull())
             return HellionKbAddState.TableFull;
@@ -153,6 +156,41 @@ export class HellionKnucklebones {
         return table[0] != null && table[3] != null && table[6] != null &&
                table[1] != null && table[4] != null && table[7] != null &&
                table[2] != null && table[5] != null && table[8] != null;
+    }
+
+    public removeColumnNum(num: number, column: HellionKbColumn, playerId: string): void {
+        let index = this.playerIndex(playerId);
+
+        switch (column) {
+            case 1:
+                if (this._tableState[index][0] == num)
+                    this._tableState[index][0] = null;
+                if (this._tableState[index][3] == num)
+                    this._tableState[index][3] = null;
+                if (this._tableState[index][6] == num)
+                    this._tableState[index][6] = null;
+
+                break;
+            case 2:
+                if (this._tableState[index][1] == num)
+                    this._tableState[index][1] = null;
+                if (this._tableState[index][4] == num)
+                    this._tableState[index][4] = null;
+                if (this._tableState[index][7] == num)
+                    this._tableState[index][7] = null;
+
+                break;
+            case 3:
+                if (this._tableState[index][2] == num)
+                    this._tableState[index][2] = null;
+                if (this._tableState[index][5] == num)
+                    this._tableState[index][5] = null;
+                if (this._tableState[index][8] == num)
+                    this._tableState[index][8] = null;
+
+                break;
+            default: throw new Error("Invalid column");
+        }
     }
 
     public calculatePoints(): HellionKbState[] {
