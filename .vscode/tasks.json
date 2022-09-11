@@ -15,6 +15,13 @@
             "problemMatcher": [],
             "label": "npm: clean",
             "detail": "tsc --build --clean"
+        },
+        {
+            "type": "npm",
+            "script": "lint",
+            "problemMatcher": [],
+            "label": "npm: lint",
+            "detail": "eslint"
         }
     ]
 }
