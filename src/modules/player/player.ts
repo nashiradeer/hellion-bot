@@ -214,8 +214,14 @@ export class HellionMusicPlayer extends EventEmitter {
         })
             .on(VoiceConnectionStatus.Disconnected, () => {
                 if (!this._destroyed) {
-                    this.destroy();
                     this.emit('disconnected');
+                    this.destroy();
+                }
+            })
+            .on(VoiceConnectionStatus.Destroyed, () => {
+                if (!this._destroyed) {
+                    this.emit('disconnected');
+                    this.destroy();
                 }
             })
             .on('error', (err) => {
@@ -440,7 +446,7 @@ export class HellionMusicPlayer extends EventEmitter {
     }
 
     private start(index: number, seek: number = 0): Promise<void> {
-        return new Promise((resolve) => { 
+        return new Promise((resolve) => {
             this.extract(this.queue[index], seek)
                 .then((m) => {
                     if (this._player != null) {
@@ -451,7 +457,7 @@ export class HellionMusicPlayer extends EventEmitter {
                         this._paused = false;
                         this._playing = true;
                     }
-                    
+
                     resolve();
                 })
                 .catch(async (e) => {
