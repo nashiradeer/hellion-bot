@@ -1,10 +1,9 @@
-import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions, TextBasedChannel, MessageEditOptions, WebhookEditMessageOptions } from 'discord.js';
+import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions, TextBasedChannel, MessageEditOptions, WebhookEditMessageOptions, SlashCommandBuilder } from 'discord.js';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
-import { Routes, RESTPostAPIApplicationCommandsJSONBody, APIApplicationCommandOptionChoice, APIInteractionGuildMember } from 'discord.js/node_modules/discord-api-types/v9';
+import { Routes, RESTPostAPIApplicationCommandsJSONBody, APIApplicationCommandOptionChoice, APIInteractionGuildMember } from 'discord-api-types/v10';
 import { REST } from '@discordjs/rest';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { discord } from '../..';
 import { HellionCommandArgs } from '.';
 
@@ -151,7 +150,7 @@ export class HellionCommandHandler extends EventEmitter {
         }
 
         this.emit('debug', 'info', "Initializing DiscordJS REST...");
-        let rest = new REST({ version: '9' }).setToken(token);
+        let rest = new REST({ version: '10' }).setToken(token);
 
         this.emit('debug', 'info', "Registering commands in Discord...");
         await rest.put(
