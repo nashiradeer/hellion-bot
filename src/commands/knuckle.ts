@@ -34,7 +34,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`A NEW GAME IS STARTING, YOU CAN JOIN WITH **${(event.member as GuildMember).nickname || event.user.username}** IN THIS GAME!.`)
+                    .setDescription(`A NEW GAME IS STARTING, YOU CAN JOIN WITH **${(event.member as GuildMember).nickname || event.user.username}** IN THIS GAME.`)
             ],
             components: [
                 new ActionRowBuilder<ButtonBuilder>()
@@ -212,7 +212,7 @@ async function announceWinner(kb: HellionKnucklebones, client: Client): Promise<
                     .setColor(0x260041)
                     .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: client.user?.avatarURL() || '' })
                     .setTitle("Hellion Warden // Knucklebones")
-                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))}\n**${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))}\n\n**${kb.players[0].username}:** ${points[0]}\n**${kb.players[1].username}:** ${points[1]} nThe match ended in a draw. :(`)
+                    .setDescription(`**${kb.players[0].username}:**\n${createTable(kb.table(kb.players[0].id))}\n**${kb.players[1].username}:**\n${createTable(kb?.table(kb.players[1].id))}\n\n**${kb.players[0].username}:** ${points[0]}\n**${kb.players[1].username}:** ${points[1]}\nThe match ended in a draw. :(`)
             ]
         });
 }
