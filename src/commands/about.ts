@@ -14,14 +14,14 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             embeds: [
                 new MessageEmbed()
                     .setColor(0x260041)
-                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
+                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                     .setThumbnail(event.client.user?.avatarURL() || '')
-                    .setTitle("Hellion Warden // About")
+                    .setTitle("Hellion // About")
                     .setDescription(
-                        `Software: Hellion Warden\n` +
+                        `Software: Hellion\n` +
                         `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
                         `Version: v${HellionWardenInformation.VERSION}\n` +
-                        `Support: https://discord.gg/n7MttxXQwa`)
+                        `Support: hellion@deersoftware.dev`)
                     .addField("NodeJS Information",
                         `Version: ${process.version}\n` +
                         `Uptime: ${this.getTime(process.uptime())}\n` +

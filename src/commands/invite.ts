@@ -15,8 +15,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Invite")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Invite")
                         .setDescription("The invite generation is disabled in this bot, request a invite URL to the bot owner.")
                 ]
             });
@@ -27,8 +27,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             embeds: [
                 new MessageEmbed()
                     .setColor(0x260041)
-                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                    .setTitle("Hellion Warden // Invite")
+                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                    .setTitle("Hellion // Invite")
                     .setDescription(event.client.generateInvite({
                         scopes: ["bot", "applications.commands"],
                         permissions: [
