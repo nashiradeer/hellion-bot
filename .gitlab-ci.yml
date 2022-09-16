@@ -33,7 +33,7 @@ docker-build-amd64:
   script:
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag="latest-amd64"
+        tag=":latest-amd64"
         echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = $tag"
       elif [[ -z "$CI_COMMIT_TAG" ]]; then
         tag=":$CI_COMMIT_REF_SLUG-amd64"
@@ -67,7 +67,7 @@ docker-build-arm64:
   script:
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag="latest-arm64"
+        tag=":latest-arm64"
         echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = $tag"
       elif [[ -z "$CI_COMMIT_TAG" ]]; then
         tag=":$CI_COMMIT_REF_SLUG-arm64"
@@ -97,7 +97,7 @@ docker-manifest:
   script:
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag="latest"
+        tag=":latest"
         echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = $tag"
       elif [[ -z "$CI_COMMIT_TAG" ]]; then
         tag=":$CI_COMMIT_REF_SLUG"
