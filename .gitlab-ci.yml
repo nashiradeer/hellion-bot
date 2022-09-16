@@ -20,7 +20,7 @@ npm-lint:
         - .eslintrc.json
     - when: never
 
-docker-build:
+docker-build-amd64:
   image: docker:latest
   services:
     - docker:dind
@@ -54,7 +54,7 @@ docker-build:
     - when: never
 
 
-docker-build:
+docker-build-arm64:
   image: docker:latest
   services:
     - docker:dind
