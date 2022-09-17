@@ -9,6 +9,7 @@ npm-lint:
   before_script:
     - apk upgrade -U
     - npm i -g npm
+    - npm ci
   script:
     - npm run lint
   rules:
@@ -52,7 +53,6 @@ docker-build-amd64:
       exists:
         - Dockerfile
     - when: never
-
 
 docker-build-arm64:
   image: docker:latest
@@ -112,4 +112,3 @@ docker-manifest:
         --amend "$CI_REGISTRY_IMAGE${tag}-amd64" \
         --amend "$CI_REGISTRY_IMAGE${tag}-arm64"
     - docker manifest push "$CI_REGISTRY_IMAGE${tag}"
-  
