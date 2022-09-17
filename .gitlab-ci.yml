@@ -7,7 +7,8 @@ npm-lint:
   image: node:16-alpine
   stage: lint
   before_script:
-    - apk upgrade -U
+    - apk -U upgrade
+    - apk add make libtool autoconf automake gcc g++ libc-dev python3
     - npm i -g npm
     - npm ci
   script:
