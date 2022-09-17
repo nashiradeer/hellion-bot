@@ -1,5 +1,5 @@
 {
-  "name": "hellion-warden",
+  "name": "hellion",
   "version": "1.2.0-alpha.2",
   "description": "Discord Music Bot with support to YouTube and SoundCloud.",
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
     "start": "node dist/app.js",
     "build": "tsc --build",
     "clean": "tsc --build --clean",
-    "lint": "eslint",
+    "lint": "eslint src/ --ext .ts,.js",
     "prepack": "npm run build"
   },
   "repository": {
@@ -39,10 +39,10 @@
     "@types/random-number-csprng": "^1.0.0",
     "argparse": "^2.0.1",
     "bufferutil": "^4.0.6",
-    "discord-api-types": "^0.37.8",
+    "discord-api-types": "^0.37.10",
     "discord.js": "^14.3.0",
     "erlpack": "github:discord/erlpack",
-    "ffmpeg-static": "^5.0.2",
+    "ffmpeg-static": "^5.1.0",
     "play-dl": "^1.9.5",
     "random-number-csprng": "^1.0.2",
     "sodium": "^3.0.2",
@@ -50,9 +50,9 @@
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.33.1",
-    "@typescript-eslint/parser": "^5.33.1",
-    "eslint": "^8.22.0",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "eslint": "^8.23.1",
     "typescript": "^4.8.3"
   },
   "engines": {
