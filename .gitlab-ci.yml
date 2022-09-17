@@ -9,6 +9,7 @@ npm-lint:
   before_script:
     - apk upgrade -U
     - npm i -g npm
+    - npm ci
   script:
     - npm run lint
   rules:
