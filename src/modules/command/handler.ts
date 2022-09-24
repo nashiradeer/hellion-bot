@@ -147,7 +147,7 @@ export class HellionCommandHandler extends EventEmitter {
                 }
             }
 
-            slashCommands.push(command.toJSON());
+            slashCommands.push(command.toJSON() as RESTPostAPIApplicationCommandsJSONBody);
         }
 
         this.emit('debug', 'info', "Initializing DiscordJS REST...");
