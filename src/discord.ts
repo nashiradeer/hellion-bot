@@ -67,10 +67,12 @@ export class HellionWarden extends EventEmitter {
         });
         this._client.once('ready', async () => {
             this.emit('logged');
-            let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
             setInterval(async () => {
-                let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
+                let messages = [
+                    "with DeerSoftware",
+                    `in ${await this.guildSize()} guilds`,
+                    `using Hellion v${HellionWardenInformation.VERSION}`
+                ];
                 this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
             }, 60000);
         });
