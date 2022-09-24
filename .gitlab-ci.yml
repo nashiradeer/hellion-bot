@@ -93,6 +93,8 @@ docker-manifest:
   services:
     - docker:dind
   stage: manifest
+  tags:
+    - docker
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
@@ -113,3 +115,11 @@ docker-manifest:
         --amend "$CI_REGISTRY_IMAGE${tag}-amd64" \
         --amend "$CI_REGISTRY_IMAGE${tag}-arm64"
     - docker manifest push "$CI_REGISTRY_IMAGE${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED == 'true'
+      exists:
+        - Dockerfile
+    - if: $CI_COMMIT_TAG
+      exists:
+        - Dockerfile
+    - when: never
