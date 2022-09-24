@@ -1,5 +1,5 @@
 FROM node:16-alpine AS builder
-RUN apk -U upgrade
+RUN apk -U upgrade && npm i -g npm
 RUN apk add --virtual .build-deps make libtool autoconf automake gcc g++ libc-dev python3
 WORKDIR /usr/src/app
 COPY package*.json ./
@@ -8,7 +8,7 @@ COPY . .
 RUN npm run build
 
 FROM node:16-alpine
-RUN apk -U upgrade
+RUN apk -U upgrade && npm i -g npm
 ENV NODE_ENV=production
 WORKDIR /usr/src/app
 COPY package*.json ./
