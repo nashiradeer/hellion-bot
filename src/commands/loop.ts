@@ -40,8 +40,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Loop")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Loop")
                         .setDescription("You aren't in a voice channel.")
                 ]
             });
@@ -55,8 +55,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Loop")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Loop")
                         .setDescription("I aren't playing anything.")
                 ]
             });
@@ -67,8 +67,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Loop")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Loop")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
                 });
@@ -83,8 +83,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Loop")
                                 .setDescription("Looping all the queue.")
                         ]
                     });
@@ -96,8 +96,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Loop")
                                 .setDescription("Looping the current music.")
                         ]
                     });
@@ -109,8 +109,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Loop")
                                 .setDescription("Loop have been disabled.")
                         ]
                     });
@@ -120,8 +120,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Loop")
                                 .setDescription(`**Queue loop type:** ${music.getLoop()}\n**Loop type options:** '\`music\`', '\`queue\`', '\`none\`'.`)
                         ]
                     });

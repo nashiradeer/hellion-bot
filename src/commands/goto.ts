@@ -25,8 +25,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Goto")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Goto")
                         .setDescription("You aren't in a voice channel.")
                 ]
             });
@@ -40,8 +40,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Goto")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Goto")
                         .setDescription("I aren't playing anything.")
                 ]
             });
@@ -52,8 +52,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Goto")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Goto")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
                 });
@@ -67,8 +67,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Goto")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Goto")
                             .setDescription("You aren't using a valid number.")
                     ]
                 });
@@ -82,8 +82,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Goto")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Goto")
                             .setDescription("You aren't using a valid number.")
                     ]
                 });
@@ -96,8 +96,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Goto")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Goto")
                         .setDescription(`Going to: ${m.title} **[${m.requestedBy.user.tag}]**`)
                 ]
             });

@@ -1,0 +1,115 @@
+stages:
+  - lint
+  - build
+  - manifest
+
+npm-lint:
+  image: node:16-alpine
+  stage: lint
+  before_script:
+    - apk -U upgrade
+    - apk add make libtool autoconf automake gcc g++ libc-dev python3
+    - npm i -g npm
+    - npm ci
+  script:
+    - npm run lint
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED == 'true'
+      exists:
+        - .eslintrc.json
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == 'true'
+      exists:
+        - .eslintrc.json
+    - when: never
+
+docker-build-amd64:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: build
+  tags:
+    - amd64
+    - docker
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest-amd64"
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = $tag"
+      elif [[ -z "$CI_COMMIT_TAG" ]]; then
+        tag=":$CI_COMMIT_REF_SLUG-amd64"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      else
+        tag=":${CI_COMMIT_TAG:1}-amd64"
+        echo "Running on tag '$CI_COMMIT_TAG': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED == 'true'
+      exists:
+        - Dockerfile
+    - if: $CI_COMMIT_TAG
+      exists:
+        - Dockerfile
+    - when: never
+
+docker-build-arm64:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: build
+  tags:
+    - arm64
+    - docker
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest-arm64"
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = $tag"
+      elif [[ -z "$CI_COMMIT_TAG" ]]; then
+        tag=":$CI_COMMIT_REF_SLUG-arm64"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      else
+        tag=":${CI_COMMIT_TAG:1}-arm64"
+        echo "Running on tag '$CI_COMMIT_TAG': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED == 'true'
+      exists:
+        - Dockerfile
+    - if: $CI_COMMIT_TAG
+      exists:
+        - Dockerfile
+    - when: never
+
+docker-manifest:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: manifest
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest"
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = $tag"
+      elif [[ -z "$CI_COMMIT_TAG" ]]; then
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      else
+        tag=":${CI_COMMIT_TAG:1}"
+        echo "Running on tag '$CI_COMMIT_TAG': tag = $tag"
+      fi
+    - |
+      docker manifest create \
+        "$CI_REGISTRY_IMAGE${tag}" \
+        --amend "$CI_REGISTRY_IMAGE${tag}-amd64" \
+        --amend "$CI_REGISTRY_IMAGE${tag}-arm64"
+    - docker manifest push "$CI_REGISTRY_IMAGE${tag}"

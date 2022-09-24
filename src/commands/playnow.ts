@@ -26,8 +26,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Play Now")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Play Now")
                         .setDescription("You aren't in a voice channel.")
                 ]
             });
@@ -41,8 +41,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Play Now")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setTitle("Hellion // Play Now")
                         .setDescription("I aren't playing anything.")
                 ]
             });
@@ -53,8 +53,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Play Now")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Play Now")
                             .setDescription("You aren't in the same voice channel of me.")
                     ]
                 });
@@ -69,8 +69,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Play Now")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Play Now")
                             .setDescription("I can't play nothing.")
                     ]
                 });
@@ -83,8 +83,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Enqueued")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Enqueued")
                                 .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
                         ]
                     });
@@ -93,8 +93,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Play Now")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Play Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                         ]
                     }).then((m) => {
@@ -106,8 +106,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         embeds: [
                             new MessageEmbed()
                                 .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Play Now")
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Play Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                         ]
                     });
@@ -119,8 +119,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Play Now")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Play Now")
                             .setDescription("I can't resolve this music.\nPlease check if the music exists, is public and if isn't age restricted.")
                     ]
                 });
