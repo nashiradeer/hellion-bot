@@ -4,8 +4,10 @@ import { commandHandler, HellionWardenInformation, player } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenOptions {
-    botpublic?: boolean;
-    botowner?: string;
+    botpublic?: boolean | null;
+    botowner?: string | null;
+    embedColor?: string | null;
+    iconUrl?: string | null;
 }
 
 export interface HellionWardenData {
@@ -13,6 +15,8 @@ export interface HellionWardenData {
     botpublic: boolean;
     botowner: string;
     prefix: string;
+    embedColor: number;
+    iconUrl: string;
 }
 
 export declare interface HellionWarden {
@@ -53,7 +57,9 @@ export class HellionWarden extends EventEmitter {
             music: new Map<string, player.HellionMusicPlayer>(),
             prefix: prefix,
             botpublic: this.botpublic,
-            botowner: this.botowner
+            botowner: this.botowner,
+            embedColor: parseInt(options?.embedColor ?? "007dff", 16),
+            iconUrl: options?.iconUrl ?? "https://www.deersoftware.dev/assets/images/hellion.png"
         };
 
         // Initialize Discord Client

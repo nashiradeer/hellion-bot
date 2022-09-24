@@ -10,16 +10,18 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
+        let hdata = data as discord.HellionWardenData;
+
         event.reply({
             embeds: [
                 new MessageEmbed()
-                    .setColor(0x260041)
+                    .setColor(hdata.embedColor)
                     .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
-                    .setThumbnail(event.client.user?.avatarURL() || '')
+                    .setThumbnail(hdata.iconUrl)
                     .setTitle("Hellion // About")
                     .setDescription(
                         `Software: Hellion\n` +
-                        `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
+                        `Prefix: ${hdata.prefix}\n` +
                         `Version: v${HellionWardenInformation.VERSION}\n` +
                         `Support: hellion@deersoftware.dev`)
                     .addField("NodeJS Information",
