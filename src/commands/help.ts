@@ -45,7 +45,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             event.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(0x260041)
+                        .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Help")
                         .setDescription(`**Commands:** ${commands[0].name}\n**Description:** ${commands[0].description}\n**Category:** ${commands[0].category}${usage}${alias}`)
@@ -69,7 +69,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             event.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(0x260041)
+                        .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Help")
                         .setDescription(message.substring(0, 2000))

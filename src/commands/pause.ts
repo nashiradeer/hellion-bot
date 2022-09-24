@@ -56,7 +56,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             event.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(0x260041)
+                        .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Pause")
                         .setDescription("Paused the music player.")

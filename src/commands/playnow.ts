@@ -82,7 +82,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
+                                .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Enqueued")
                                 .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
@@ -92,7 +92,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     music.textChannel.send({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
+                                .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Play Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
@@ -105,7 +105,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
+                                .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Play Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
