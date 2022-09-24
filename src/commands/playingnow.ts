@@ -6,7 +6,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "playingnow";
         this.category = "Music";
-        this.description = "Show the music playing and the time.";
+        this.description = "See the song being played right now.";
         this.alias = ["np", "now"];
     }
 
@@ -19,7 +19,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Playing Now")
-                        .setDescription("You aren't in a voice channel.")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -34,7 +34,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Playing Now")
-                        .setDescription("I aren't playing anything.")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
@@ -46,7 +46,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Playing Now")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;

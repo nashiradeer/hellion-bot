@@ -6,13 +6,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "loop";
         this.category = "Music";
-        this.description = "Toggle music or queue loop in the Music Player.";
+        this.description = "View or configure the type of loop Music Player should use.";
         this.alias = ["l"];
         this.usage = [
             {
                 name: "type",
                 index: 0,
-                description: "Loop type to be used.",
+                description: "The type of loop that Music Player should use.",
                 required: false,
                 type: 'STRING',
                 choices: [
@@ -42,7 +42,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Loop")
-                        .setDescription("You aren't in a voice channel.")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -57,7 +57,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Loop")
-                        .setDescription("I aren't playing anything.")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
@@ -69,7 +69,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Loop")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -85,7 +85,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Loop")
-                                .setDescription("Looping all the queue.")
+                                .setDescription("The entire queue is now in a loop.")
                         ]
                     });
                     break;
@@ -98,7 +98,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Loop")
-                                .setDescription("Looping the current music.")
+                                .setDescription("The current song is now looping.")
                         ]
                     });
                     break;
@@ -111,7 +111,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Loop")
-                                .setDescription("Loop have been disabled.")
+                                .setDescription("The loop has been disabled.")
                         ]
                     });
                     break;
@@ -122,7 +122,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Loop")
-                                .setDescription(`**Queue loop type:** ${music.getLoop()}\n**Loop type options:** '\`music\`', '\`queue\`', '\`none\`'.`)
+                                .setDescription(`**Current loop type:** ${music.getLoop()}\n**Loop type options:** '\`music\`', '\`queue\`', '\`none\`'.`)
                         ]
                     });
                     break;

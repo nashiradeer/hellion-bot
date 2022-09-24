@@ -9,13 +9,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "play";
         this.category = "Music";
-        this.description = "Play a music or resume the player.";
+        this.description = "Play a song now by skipping the current song.";
         this.alias = ["p"];
         this.usage = [
             {
                 name: "music",
                 index: -1,
-                description: "A song or playlist from YouTube or SoundCloud.",
+                description: "A song or playlist you want played.",
                 required: false,
                 type: 'STRING'
             }
@@ -42,7 +42,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Play")
-                        .setDescription("You aren't in a voice channel.")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -60,7 +60,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Play")
-                            .setDescription("I aren't playing anything. You need provide a valid URL or search term after the play command.")
+                            .setDescription("I'm not playing anything at the moment. If you want to play something, add a link or valid search term after the command.")
                     ]
                 });
                 return;
@@ -72,7 +72,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Play")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -84,7 +84,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Play")
-                        .setDescription("Resuming the music player.")
+                        .setDescription("Music Player has been resumed.")
                 ]
             });
             return;
@@ -125,7 +125,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Disconnected")
-                            .setDescription("A administrator has moved or kicked out me.")
+                            .setDescription("Disconnected by an Administrator or Moderator")
                     ]
                 });
             });
@@ -138,7 +138,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Queue Error")
-                            .setDescription(`Removing: \`${m.title}\` **[${m.requestedBy.user.tag}]**\nPlease check if the music exists, is public and if isn't age restricted.`)
+                            .setDescription(`Removing \`\`${m.title}\`\` by **${m.requestedBy.user.tag}** due to an error. Please check if this song is available or has no age restriction.`)
                     ]
                 });
             });
@@ -157,7 +157,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Play")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -173,7 +173,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(data.embedColor)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Enqueued")
-                            .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
+                            .setDescription(`Enqueued a total of ${res.count} songs to the queue.`)
                     ]
                 });
 
@@ -220,7 +220,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Play")
-                        .setDescription("I can't resolve this music.\nPlease check if the music exists, is public and if isn't age restricted.")
+                        .setDescription("Could not find this song or playlist. Please check if this song is available or has no age restriction.")
                 ]
             });
         }

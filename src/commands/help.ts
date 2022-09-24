@@ -6,12 +6,12 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "help";
         this.category = "Information";
-        this.description = "List bot commands or show the details about one.";
+        this.description = "See the list of commands or get help on a specific command.";
         this.alias = ["h"];
         this.usage = [
             {
                 name: "search",
-                description: "Command or category of a command.",
+                description: "Command or category you want help with.",
                 index: 0,
                 required: false,
                 type: 'STRING'
@@ -28,7 +28,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Help")
-                        .setDescription("Command or category not found.")
+                        .setDescription("Could not find a command or category with that name.")
                 ]
             });
         } else if (commands.length == 1) {

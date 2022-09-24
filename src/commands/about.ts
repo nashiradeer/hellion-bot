@@ -6,7 +6,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "about";
         this.category = "Information";
-        this.description = "Get a short about of the bot.";
+        this.description = "See information about Hellion.";
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
@@ -20,22 +20,25 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     .setThumbnail(hdata.iconUrl)
                     .setTitle("Hellion // About")
                     .setDescription(
-                        `Software: Hellion\n` +
                         `Prefix: ${hdata.prefix}\n` +
                         `Version: v${HellionWardenInformation.VERSION}\n` +
                         `Support: hellion@deersoftware.dev`)
-                    .addField("NodeJS Information",
-                        `Version: ${process.version}\n` +
-                        `Uptime: ${this.getTime(process.uptime())}\n` +
-                        `Operation System: ${process.platform}\n` +
-                        `Architecture: ${process.arch}`
-                        , true)
-                    .addField("Discord.JS Information",
-                        `Version: v${version}\n` +
-                        `Uptime: ${this.getTime((event.client.uptime || 0) / 1000)}\n` +
-                        `API Latency: ${event.client.ws.ping}ms\n` +
-                        `Latency: ${Date.now() - event.createdTimestamp}ms`
-                        , true)
+                    .addFields([
+                        {
+                            name: "Node.js",
+                            value: `Version: ${process.version}\n` +
+                                `Uptime: ${this.getTime(process.uptime())}\n` +
+                                `Memory: ${(process.memoryUsage.rss() / 1024 / 1024).toFixed(2)} MB`,
+                            inline: true
+                        },
+                        {
+                            name: "Discord.js",
+                            value: `Version: v${version}\n` +
+                                `API Latency: ${event.client.ws.ping}ms\n` +
+                                `Latency: ${Date.now() - event.createdTimestamp}ms`,
+                            inline: true
+                        }
+                    ])
             ]
         });
     }
