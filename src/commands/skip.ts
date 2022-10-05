@@ -6,7 +6,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "skip";
         this.category = "Music";
-        this.description = "Skip the current music playing.";
+        this.description = "Skip the currently playing song.";
         this.alias = ["s"];
     }
 
@@ -19,7 +19,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Skip")
-                        .setDescription("You aren't in a voice channel.")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -34,7 +34,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Skip")
-                        .setDescription("I aren't playing anything.")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
@@ -46,7 +46,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Skip")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -61,7 +61,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(data.embedColor)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Skip")
-                            .setDescription(`Reached the end of the queue, disconnecting...`)
+                            .setDescription(`There is no song after this one, disconnecting from voice chat...`)
                     ]
                 });
             } else {
@@ -71,7 +71,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(data.embedColor)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Skip")
-                            .setDescription(`Skipped to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                            .setDescription(`Skipping to: ${m.title} **[${m.requestedBy.user.tag}]**`)
                     ]
                 });
             }

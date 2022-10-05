@@ -99,7 +99,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Remove")
-                            .setDescription("Don't have a item with this number in the queue.")
+                            .setDescription("There's no item with this number in the queue.")
                     ]
                 });
                 return;
