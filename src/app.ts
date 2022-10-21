@@ -10,6 +10,8 @@ interface HellionWardenArgs {
    botowner: string;
    public: string;
    verbose: logger.HellionLoggerLevel | 'none';
+   embedcolor: string;
+   icon: string;
 }
 
 const argparser = new ArgumentParser({
@@ -46,7 +48,19 @@ argparser.add_argument('--botowner', {
    type: 'str',
    help: 'Set the bot owner ID.',
    default: process.env.BOT_OWNER || ''
-})
+});
+
+argparser.add_argument('--embedcolor', {
+   type: 'str',
+   help: 'Change the color used in the embeds.',
+   default: process.env.EMBED_COLOR || ''
+});
+
+argparser.add_argument('--icon', {
+   type: 'str',
+   help: 'Change the icon displayed in the about.',
+   default: process.env.ICON || ''
+});
 
 argparser.add_argument('-v', '--version', {
    action: 'version',
@@ -66,7 +80,9 @@ if (args.verbose && args.verbose != 'none')
 const DiscordBot = new discord.HellionWarden(args.token, args.prefix, {
    botpublic: args.public == "yes",
    botowner: args.botowner,
-   intents: discord.HellionWarden.REQUIRED_INTENTS
+   intents: discord.HellionWarden.REQUIRED_INTENTS,
+   embedColor: (/^[a-f0-9]{1,6}$/gi.test(args.embedcolor)) ? args.embedcolor : null,
+   iconUrl: args.icon || null
 });
 
 DiscordBot.once('ready', () => {

@@ -4,8 +4,10 @@ import { commandHandler, HellionWardenInformation, player } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenOptions {
-    botpublic?: boolean;
-    botowner?: string;
+    botpublic?: boolean | null;
+    botowner?: string | null;
+    embedColor?: string | null;
+    iconUrl?: string | null;
 }
 
 export interface HellionWardenData {
@@ -13,6 +15,8 @@ export interface HellionWardenData {
     botpublic: boolean;
     botowner: string;
     prefix: string;
+    embedColor: number;
+    iconUrl: string;
 }
 
 export declare interface HellionWarden {
@@ -53,7 +57,9 @@ export class HellionWarden extends EventEmitter {
             music: new Map<string, player.HellionMusicPlayer>(),
             prefix: prefix,
             botpublic: this.botpublic,
-            botowner: this.botowner
+            botowner: this.botowner,
+            embedColor: parseInt(options?.embedColor ?? "007dff", 16),
+            iconUrl: options?.iconUrl ?? "https://www.deersoftware.dev/assets/images/hellion.png"
         };
 
         // Initialize Discord Client
@@ -67,10 +73,12 @@ export class HellionWarden extends EventEmitter {
         });
         this._client.once('ready', async () => {
             this.emit('logged');
-            let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
             setInterval(async () => {
-                let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
+                let messages = [
+                    "with DeerSoftware",
+                    `in ${await this.guildSize()} guilds`,
+                    `using Hellion v${HellionWardenInformation.VERSION}`
+                ];
                 this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
             }, 60000);
         });

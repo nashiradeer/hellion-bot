@@ -6,7 +6,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "shuffle";
         this.category = "Music";
-        this.description = "Randomize the queue order and skip to next the random music.";
+        this.description = "Shuffles the songs in the queue.";
         this.alias = ["random", "sh"];
     }
 
@@ -19,7 +19,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Shuffle")
-                        .setDescription("You aren't in a voice channel.")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -34,7 +34,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Shuffle")
-                        .setDescription("I aren't playing anything.")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
@@ -46,7 +46,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Shuffle")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -56,10 +56,10 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             event.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(0x260041)
+                        .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Shuffle")
-                        .setDescription("The music order from the queue has been shuffled.")
+                        .setDescription("The songs in the queue have been shuffled.")
                 ]
             });
         }

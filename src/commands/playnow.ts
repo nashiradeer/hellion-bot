@@ -12,7 +12,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             {
                 name: "music",
                 index: -1,
-                description: "A song or playlist from YouTube or SoundCloud.",
+                description: "A song or playlist you want played.",
                 required: true,
                 type: 'STRING'
             }
@@ -28,7 +28,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Play Now")
-                        .setDescription("You aren't in a voice channel.")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -43,7 +43,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                         .setTitle("Hellion // Play Now")
-                        .setDescription("I aren't playing anything.")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
@@ -55,7 +55,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Play Now")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -71,7 +71,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Play Now")
-                            .setDescription("I can't play nothing.")
+                            .setDescription("You need to provide a song or playlist to play.")
                     ]
                 });
                 return;
@@ -82,17 +82,17 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
+                                .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Enqueued")
-                                .setDescription(`Enqueued a total of ${res.count} songs to end of the queue.`)
+                                .setDescription(`Enqueued a total of ${res.count} songs to the queue.`)
                         ]
                     });
 
                     music.textChannel.send({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
+                                .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Play Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
@@ -105,7 +105,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
+                                .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                                 .setTitle("Hellion // Play Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
@@ -121,7 +121,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Play Now")
-                            .setDescription("I can't resolve this music.\nPlease check if the music exists, is public and if isn't age restricted.")
+                            .setDescription("Could not find this song or playlist. Please check if this song is available or has no age restriction.")
                     ]
                 });
             }
