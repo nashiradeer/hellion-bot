@@ -1,5 +1,5 @@
 import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 
@@ -18,6 +18,9 @@ export declare interface HellionMusicPlayer {
 
     on(event: 'disconnected', listener: () => void): this;
     once(event: 'disconnected', listener: () => void): this;
+
+    on(event: 'reconnecting', listener: () => void): this;
+    once(event: 'reconnecting', listener: () => void): this;
 
     on(event: 'end', listener: () => void): this;
     once(event: 'end', listener: () => void): this;
@@ -109,10 +112,22 @@ export class HellionMusicPlayer extends EventEmitter {
             guildId: this.voiceChannel.guildId,
             adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
         })
-            .on(VoiceConnectionStatus.Disconnected, () => {
-                if (!this._destroyed) {
-                    this.emit('disconnected');
-                    this.destroy();
+            .on(VoiceConnectionStatus.Disconnected, async () => {
+                try {
+                    if (this._connection) {
+                        await Promise.race([
+                            entersState(this._connection, VoiceConnectionStatus.Signalling, 5000),
+                            entersState(this._connection, VoiceConnectionStatus.Connecting, 5000),
+                        ]);
+
+                        this.emit('reconnecting');
+                    }
+
+                } catch (error) {
+                    if (!this._destroyed) {
+                        this.emit('disconnected');
+                        this.destroy();
+                    }
                 }
             })
             .on(VoiceConnectionStatus.Destroyed, () => {

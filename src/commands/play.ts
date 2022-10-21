@@ -132,6 +132,18 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 (data as discord.HellionWardenData).music.delete(event.guild?.id || '');
             });
 
+            music.on('reconnecting', () => {
+                music?.textChannel.send({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(data.embedColor)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Reconnecting")
+                            .setDescription("I've been moved from voice chat or a Discord error has occurred trying to reconnect.")
+                    ]
+                });
+            });
+
             music.on('disconnected', () => {
                 music?.textChannel.send({
                     embeds: [
@@ -139,7 +151,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Disconnected")
-                            .setDescription("Disconnected by an Administrator or Moderator")
+                            .setDescription("I was disconnected due to a Discord error or by an administrator.")
                     ]
                 });
             });
