@@ -91,6 +91,19 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
 
         if (!music) {
+            if (event.guild?.me && !member.voice.channel.permissionsFor(event.guild.me).has(["CONNECT", "SPEAK"])) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Play")
+                            .setDescription("I don't have the permissions to connect and speak on this voice chat.")
+                    ]
+                });
+                return;
+            }
+
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
 
             music.addResolver(new (await player.resolvers.playDl()).HellionYTDLResolver());
@@ -118,6 +131,18 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 (data as discord.HellionWardenData).music.delete(event.guild?.id || '');
             });
 
+            music.on('reconnecting', () => {
+                music?.textChannel.send({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(data.embedColor)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Reconnecting")
+                            .setDescription("I've been moved from voice chat or a Discord error has occurred trying to reconnect.")
+                    ]
+                });
+            });
+
             music.on('disconnected', () => {
                 music?.textChannel.send({
                     embeds: [
@@ -125,7 +150,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
                             .setTitle("Hellion // Disconnected")
-                            .setDescription("Disconnected by an Administrator or Moderator")
+                            .setDescription("I was disconnected due to a Discord error or by an administrator.")
                     ]
                 });
             });
