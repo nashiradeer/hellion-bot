@@ -1,6 +1,7 @@
 import { GuildMember, MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
 import { setToken, getFreeClientID } from 'play-dl';
 import { commandHandler, discord, player } from "..";
+import { HellionWardenData } from "../discord";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
     private _tokenCreated: boolean;
@@ -91,6 +92,19 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
 
         if (!music) {
+            if (event.guild?.me && !member.voice.channel.permissionsFor(event.guild.me).has(["CONNECT", "SPEAK"])) {
+                event.reply({
+                    embeds: [
+                        new MessageEmbed()
+                            .setColor(0xff0000)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                            .setTitle("Hellion // Play")
+                            .setDescription("I don't have the permissions to connect and speak on this voice chat.")
+                    ]
+                });
+                return;
+            }
+
             music = new player.HellionMusicPlayer(member.voice.channel as VoiceChannel, event.channel as TextChannel);
 
             music.addResolver(new (await player.resolvers.playDl()).HellionYTDLResolver());
