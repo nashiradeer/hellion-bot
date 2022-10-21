@@ -119,18 +119,43 @@ export class HellionWarden extends EventEmitter {
 
     private async autoexit(oldState: VoiceState, newState: VoiceState) {
         let player = this._data.music.get(oldState?.guild.id || '');
+
         if (player && player.voiceChannel.id == oldState?.channelId && player.voiceChannel.id != newState.channelId) {
             if (oldState.channel?.members.size == 1) {
-                player.textChannel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Music Player")
-                            .setDescription("I'm disconnecting from a empty voice channel.")
-                    ]
-                });
-                player.destroy();
+                if (!player.emptyCallTimer) {
+                    player.textChannel.send({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(this._data.embedColor)
+                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion Warden // Music Player")
+                                .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
+                        ]
+                    });
+
+                    player.emptyCallTimer = setTimeout(() => {
+                        if (player) {
+                            player.emptyCallTimer = null;
+
+                            player.textChannel.send({
+                                embeds: [
+                                    new MessageEmbed()
+                                        .setColor(this._data.embedColor)
+                                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                        .setTitle("Hellion Warden // Music Player")
+                                        .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
+                                ]
+                            });
+
+                            player.destroy();
+                        }
+                    }, 10000);
+                }
+            } else {
+                if (player.emptyCallTimer)
+                    clearInterval(player.emptyCallTimer);
+
+                player.emptyCallTimer = null;
             }
         }
     }

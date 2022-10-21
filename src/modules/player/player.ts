@@ -30,6 +30,8 @@ export class HellionMusicPlayer extends EventEmitter {
     public voiceChannel: VoiceChannel;
     public textChannel: TextChannel;
 
+    public emptyCallTimer?: NodeJS.Timeout | null;
+
     private _playingNow: number;
     private _queue: HellionQueuedMusic[];
     private _connection: VoiceConnection | null;
@@ -46,6 +48,8 @@ export class HellionMusicPlayer extends EventEmitter {
         super();
         this.voiceChannel = voiceChannel;
         this.textChannel = textChannel;
+
+        this.emptyCallTimer = null;
 
         this._playingNow = 0;
         this._queue = [];
