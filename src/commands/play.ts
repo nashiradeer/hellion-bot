@@ -1,7 +1,6 @@
 import { GuildMember, MessageEmbed, TextChannel, VoiceChannel } from "discord.js";
 import { setToken, getFreeClientID } from 'play-dl';
 import { commandHandler, discord, player } from "..";
-import { HellionWardenData } from "../discord";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
     private _tokenCreated: boolean;
