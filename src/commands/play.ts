@@ -122,7 +122,11 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
                     ]
                 }).then((m) => {
-                    setTimeout(() => m.delete(), 30000);
+                    setTimeout(() => {
+                        m.delete().catch((e: Error) => {
+                            event.warn("Delete message error in 'play': " + (e.stack || e.toString()))
+                        });
+                    }, 30000);
                 }).catch((e: Error) => {
                     event.warn("Send message error in 'play': " + (e.stack || e.toString()))
                 });
@@ -221,7 +225,11 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         ]
                     });
 
-                    setTimeout(() => msg.delete(), 30000);
+                    setTimeout(() => {
+                        msg.delete().catch((e: Error) => {
+                            event.warn("Delete message error: " + (e.stack || e.toString()))
+                        });
+                    }, 30000);
                 }
             } else if (res.playing) {
                 await event.reply({
