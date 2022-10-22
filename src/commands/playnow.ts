@@ -22,7 +22,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -37,7 +37,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
         if (!music) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -49,7 +49,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -65,7 +65,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             let link = event.args.getByIndex(0);
 
             if (!link) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -79,7 +79,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             try {
                 let res = await music.playNow(link, event.member as GuildMember);
                 if (res.count > 1) {
-                    event.reply({
+                    await event.reply({
                         embeds: [
                             new MessageEmbed()
                                 .setColor(data.embedColor)
@@ -89,7 +89,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         ]
                     });
 
-                    music.textChannel.send({
+                    await music.textChannel.send({
                         embeds: [
                             new MessageEmbed()
                                 .setColor(data.embedColor)
@@ -102,7 +102,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     });
                 }
                 else {
-                    event.reply({
+                    await event.reply({
                         embeds: [
                             new MessageEmbed()
                                 .setColor(data.embedColor)
@@ -115,7 +115,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             }
             catch (err) {
                 event.error(err);
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)

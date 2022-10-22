@@ -13,7 +13,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -28,7 +28,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
         if (!music) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -40,7 +40,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -55,7 +55,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             let m = music.nowPlaying();
             let nib = Math.round(m.current / (m.duration / 30));
             let progressbar = `╣${"▓".repeat(nib)}${"░".repeat(30 - nib)}╠`;
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(data.embedColor)
