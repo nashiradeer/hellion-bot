@@ -36,7 +36,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -54,7 +54,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
         if (!link) {
             if (!music) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -66,7 +66,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -78,7 +78,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
             music?.resume();
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(data.embedColor)
@@ -92,7 +92,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
         if (!music) {
             if (event.guild?.me && !member.voice.channel.permissionsFor(event.guild.me).has(["CONNECT", "SPEAK"])) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -122,7 +122,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
                     ]
                 }).then((m) => {
-                    setTimeout(() => m.delete(), 30000);
+                    setTimeout(() => {
+                        m.delete().catch((e: Error) => {
+                            event.warn("Delete message error in 'play': " + (e.stack || e.toString()))
+                        });
+                    }, 30000);
+                }).catch((e: Error) => {
+                    event.warn("Send message error in 'play': " + (e.stack || e.toString()))
                 });
             });
 
@@ -140,6 +146,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setTitle("Hellion // Reconnecting")
                             .setDescription("I've been moved from voice chat or a Discord error has occurred trying to reconnect.")
                     ]
+                }).catch((e: Error) => {
+                    event.warn("Send message error in 'reconnecting': " + (e.stack || e.toString()))
                 });
             });
 
@@ -152,6 +160,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setTitle("Hellion // Disconnected")
                             .setDescription("I was disconnected due to a Discord error or by an administrator.")
                     ]
+                }).catch((e: Error) => {
+                    event.warn("Send message error in 'disconnected': " + (e.stack || e.toString()))
                 });
             });
 
@@ -165,6 +175,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setTitle("Hellion // Queue Error")
                             .setDescription(`Removing \`\`${m.title}\`\` by **${m.requestedBy.user.tag}** due to an error. Please check if this song is available or has no age restriction.`)
                     ]
+                }).catch((e: Error) => {
+                    event.warn("Send message error in 'queueError': " + (e.stack || e.toString()))
                 });
             });
 
@@ -176,7 +188,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -192,7 +204,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         try {
             let res = await music.play(link, event.member as GuildMember);
             if (res.count > 1) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(data.embedColor)
@@ -203,7 +215,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 });
 
                 if (res.playing) {
-                    music.textChannel.send({
+                    let msg = await music.textChannel.send({
                         embeds: [
                             new MessageEmbed()
                                 .setColor(data.embedColor)
@@ -211,12 +223,16 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setTitle("Hellion // Playing Now")
                                 .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
                         ]
-                    }).then((m) => {
-                        setTimeout(() => m.delete(), 30000);
                     });
+
+                    setTimeout(() => {
+                        msg.delete().catch((e: Error) => {
+                            event.warn("Delete message error: " + (e.stack || e.toString()))
+                        });
+                    }, 30000);
                 }
             } else if (res.playing) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(data.embedColor)
@@ -226,7 +242,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                     ]
                 });
             } else {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(data.embedColor)
@@ -239,7 +255,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
         catch (err) {
             event.error(err);
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)

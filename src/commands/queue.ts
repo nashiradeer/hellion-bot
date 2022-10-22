@@ -22,7 +22,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -37,7 +37,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
         if (!music) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -49,7 +49,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -71,7 +71,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 curPage = 1;
 
             if (curPage > totalPages) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -93,7 +93,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].requestedBy.user.tag})**\n`;
 
             if (msg == "") {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
@@ -105,7 +105,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
 
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(data.embedColor)

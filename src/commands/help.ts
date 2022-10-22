@@ -22,7 +22,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let commands = event.handler.searchCommands(event.args.getByIndex(0)?.toLowerCase());
         if (commands.length == 0) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -37,12 +37,14 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 usage += (commands[0].usage[i].required) ? `<${commands[0].usage[i].name}> ` : `[${commands[0].usage[i].name}] `;
             }
             if (usage) usage = "\n**Usage:** " + usage;
+
             let alias = "";
             for (let i = 0; i < commands[0].alias.length; i++) {
                 alias += `'${commands[0].alias[i]}' `;
             }
             if (alias) alias = "\n**Aliases:** " + alias;
-            event.reply({
+
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(data.embedColor)
@@ -57,7 +59,9 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 if (!categories[commands[i].category]) categories[commands[i].category] = [commands[i]];
                 else categories[commands[i].category].push(commands[i]);
             }
+
             let message = "";
+
             let keys = Object.keys(categories);
             for (let i = 0; i < keys.length; i++) {
                 message += `**${keys[i]}: **`;
@@ -66,7 +70,8 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 }
                 message += "\n";
             }
-            event.reply({
+
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(data.embedColor)

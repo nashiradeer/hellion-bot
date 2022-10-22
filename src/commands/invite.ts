@@ -11,7 +11,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
     public async run(event: commandHandler.HellionCommandEvent, data: discord.HellionWardenData): Promise<void> {
         if (!data.botpublic && event.user.id != data.botowner) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
@@ -23,7 +23,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             return;
         }
 
-        event.reply({
+        await event.reply({
             embeds: [
                 new MessageEmbed()
                     .setColor(data.embedColor)

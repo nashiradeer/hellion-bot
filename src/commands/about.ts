@@ -12,7 +12,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let hdata = data as discord.HellionWardenData;
 
-        event.reply({
+        await event.reply({
             embeds: [
                 new MessageEmbed()
                     .setColor(hdata.embedColor)

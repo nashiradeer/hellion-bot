@@ -1,4 +1,4 @@
-import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
+import { GuildMember, TextBasedChannel, TextChannel, VoiceBasedChannel, VoiceChannel } from "discord.js";
 import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, StreamType, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { EventEmitter } from 'events';
 import { Readable } from 'stream';
@@ -27,8 +27,8 @@ export declare interface HellionMusicPlayer {
 }
 
 export class HellionMusicPlayer extends EventEmitter {
-    public voiceChannel: VoiceChannel;
-    public textChannel: TextChannel;
+    public voiceChannel: VoiceBasedChannel;
+    public textChannel: TextBasedChannel;
 
     public emptyCallTimer?: NodeJS.Timeout | null;
 

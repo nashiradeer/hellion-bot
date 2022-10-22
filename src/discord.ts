@@ -1,6 +1,6 @@
 import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler, HellionWardenInformation, player } from '.';
+import { commandHandler, HellionWardenInformation, logger, player } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenOptions {
@@ -100,7 +100,7 @@ export class HellionWarden extends EventEmitter {
                             .setTitle("Hellion Warden // Mention")
                             .setDescription(`My command prefix is: \`\`${this.prefix}\`\``)
                     ]
-                });
+                }).catch((e: Error) => this.emit('debug', 'warn', "Send message error in 'message': " + e.stack || e.toString()));
             }
             return;
         }
@@ -120,42 +120,64 @@ export class HellionWarden extends EventEmitter {
     private async autoexit(oldState: VoiceState, newState: VoiceState) {
         let player = this._data.music.get(oldState?.guild.id || '');
 
-        if (player && player.voiceChannel.id == oldState?.channelId && player.voiceChannel.id != newState.channelId) {
-            if (oldState.channel?.members.size == 1) {
-                if (!player.emptyCallTimer) {
-                    player.textChannel.send({
-                        embeds: [
-                            new MessageEmbed()
-                                .setColor(this._data.embedColor)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
-                                .setTitle("Hellion Warden // Music Player")
-                                .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
-                        ]
-                    });
+        if (player) {
+            if (newState.guild.me?.voice.channel && newState.guild.me.voice.channelId != player.voiceChannel.id)
+                player.voiceChannel = newState.guild.me.voice.channel;
 
-                    player.emptyCallTimer = setTimeout(() => {
-                        if (player) {
-                            player.emptyCallTimer = null;
+            if (player.voiceChannel.id == newState.channelId) {
+                if (player.voiceChannel.members.size == 1) {
+                    if (!player.emptyCallTimer) {
+                        player.textChannel.send({
+                            embeds: [
+                                new MessageEmbed()
+                                    .setColor(this._data.embedColor)
+                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                    .setTitle("Hellion Warden // Music Player")
+                                    .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
+                            ]
+                        }).catch((e: Error) => {
+                            this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
+                        });
 
-                            player.textChannel.send({
-                                embeds: [
-                                    new MessageEmbed()
-                                        .setColor(this._data.embedColor)
-                                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
-                                        .setTitle("Hellion Warden // Music Player")
-                                        .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
-                                ]
-                            });
+                        player.emptyCallTimer = setTimeout(() => {
+                            if (player) {
+                                player.emptyCallTimer = null;
 
-                            player.destroy();
-                        }
-                    }, 10000);
+                                player.textChannel.send({
+                                    embeds: [
+                                        new MessageEmbed()
+                                            .setColor(this._data.embedColor)
+                                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                            .setTitle("Hellion Warden // Music Player")
+                                            .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
+                                    ]
+                                }).catch((e: Error) => {
+                                    this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
+                                });
+
+                                player.destroy();
+                            }
+                        }, 10000);
+                    }
+                } else {
+                    if (player.emptyCallTimer) {
+                        clearInterval(player.emptyCallTimer);
+
+                        player.textChannel.send({
+                            embeds: [
+                                new MessageEmbed()
+                                    .setColor(this._data.embedColor)
+                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                    .setTitle("Hellion Warden // Music Player")
+                                    .setDescription("Someone joined voice chat, disconnection canceled.")
+                            ]
+                        }).catch((e: Error) => {
+                            this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
+                        });
+                    }
+
+                    player.emptyCallTimer = null;
                 }
-            } else {
-                if (player.emptyCallTimer)
-                    clearInterval(player.emptyCallTimer);
-
-                player.emptyCallTimer = null;
             }
         }
     }
