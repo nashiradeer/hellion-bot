@@ -112,24 +112,26 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             music.addResolver(new (await player.resolvers.playDl()).HellionSOPLResolver());
             music.addResolver(new (await player.resolvers.playDl()).HellionYTSRResolver());
 
-            music.on('play', (playing) => {
-                music?.textChannel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(data.embedColor)
-                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
-                            .setTitle("Hellion // Playing Now")
-                            .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
-                    ]
-                }).then((m) => {
-                    setTimeout(() => {
-                        m.delete().catch((e: Error) => {
-                            event.warn("Delete message error in 'play': " + (e.stack || e.toString()))
-                        });
-                    }, 30000);
-                }).catch((e: Error) => {
-                    event.warn("Send message error in 'play': " + (e.stack || e.toString()))
-                });
+            music.on('play', async (playing) => {
+                if (music) {
+                    if (music.lastNowPlatingMsg) {
+                        try {
+                            await music.lastNowPlatingMsg.delete();
+                        } catch (e) {
+                            event.warn("Cannot delete a queue message: " + (e.stack || e.toString()));
+                        }
+                    }
+
+                    music.lastNowPlatingMsg = await music.textChannel.send({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(data.embedColor)
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                .setTitle("Hellion // Playing Now")
+                                .setDescription(`${playing.title} **[${playing.requestedBy.user.tag}]**`)
+                        ]
+                    });
+                }
             });
 
             music.on('end', () => {
@@ -215,7 +217,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 });
 
                 if (res.playing) {
-                    let msg = await music.textChannel.send({
+                    music.lastNowPlatingMsg = await music.textChannel.send({
                         embeds: [
                             new MessageEmbed()
                                 .setColor(data.embedColor)
@@ -225,11 +227,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         ]
                     });
 
-                    setTimeout(() => {
-                        msg.delete().catch((e: Error) => {
-                            event.warn("Delete message error: " + (e.stack || e.toString()))
-                        });
-                    }, 30000);
+
                 }
             } else if (res.playing) {
                 await event.reply({
