@@ -16,4 +16,4 @@ RUN apk add --virtual .build-deps make libtool autoconf automake gcc g++ libc-de
     npm ci --omit=dev && \
     apk del .build-deps
 COPY --from=builder /usr/src/app/dist ./dist
-CMD [ "npm", "start" ]
+CMD [ "node", "dist/app.js" ]
