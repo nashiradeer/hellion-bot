@@ -1,0 +1,8 @@
+DeerSoftware Internals 1.0
+(c) 2022 DeerSoftware. All Rights Reserved.
+
+This project is proprietary software, if you aren't the copyright holder, you gonna need permission from him for everything (access, redistribute, modify, fork, or use it), the permission can only be given with contracts directly with the copyright holder or if are a group, one of it owners. 
+
+In any case, this source code can be public or open source, this license considers access as permission that need to be given, singularly, to each people in the project, in other words, each people in the project need to have a contract with the copyright holder, otherwise is breaking the terms in the license.
+
+If any term in this license is disrespected, the copyright holder can and must start a judicial process about contract breaking.
