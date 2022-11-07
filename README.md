@@ -28,5 +28,5 @@ Hellion can be built using Docker or Node.js directly, the Docker way is recomme
 
 ## Licensing
 
-(c) 2022 DeerSoftware. All Rights Reserved.
+(c) 2022 DeerSoftware. All Rights Reserved.  
 Proprietary software, licensed under DeerSoftware Internals 1.0.0, you can't redistribute, modify, fork, or use without the needed permissions from the copyright holder.
