@@ -16,7 +16,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             embeds: [
                 new MessageEmbed()
                     .setColor(hdata.embedColor)
-                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                     .setThumbnail(hdata.iconUrl)
                     .setTitle("Hellion // About")
                     .setDescription(
