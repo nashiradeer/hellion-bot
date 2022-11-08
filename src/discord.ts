@@ -1,11 +1,13 @@
 import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler, HellionWardenInformation, player } from '.';
+import { commandHandler, HellionWardenInformation, logger, player } from '.';
 import { resolve } from 'path';
 
 export interface HellionWardenOptions {
-    botpublic?: boolean;
-    botowner?: string;
+    botpublic?: boolean | null;
+    botowner?: string | null;
+    embedColor?: string | null;
+    iconUrl?: string | null;
 }
 
 export interface HellionWardenData {
@@ -13,6 +15,8 @@ export interface HellionWardenData {
     botpublic: boolean;
     botowner: string;
     prefix: string;
+    embedColor: number;
+    iconUrl: string;
 }
 
 export declare interface HellionWarden {
@@ -53,7 +57,9 @@ export class HellionWarden extends EventEmitter {
             music: new Map<string, player.HellionMusicPlayer>(),
             prefix: prefix,
             botpublic: this.botpublic,
-            botowner: this.botowner
+            botowner: this.botowner,
+            embedColor: parseInt(options?.embedColor ?? "007dff", 16),
+            iconUrl: options?.iconUrl ?? "https://www.deersoftware.dev/assets/images/hellion.png"
         };
 
         // Initialize Discord Client
@@ -67,10 +73,12 @@ export class HellionWarden extends EventEmitter {
         });
         this._client.once('ready', async () => {
             this.emit('logged');
-            let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
-            this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
             setInterval(async () => {
-                let messages = ["with Nashira Deer", `in ${await this.guildSize()} guilds`, `using Hellion Warden ${HellionWardenInformation.VERSION}`];
+                let messages = [
+                    "with DeerSoftware",
+                    `in ${await this.guildSize()} guilds`,
+                    `using Hellion v${HellionWardenInformation.VERSION}`
+                ];
                 this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
             }, 60000);
         });
@@ -92,7 +100,7 @@ export class HellionWarden extends EventEmitter {
                             .setTitle("Hellion Warden // Mention")
                             .setDescription(`My command prefix is: \`\`${this.prefix}\`\``)
                     ]
-                });
+                }).catch((e: Error) => this.emit('debug', 'warn', "Send message error in 'message': " + e.stack || e.toString()));
             }
             return;
         }
@@ -111,18 +119,65 @@ export class HellionWarden extends EventEmitter {
 
     private async autoexit(oldState: VoiceState, newState: VoiceState) {
         let player = this._data.music.get(oldState?.guild.id || '');
-        if (player && player.voiceChannel.id == oldState?.channelId && player.voiceChannel.id != newState.channelId) {
-            if (oldState.channel?.members.size == 1) {
-                player.textChannel.send({
-                    embeds: [
-                        new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Music Player")
-                            .setDescription("I'm disconnecting from a empty voice channel.")
-                    ]
-                });
-                player.destroy();
+
+        if (player) {
+            if (newState.guild.me?.voice.channel && newState.guild.me.voice.channelId != player.voiceChannel.id)
+                player.voiceChannel = newState.guild.me.voice.channel;
+
+            if (player.voiceChannel.id == newState.channelId) {
+                if (player.voiceChannel.members.size == 1) {
+                    if (!player.emptyCallTimer) {
+                        player.textChannel.send({
+                            embeds: [
+                                new MessageEmbed()
+                                    .setColor(this._data.embedColor)
+                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                    .setTitle("Hellion Warden // Music Player")
+                                    .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
+                            ]
+                        }).catch((e: Error) => {
+                            this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
+                        });
+
+                        player.emptyCallTimer = setTimeout(() => {
+                            if (player) {
+                                player.emptyCallTimer = null;
+
+                                player.textChannel.send({
+                                    embeds: [
+                                        new MessageEmbed()
+                                            .setColor(this._data.embedColor)
+                                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                            .setTitle("Hellion Warden // Music Player")
+                                            .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
+                                    ]
+                                }).catch((e: Error) => {
+                                    this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
+                                });
+
+                                player.destroy();
+                            }
+                        }, 10000);
+                    }
+                } else {
+                    if (player.emptyCallTimer) {
+                        clearInterval(player.emptyCallTimer);
+
+                        player.textChannel.send({
+                            embeds: [
+                                new MessageEmbed()
+                                    .setColor(this._data.embedColor)
+                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                    .setTitle("Hellion Warden // Music Player")
+                                    .setDescription("Someone joined voice chat, disconnection canceled.")
+                            ]
+                        }).catch((e: Error) => {
+                            this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
+                        });
+                    }
+
+                    player.emptyCallTimer = null;
+                }
             }
         }
     }

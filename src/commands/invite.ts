@@ -6,29 +6,29 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "invite";
         this.category = "Information";
-        this.description = "Get a invite URL to add the bot in your guild.";
+        this.description = "Get an invite link from the bot to your server.";
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: discord.HellionWardenData): Promise<void> {
         if (!data.botpublic && event.user.id != data.botowner) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Invite")
-                        .setDescription("The invite generation is disabled in this bot, request a invite URL to the bot owner.")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                        .setTitle("Hellion // Invite")
+                        .setDescription("Getting invite links for this bot is disabled.")
                 ]
             });
             return;
         }
 
-        event.reply({
+        await event.reply({
             embeds: [
                 new MessageEmbed()
-                    .setColor(0x260041)
-                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                    .setTitle("Hellion Warden // Invite")
+                    .setColor(data.embedColor)
+                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                    .setTitle("Hellion // Invite")
                     .setDescription(event.client.generateInvite({
                         scopes: ["bot", "applications.commands"],
                         permissions: [

@@ -6,7 +6,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "queue";
         this.category = "Music";
-        this.description = "Show the Music Player queue.";
+        this.description = "See the Music Player queue.";
         this.alias = ["q"];
         this.usage = [
             {
@@ -22,13 +22,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Queue")
-                        .setDescription("You aren't in a voice channel.")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                        .setTitle("Hellion // Queue")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -37,25 +37,25 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
         if (!music) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Queue")
-                        .setDescription("I aren't playing anything.")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                        .setTitle("Hellion // Queue")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Queue")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                            .setTitle("Hellion // Queue")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -71,13 +71,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 curPage = 1;
 
             if (curPage > totalPages) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Queue")
-                            .setDescription(`Page number is greater than total pages: \`\`${totalPages}\`\``)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                            .setTitle("Hellion // Queue")
+                            .setDescription(`The page number chosen is greater than the total number of pages: \`\`${totalPages}\`\``)
                     ]
                 });
                 return;
@@ -93,24 +93,24 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].requestedBy.user.tag})**\n`;
 
             if (msg == "") {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Queue")
-                            .setDescription(`The queue page number **${curPage}** is empty.`)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                            .setTitle("Hellion // Queue")
+                            .setDescription(`Page number **${curPage}** is empty.`)
                     ]
                 });
                 return;
             }
 
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
-                        .setColor(0x260041)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Queue")
+                        .setColor(data.embedColor)
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                        .setTitle("Hellion // Queue")
                         .setDescription(msg.slice(0, 2000))
                 ]
             });

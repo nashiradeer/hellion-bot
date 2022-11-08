@@ -6,34 +6,39 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "about";
         this.category = "Information";
-        this.description = "Get a short about of the bot.";
+        this.description = "See information about Hellion.";
     }
 
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
-        event.reply({
+        let hdata = data as discord.HellionWardenData;
+
+        await event.reply({
             embeds: [
                 new MessageEmbed()
-                    .setColor(0x260041)
-                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                    .setThumbnail(event.client.user?.avatarURL() || '')
-                    .setTitle("Hellion Warden // About")
+                    .setColor(hdata.embedColor)
+                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                    .setThumbnail(hdata.iconUrl)
+                    .setTitle("Hellion // About")
                     .setDescription(
-                        `Software: Hellion Warden\n` +
-                        `Prefix: ${(data as discord.HellionWardenData).prefix}\n` +
+                        `Prefix: ${hdata.prefix}\n` +
                         `Version: v${HellionWardenInformation.VERSION}\n` +
-                        `Support: https://discord.gg/n7MttxXQwa`)
-                    .addField("NodeJS Information",
-                        `Version: ${process.version}\n` +
-                        `Uptime: ${this.getTime(process.uptime())}\n` +
-                        `Operation System: ${process.platform}\n` +
-                        `Architecture: ${process.arch}`
-                        , true)
-                    .addField("Discord.JS Information",
-                        `Version: v${version}\n` +
-                        `Uptime: ${this.getTime((event.client.uptime || 0) / 1000)}\n` +
-                        `API Latency: ${event.client.ws.ping}ms\n` +
-                        `Latency: ${Date.now() - event.createdTimestamp}ms`
-                        , true)
+                        `Support: hellion@deersoftware.dev`)
+                    .addFields([
+                        {
+                            name: "Node.js",
+                            value: `Version: ${process.version}\n` +
+                                `Uptime: ${this.getTime(process.uptime())}\n` +
+                                `Memory: ${(process.memoryUsage.rss() / 1024 / 1024).toFixed(2)} MB`,
+                            inline: true
+                        },
+                        {
+                            name: "Discord.js",
+                            value: `Version: v${version}\n` +
+                                `API Latency: ${event.client.ws.ping}ms\n` +
+                                `Latency: ${Date.now() - event.createdTimestamp}ms`,
+                            inline: true
+                        }
+                    ])
             ]
         });
     }

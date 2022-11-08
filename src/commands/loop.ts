@@ -6,13 +6,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         super();
         this.name = "loop";
         this.category = "Music";
-        this.description = "Toggle music or queue loop in the Music Player.";
+        this.description = "View or configure the type of loop Music Player should use.";
         this.alias = ["l"];
         this.usage = [
             {
                 name: "type",
                 index: 0,
-                description: "Loop type to be used.",
+                description: "The type of loop that Music Player should use.",
                 required: false,
                 type: 'STRING',
                 choices: [
@@ -36,13 +36,13 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
     public async run(event: commandHandler.HellionCommandEvent, data: any): Promise<void> {
         let member = event.member as GuildMember;
         if (!member.voice.channel) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Loop")
-                        .setDescription("You aren't in a voice channel.")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                        .setTitle("Hellion // Loop")
+                        .setDescription("You aren't on a voice chat.")
                 ]
             });
             return;
@@ -51,25 +51,25 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         let music = (data as discord.HellionWardenData).music.get(event.guild?.id || '');
 
         if (!music) {
-            event.reply({
+            await event.reply({
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                        .setTitle("Hellion Warden // Loop")
-                        .setDescription("I aren't playing anything.")
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                        .setTitle("Hellion // Loop")
+                        .setDescription("I'm not playing anything at the moment.")
                 ]
             });
         }
         else {
             if (music.voiceChannel.id != member.voice.channelId) {
-                event.reply({
+                await event.reply({
                     embeds: [
                         new MessageEmbed()
                             .setColor(0xff0000)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Loop")
-                            .setDescription("You aren't in the same voice channel of me.")
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                            .setTitle("Hellion // Loop")
+                            .setDescription("You're not on the same voice chat as me.")
                     ]
                 });
                 return;
@@ -79,50 +79,50 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 case 'q':
                 case 'queue':
                     music.setLoop('queue');
-                    event.reply({
+                    await event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
-                                .setDescription("Looping all the queue.")
+                                .setColor(data.embedColor)
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                .setTitle("Hellion // Loop")
+                                .setDescription("The entire queue is now in a loop.")
                         ]
                     });
                     break;
                 case 'm':
                 case 'music':
                     music.setLoop('music');
-                    event.reply({
+                    await event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
-                                .setDescription("Looping the current music.")
+                                .setColor(data.embedColor)
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                .setTitle("Hellion // Loop")
+                                .setDescription("The current song is now looping.")
                         ]
                     });
                     break;
                 case 'n':
                 case 'none':
                     music.setLoop('none');
-                    event.reply({
+                    await event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
-                                .setDescription("Loop have been disabled.")
+                                .setColor(data.embedColor)
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                .setTitle("Hellion // Loop")
+                                .setDescription("The loop has been disabled.")
                         ]
                     });
                     break;
                 default:
-                    event.reply({
+                    await event.reply({
                         embeds: [
                             new MessageEmbed()
-                                .setColor(0x260041)
-                                .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: event.client.user?.avatarURL() || '' })
-                                .setTitle("Hellion Warden // Loop")
-                                .setDescription(`**Queue loop type:** ${music.getLoop()}\n**Loop type options:** '\`music\`', '\`queue\`', '\`none\`'.`)
+                                .setColor(data.embedColor)
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                .setTitle("Hellion // Loop")
+                                .setDescription(`**Current loop type:** ${music.getLoop()}\n**Loop type options:** '\`music\`', '\`queue\`', '\`none\`'.`)
                         ]
                     });
                     break;
