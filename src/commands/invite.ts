@@ -15,7 +15,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 embeds: [
                     new MessageEmbed()
                         .setColor(0xff0000)
-                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                        .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Invite")
                         .setDescription("Getting invite links for this bot is disabled.")
                 ]
@@ -27,7 +27,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             embeds: [
                 new MessageEmbed()
                     .setColor(data.embedColor)
-                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                     .setTitle("Hellion // Invite")
                     .setDescription(event.client.generateInvite({
                         scopes: ["bot", "applications.commands"],

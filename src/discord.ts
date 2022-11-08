@@ -131,7 +131,7 @@ export class HellionWarden extends EventEmitter {
                             embeds: [
                                 new MessageEmbed()
                                     .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                     .setTitle("Hellion Warden // Music Player")
                                     .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
                             ]
@@ -147,7 +147,7 @@ export class HellionWarden extends EventEmitter {
                                     embeds: [
                                         new MessageEmbed()
                                             .setColor(this._data.embedColor)
-                                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                             .setTitle("Hellion Warden // Music Player")
                                             .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
                                     ]
@@ -167,7 +167,7 @@ export class HellionWarden extends EventEmitter {
                             embeds: [
                                 new MessageEmbed()
                                     .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-tinysquare.png" })
+                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                     .setTitle("Hellion Warden // Music Player")
                                     .setDescription("Someone joined voice chat, disconnection canceled.")
                             ]
