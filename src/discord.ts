@@ -128,7 +128,7 @@ export class HellionWarden extends EventEmitter {
             if (newState.guild.me?.voice.channel && newState.guild.me.voice.channelId != player.voiceChannel.id)
                 player.voiceChannel = newState.guild.me.voice.channel;
 
-            if (player.voiceChannel.id == newState.channelId) {
+            if (player.voiceChannel.id == oldState.channelId) {
                 if (player.voiceChannel.members.size == 1) {
                     if (!player.emptyCallTimer) {
                         player.textChannel.send({
