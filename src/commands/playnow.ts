@@ -77,7 +77,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                 return;
             }
             try {
-                let res = await music.playNow(link, event.member as GuildMember);
+                let res = await music.playNow(link, (event.member as GuildMember).nickname || (event.member as GuildMember).user.username);
                 if (res.count > 1) {
                     await event.reply({
                         embeds: [
@@ -95,7 +95,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                 .setTitle("Hellion // Play Now")
-                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                                .setDescription(`${res.title} **[${res.user}]**`)
                         ]
                     }).then((m) => {
                         setTimeout(() => m.delete(), 30000);
@@ -108,7 +108,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                                 .setColor(data.embedColor)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                 .setTitle("Hellion // Play Now")
-                                .setDescription(`${res.title} **[${res.requestedBy.user.tag}]**`)
+                                .setDescription(`${res.title} **[${res.user}]**`)
                         ]
                     });
                 }

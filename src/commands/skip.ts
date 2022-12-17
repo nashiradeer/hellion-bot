@@ -71,7 +71,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                             .setColor(data.embedColor)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                             .setTitle("Hellion // Skip")
-                            .setDescription(`Skipping to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                            .setDescription(`Skipping to: ${m.title} **[${m.user}]**`)
                     ]
                 });
             }

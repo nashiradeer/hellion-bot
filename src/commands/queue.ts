@@ -90,7 +90,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             let msg = `**${"━".repeat(20)}**\n**Playing:** [${m.pos + 1}] // **Page:** [${curPage} / ${totalPages}]\n**${"━".repeat(20)}**\n`;
             for (let i = offset; i < limit; i++)
-                msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].requestedBy.user.tag})**\n`;
+                msg += `**[${i + 1}]** ${queue[i].title} **(${queue[i].user})**\n`;
 
             if (msg == "") {
                 await event.reply({

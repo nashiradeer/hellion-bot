@@ -1,4 +1,4 @@
-import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, IntentsString, Interaction, Message, MessageEmbed, VoiceState } from 'discord.js';
+import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, DMChannel, GuildChannel, IntentsString, Interaction, Message, MessageEmbed, NonThreadGuildBasedChannel, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
 import { commandHandler, HellionWardenInformation, logger, player } from '.';
 import { resolve } from 'path';
@@ -67,10 +67,15 @@ export class HellionWarden extends EventEmitter {
 
         // Register Discord Client events
         this._client.on('messageCreate', (message) => this.message(message));
+
         this._client.on('interactionCreate', (interaction) => this.interaction(interaction));
+
         this._client.on('voiceStateUpdate', (oldState, newState) => {
             this.autoexit(oldState, newState);
         });
+
+        this._client.on('channelDelete', (channel) => this.channeldelete(channel));
+
         this._client.once('ready', async () => {
             this.emit('logged');
             setInterval(async () => {
@@ -95,9 +100,9 @@ export class HellionWarden extends EventEmitter {
                 message.reply({
                     embeds: [
                         new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Mention")
+                            .setColor(this._data.embedColor)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: this._client.user?.avatarURL() || '' })
+                            .setTitle("Hellion // Mention")
                             .setDescription(`My command prefix is: \`\`${this.prefix}\`\``)
                     ]
                 }).catch((e: Error) => this.emit('debug', 'warn', "Send message error in 'message': " + e.stack || e.toString()));
@@ -108,7 +113,6 @@ export class HellionWarden extends EventEmitter {
         this.emit('debug', 'debug', 'Running command from a message.');
         await this.handler.run(this._client, message, this.prefix, this._data);
     }
-
 
     private async interaction(interaction: Interaction): Promise<void> {
         if (interaction.isCommand()) {
@@ -124,15 +128,15 @@ export class HellionWarden extends EventEmitter {
             if (newState.guild.me?.voice.channel && newState.guild.me.voice.channelId != player.voiceChannel.id)
                 player.voiceChannel = newState.guild.me.voice.channel;
 
-            if (player.voiceChannel.id == newState.channelId) {
+            if (player.voiceChannel.id == oldState.channelId) {
                 if (player.voiceChannel.members.size == 1) {
                     if (!player.emptyCallTimer) {
                         player.textChannel.send({
                             embeds: [
                                 new MessageEmbed()
                                     .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                    .setTitle("Hellion Warden // Music Player")
+                                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                    .setTitle("Hellion // Music Player")
                                     .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
                             ]
                         }).catch((e: Error) => {
@@ -147,8 +151,8 @@ export class HellionWarden extends EventEmitter {
                                     embeds: [
                                         new MessageEmbed()
                                             .setColor(this._data.embedColor)
-                                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                            .setTitle("Hellion Warden // Music Player")
+                                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                            .setTitle("Hellion // Music Player")
                                             .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
                                     ]
                                 }).catch((e: Error) => {
@@ -167,8 +171,8 @@ export class HellionWarden extends EventEmitter {
                             embeds: [
                                 new MessageEmbed()
                                     .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                    .setTitle("Hellion Warden // Music Player")
+                                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                    .setTitle("Hellion // Music Player")
                                     .setDescription("Someone joined voice chat, disconnection canceled.")
                             ]
                         }).catch((e: Error) => {
@@ -178,6 +182,43 @@ export class HellionWarden extends EventEmitter {
 
                     player.emptyCallTimer = null;
                 }
+            }
+        }
+    }
+
+    /***
+     * The voice or text channel used by the music player has been deleted, I will disconnect to avoid possible problems
+     * 
+     * @param channel The deleted channel.
+     */
+    private async channeldelete(channel: DMChannel | NonThreadGuildBasedChannel): Promise<void> {
+        // Check if the deleted channel is a guild channel.
+        if (channel instanceof GuildChannel) {
+            // Get player from the memory.
+            let player = this._data.music.get(channel.guildId);
+
+            // Return if haven't a player.
+            if (!player) return;
+
+            // Check if the channel is the voice channel or the text channel of the music player.
+            if (channel.id == player.voiceChannel.id || channel.id == player.textChannel.id) {
+                // Send a message warning if the channel aren't the text channel.
+                if (channel.id == player.textChannel.id) {
+                    player.textChannel.send({
+                        embeds: [
+                            new MessageEmbed()
+                                .setColor(0xff0000)
+                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                .setTitle("Hellion // Music Player")
+                                .setDescription("The voice or text channel used by the music player has been deleted, I will disconnect to avoid possible problems.")
+                        ]
+                    }).catch((e: Error) => {
+                        this.emit('debug', 'warn', "Send message error in 'channelDelete': " + (e.stack || e.toString()))
+                    });
+                }
+
+                // Destroys the music player to avoid problems with the others commands.
+                player.destroy();
             }
         }
     }
