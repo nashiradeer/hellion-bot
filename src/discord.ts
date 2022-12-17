@@ -95,9 +95,9 @@ export class HellionWarden extends EventEmitter {
                 message.reply({
                     embeds: [
                         new MessageEmbed()
-                            .setColor(0x260041)
-                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: this._client.user?.avatarURL() || '' })
-                            .setTitle("Hellion Warden // Mention")
+                            .setColor(this._data.embedColor)
+                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: this._client.user?.avatarURL() || '' })
+                            .setTitle("Hellion // Mention")
                             .setDescription(`My command prefix is: \`\`${this.prefix}\`\``)
                     ]
                 }).catch((e: Error) => this.emit('debug', 'warn', "Send message error in 'message': " + e.stack || e.toString()));
@@ -131,8 +131,8 @@ export class HellionWarden extends EventEmitter {
                             embeds: [
                                 new MessageEmbed()
                                     .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                    .setTitle("Hellion Warden // Music Player")
+                                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                    .setTitle("Hellion // Music Player")
                                     .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
                             ]
                         }).catch((e: Error) => {
@@ -147,8 +147,8 @@ export class HellionWarden extends EventEmitter {
                                     embeds: [
                                         new MessageEmbed()
                                             .setColor(this._data.embedColor)
-                                            .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                            .setTitle("Hellion Warden // Music Player")
+                                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                            .setTitle("Hellion // Music Player")
                                             .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
                                     ]
                                 }).catch((e: Error) => {
@@ -167,8 +167,8 @@ export class HellionWarden extends EventEmitter {
                             embeds: [
                                 new MessageEmbed()
                                     .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion Warden by Nashira Deer", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                    .setTitle("Hellion Warden // Music Player")
+                                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
+                                    .setTitle("Hellion // Music Player")
                                     .setDescription("Someone joined voice chat, disconnection canceled.")
                             ]
                         }).catch((e: Error) => {
