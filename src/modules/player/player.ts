@@ -87,7 +87,7 @@ export class HellionMusicPlayer extends EventEmitter {
     public getQueue(): HellionMusic[] {
         let result: HellionMusic[] = [];
         for (let item of this._queue)
-            result.push({ title: item.title, requestedBy: item.requestedBy, duration: item.duration });
+            result.push({ title: item.title, requestedBy: item.requestedBy, duration: item.duration, user: item.user });
         return result;
     }
 
@@ -95,18 +95,29 @@ export class HellionMusicPlayer extends EventEmitter {
         return {
             title: this._queue[this._playingNow].title,
             requestedBy: this._queue[this._playingNow].requestedBy,
+            user: this._queue[this._playingNow].user,
             duration: this._queue[this._playingNow].duration,
             current: ((!this._paused) ? Date.now() - this._lastTime : 0) + this._playingTime,
             pos: this._playingNow
         };
     }
 
-    public async playNow(music: string, user: GuildMember): Promise<HellionPlayResult> {
-        let musics = await this.resolve(music, user);
+    public async playNow(music: string, user: GuildMember | string): Promise<HellionPlayResult> {
+        let username = "";
+        let userobj: GuildMember | null = null;
+
+        if (user instanceof GuildMember) {
+            username = user.nickname || user.user.username;
+            userobj = user;
+        } else {
+            username = user;
+        }
+
+        let musics = await this.resolve(music, username, userobj);
         if (musics.length <= 0) throw new Error("Resolve returned a empty array");
         this._queue.splice(this._playingNow + 1, 0, ...musics);
         this.skip();
-        return { title: musics[0].title, count: musics.length, playing: true, pos: this._playingNow, requestedBy: musics[0].requestedBy };
+        return { title: musics[0].title, count: musics.length, playing: true, pos: this._playingNow, requestedBy: musics[0].requestedBy, user: musics[0].user };
     }
 
     public join(): void {
@@ -148,9 +159,20 @@ export class HellionMusicPlayer extends EventEmitter {
         this.emit('ready');
     }
 
-    public async play(music: string, user: GuildMember): Promise<HellionPlayResult> {
+    public async play(music: string, user: GuildMember | string): Promise<HellionPlayResult> {
         if (!this._connection)
             this.join();
+
+        let username = "";
+        let userobj: GuildMember | null = null;
+
+        if (user instanceof GuildMember) {
+            username = user.nickname || user.user.username;
+            userobj = user;
+        } else {
+            username = user;
+        }
+
         let playingNow = false;
         if (!this._player) {
             this._player = createAudioPlayer();
@@ -163,7 +185,7 @@ export class HellionMusicPlayer extends EventEmitter {
             playingNow = true;
         }
         try {
-            let musics = await this.resolve(music, user);
+            let musics = await this.resolve(music, username, userobj);
             if (music.length == 0) throw new Error("Resolve returned a empty array");
             let pos = this._queue.length;
             this._queue.push(...musics);
@@ -175,7 +197,7 @@ export class HellionMusicPlayer extends EventEmitter {
                 this._playingTime = 0;
                 this._lastTime = Date.now();
             }
-            return { playing: playingNow, title: this._queue[pos].title, requestedBy: user, count: musics.length, pos: pos };
+            return { playing: playingNow, title: this._queue[pos].title, requestedBy: userobj, user: username, count: musics.length, pos: pos };
         } catch (e) {
             if (playingNow)
                 this.destroy();
@@ -201,7 +223,7 @@ export class HellionMusicPlayer extends EventEmitter {
             this._playingNow = index - 1;
             this._player?.once(AudioPlayerStatus.Playing, () => {
                 let music = this._queue[this._playingNow];
-                res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
+                res({ title: music.title, requestedBy: music.requestedBy, user: music.user, duration: music.duration });
             });
             this._player?.stop();
         });
@@ -234,7 +256,7 @@ export class HellionMusicPlayer extends EventEmitter {
             else
                 this._player.once(AudioPlayerStatus.Playing, () => {
                     let music = this._queue[this._playingNow];
-                    res({ title: music.title, requestedBy: music.requestedBy, duration: music.duration });
+                    res({ title: music.title, requestedBy: music.requestedBy, user: music.user, duration: music.duration });
                 });
             this._player.unpause();
             this._player.stop();
@@ -283,7 +305,7 @@ export class HellionMusicPlayer extends EventEmitter {
         this.emit('end');
     }
 
-    private async resolve(music: string, user: GuildMember): Promise<HellionQueuedMusic[]> {
+    private async resolve(music: string, username: string, userobj: GuildMember | null): Promise<HellionQueuedMusic[]> {
         for (let i = 0; i < this._resolver.length; i++) {
             try {
                 if (this._resolver[i] instanceof HellionBulkMusic) {
@@ -292,7 +314,7 @@ export class HellionMusicPlayer extends EventEmitter {
                     if (!res) continue;
                     let result: HellionQueuedMusic[] = [];
                     for (let d of res) {
-                        let k = { title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: user };
+                        let k = { title: d.title, duration: d.duration, resolver: i, resolvable: d.resolvable, requestedBy: userobj, user: username };
                         result.push(k);
                     };
                     return result;
@@ -301,7 +323,7 @@ export class HellionMusicPlayer extends EventEmitter {
                     let resolver = this._resolver[i] as HellionSingleMusic;
                     let res = await resolver.resolve(music);
                     if (!res) continue;
-                    let k = { title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: user };
+                    let k = { title: res.title, duration: res.duration, resolver: i, resolvable: res.resolvable, requestedBy: userobj, user: username };
                     return [k];
                 }
             } catch (e) {
@@ -384,7 +406,8 @@ export interface HellionMusicResolved {
 export interface HellionMusic {
     title: string;
     duration: number;
-    requestedBy: GuildMember;
+    requestedBy?: GuildMember | null;
+    user: string;
 }
 
 export interface HellionQueuedMusic {
@@ -392,14 +415,16 @@ export interface HellionQueuedMusic {
     resolver: number;
     duration: number;
     resolvable: string;
-    requestedBy: GuildMember;
+    requestedBy?: GuildMember | null;
+    user: string;
 }
 
 export interface HellionPlayingNow {
     title: string;
     current: number;
     duration: number;
-    requestedBy: GuildMember;
+    requestedBy?: GuildMember | null;
+    user: string;
     pos: number;
 }
 
@@ -407,7 +432,8 @@ export interface HellionPlayResult {
     title: string;
     playing: boolean;
     pos: number;
-    requestedBy: GuildMember;
+    requestedBy?: GuildMember | null;
+    user: string;
     count: number;
 }
 
