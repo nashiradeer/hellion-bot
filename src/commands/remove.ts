@@ -111,7 +111,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Remove")
-                        .setDescription(`Removed: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                        .setDescription(`Removed: ${m.title} **[${m.user}]**`)
                 ]
             });
         }

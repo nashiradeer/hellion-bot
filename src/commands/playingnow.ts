@@ -61,7 +61,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Playing Now")
-                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.requestedBy.user.tag})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration)}\`\`\n${progressbar}`)
+                        .setDescription(`**[${m.pos + 1}]** ${m.title} **(${m.user})**\n\`\`${this.time2string(m.current)} / ${this.time2string(m.duration)}\`\`\n${progressbar}`)
                 ]
             });
         }
