@@ -98,7 +98,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Goto")
-                        .setDescription(`Going to: ${m.title} **[${m.requestedBy.user.tag}]**`)
+                        .setDescription(`Going to: ${m.title} **[${m.user}]**`)
                 ]
             });
         }
