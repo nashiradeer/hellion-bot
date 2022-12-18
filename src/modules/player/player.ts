@@ -353,7 +353,7 @@ export class HellionMusicPlayer extends EventEmitter {
                 }
             }
             let music = this._queue[this._playingNow];
-            this.emit('play', { title: music.title, requestedBy: music.requestedBy, duration: music.duration });
+            this.emit('play', { title: music.title, requestedBy: music.requestedBy, user: music.user, duration: music.duration });
             let m = await this._resolver[music.resolver].get(music.resolvable);
             if (!m)
                 throw new Error("Abnormal null during resolver get");
@@ -365,7 +365,7 @@ export class HellionMusicPlayer extends EventEmitter {
             let music = this._queue[this._playingNow];
             this.remove(this._playingNow);
             this.next();
-            this.emit('queueError', { title: music.title, requestedBy: music.requestedBy, duration: music.duration }, e);
+            this.emit('queueError', { title: music.title, requestedBy: music.requestedBy, user: music.user, duration: music.duration }, e);
         }
     }
 }
