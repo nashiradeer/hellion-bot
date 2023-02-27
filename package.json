@@ -1,6 +1,6 @@
 {
   "name": "hellion",
-  "version": "1.2.0",
+  "version": "1.2.0-alpha.1",
   "description": "A general purpose bot, created by DeerSoftware, to give your server more features, such as listening to music from YouTube and SoundCloud, among other features.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
