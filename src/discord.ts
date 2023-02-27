@@ -1,4 +1,4 @@
-import { BitFieldResolvable, Client, ClientOptions, CommandInteraction, DMChannel, GuildChannel, IntentsString, Interaction, Message, MessageEmbed, NonThreadGuildBasedChannel, VoiceState } from 'discord.js';
+import { ActivityType, BitFieldResolvable, Client, ClientOptions, CommandInteraction, DMChannel, EmbedBuilder, GatewayIntentBits, GuildChannel, IntentsBitField, Interaction, Message, NonThreadGuildBasedChannel, VoiceState } from 'discord.js';
 import { EventEmitter } from 'events';
 import { commandHandler, HellionWardenInformation, logger, player } from '.';
 import { resolve } from 'path';
@@ -34,7 +34,7 @@ export declare interface HellionWarden {
 }
 
 export class HellionWarden extends EventEmitter {
-    public static readonly REQUIRED_INTENTS: BitFieldResolvable<IntentsString, number> = ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'];
+    public static readonly REQUIRED_INTENTS: IntentsBitField = new IntentsBitField(['Guilds', 'GuildMessages', 'MessageContent']);
 
     private _data: HellionWardenData;
     private _client: Client;
@@ -84,7 +84,7 @@ export class HellionWarden extends EventEmitter {
                     `in ${await this.guildSize()} guilds`,
                     `using Hellion v${HellionWardenInformation.VERSION}`
                 ];
-                this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: 'LISTENING' });
+                this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.Listening });
             }, 60000);
         });
 
@@ -99,7 +99,7 @@ export class HellionWarden extends EventEmitter {
             if (message.content.trim() == `<@${this._client.user?.id}>` || message.content.trim() == `<@!${this._client.user?.id}>`) {
                 message.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(this._data.embedColor)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: this._client.user?.avatarURL() || '' })
                             .setTitle("Hellion // Mention")
@@ -125,15 +125,15 @@ export class HellionWarden extends EventEmitter {
         let player = this._data.music.get(oldState?.guild.id || '');
 
         if (player) {
-            if (newState.guild.me?.voice.channel && newState.guild.me.voice.channelId != player.voiceChannel.id)
-                player.voiceChannel = newState.guild.me.voice.channel;
+            if (newState.guild.members.me?.voice.channel && newState.guild.members.me.voice.channelId != player.voiceChannel.id)
+                player.voiceChannel = newState.guild.members.me.voice.channel;
 
             if (player.voiceChannel.id == oldState.channelId) {
                 if (player.voiceChannel.members.size == 1) {
                     if (!player.emptyCallTimer) {
                         player.textChannel.send({
                             embeds: [
-                                new MessageEmbed()
+                                new EmbedBuilder()
                                     .setColor(this._data.embedColor)
                                     .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                     .setTitle("Hellion // Music Player")
@@ -149,7 +149,7 @@ export class HellionWarden extends EventEmitter {
 
                                 player.textChannel.send({
                                     embeds: [
-                                        new MessageEmbed()
+                                        new EmbedBuilder()
                                             .setColor(this._data.embedColor)
                                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                             .setTitle("Hellion // Music Player")
@@ -169,7 +169,7 @@ export class HellionWarden extends EventEmitter {
 
                         player.textChannel.send({
                             embeds: [
-                                new MessageEmbed()
+                                new EmbedBuilder()
                                     .setColor(this._data.embedColor)
                                     .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                     .setTitle("Hellion // Music Player")
@@ -206,7 +206,7 @@ export class HellionWarden extends EventEmitter {
                 if (channel.id == player.textChannel.id) {
                     player.textChannel.send({
                         embeds: [
-                            new MessageEmbed()
+                            new EmbedBuilder()
                                 .setColor(0xff0000)
                                 .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                                 .setTitle("Hellion // Music Player")

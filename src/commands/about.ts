@@ -1,4 +1,4 @@
-import { MessageEmbed, version } from "discord.js";
+import { EmbedBuilder, version } from "discord.js";
 import { commandHandler, HellionWardenInformation, discord } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
@@ -14,7 +14,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
         await event.reply({
             embeds: [
-                new MessageEmbed()
+                new EmbedBuilder()
                     .setColor(hdata.embedColor)
                     .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                     .setThumbnail(hdata.iconUrl)

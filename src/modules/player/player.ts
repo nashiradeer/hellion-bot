@@ -126,7 +126,7 @@ export class HellionMusicPlayer extends EventEmitter {
         this._connection = joinVoiceChannel({
             channelId: this.voiceChannel.id,
             guildId: this.voiceChannel.guildId,
-            adapterCreator: this.voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
+            adapterCreator: this.voiceChannel.guild.voiceAdapterCreator
         })
             .on(VoiceConnectionStatus.Disconnected, async () => {
                 try {

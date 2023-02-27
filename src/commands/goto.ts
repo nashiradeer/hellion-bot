@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbed } from "discord.js";
+import { GuildMember, EmbedBuilder } from "discord.js";
 import { commandHandler, discord } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
@@ -23,7 +23,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!member.voice.channel) {
             await event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Goto")
@@ -38,7 +38,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (!music) {
             await event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Goto")
@@ -50,7 +50,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (music.voiceChannel.id != member.voice.channelId) {
                 await event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                             .setTitle("Hellion // Goto")
@@ -65,7 +65,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (!numstr) {
                 await event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                             .setTitle("Hellion // Goto")
@@ -80,7 +80,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
             if (isNaN(queuenum) || !isFinite(queuenum)) {
                 await event.reply({
                     embeds: [
-                        new MessageEmbed()
+                        new EmbedBuilder()
                             .setColor(0xff0000)
                             .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                             .setTitle("Hellion // Goto")
@@ -94,7 +94,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             await event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Goto")

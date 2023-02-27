@@ -1,10 +1,8 @@
-import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, ReplyMessageOptions, InteractionDeferReplyOptions, TextBasedChannel } from 'discord.js';
+import { Client, User, Message, GuildMember, Guild, CommandInteraction, CommandInteractionOptionResolver, MessagePayload, InteractionReplyOptions, InteractionDeferReplyOptions, TextBasedChannel, RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder, APIApplicationCommandOptionChoice, Routes, MessageReplyOptions, APIInteractionGuildMember } from 'discord.js';
 import { EventEmitter } from 'events';
 import { readdirSync } from 'fs';
 import { resolve } from 'path';
-import { Routes, RESTPostAPIApplicationCommandsJSONBody, APIApplicationCommandOptionChoice, APIInteractionGuildMember } from 'discord.js/node_modules/discord-api-types/v9';
 import { REST } from '@discordjs/rest';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { discord } from '../..';
 import { HellionCommandArgs } from '.';
 
@@ -74,7 +72,7 @@ export class HellionCommandHandler extends EventEmitter {
 
     public async initSlashCommand(clientId: string, token: string) {
         this.emit('debug', 'info', "Creating Slash Commands...");
-        let slashCommands: RESTPostAPIApplicationCommandsJSONBody[] = [];
+        let slashCommands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
         for (let cmdName in this._commands) {
             let cmd = this._commands[cmdName];
@@ -147,11 +145,11 @@ export class HellionCommandHandler extends EventEmitter {
                 }
             }
 
-            slashCommands.push(command.toJSON() as RESTPostAPIApplicationCommandsJSONBody);
+            slashCommands.push(command.toJSON() as RESTPostAPIChatInputApplicationCommandsJSONBody);
         }
 
         this.emit('debug', 'info', "Initializing DiscordJS REST...");
-        let rest = new REST({ version: '9' }).setToken(token);
+        let rest = new REST({ version: '10' }).setToken(token);
 
         this.emit('debug', 'info', "Registering commands in Discord...");
         await rest.put(
@@ -279,7 +277,7 @@ export class HellionCommandEvent {
         this.replyHandler = reply;
     }
 
-    public reply(options: ReplyMessageOptions & (string | MessagePayload | InteractionReplyOptions)): Promise<Message | null> {
+    public reply(options: InteractionReplyOptions & (string | MessagePayload | MessageReplyOptions)): Promise<Message | null> {
         return this.replyHandler.reply(options);
     }
 
@@ -320,7 +318,7 @@ export class HellionReplyHandler {
         }
     }
 
-    public async reply(message: ReplyMessageOptions & (string | MessagePayload | InteractionReplyOptions)): Promise<Message | null> {
+    public async reply(message: InteractionReplyOptions & (string | MessagePayload | MessageReplyOptions)): Promise<Message | null> {
         if (!this._deferred) {
             let msg = await this._handler.reply(message);
             if (msg instanceof Message) {

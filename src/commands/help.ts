@@ -1,5 +1,5 @@
-import { MessageEmbed, version } from "discord.js";
-import { commandHandler, HellionWardenInformation, discord } from "..";
+import { EmbedBuilder } from "discord.js";
+import { commandHandler } from "..";
 
 export class HellionCommand extends commandHandler.HellionCommandListener {
     constructor() {
@@ -24,7 +24,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         if (commands.length == 0) {
             await event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(0xff0000)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Help")
@@ -46,7 +46,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             await event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Help")
@@ -73,7 +73,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
 
             await event.reply({
                 embeds: [
-                    new MessageEmbed()
+                    new EmbedBuilder()
                         .setColor(data.embedColor)
                         .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
                         .setTitle("Hellion // Help")
