@@ -1,127 +1,67 @@
 #!/usr/bin/env node
 
-console.log("Initializing...");
-import { ArgumentParser } from 'argparse';
-import { HellionWardenInformation, discord, logger } from '.';
+import { Hellion } from './discord';
+import { createLogger, format, transports } from 'winston';
 
-interface HellionWardenArgs {
-   token: string;
-   prefix: string;
-   botowner: string;
-   public: string;
-   verbose: logger.HellionLoggerLevel | 'none';
-   embedcolor: string;
-   icon: string;
+console.log("[init] Initializing, please wait...");
+
+
+const args = {
+   token: process.env.HELLION_TOKEN,
+   verbose: process.env.HELLION_VERBOSE,
+   successColor: process.env.HELLION_SUCCESS_COLOR,
+   infoColor: process.env.HELLION_INFO_COLOR,
+   failColor: process.env.HELLION_FAIL_COLOR,
+   iconUrl: process.env.HELLION_ICON_URL
 }
 
-const argparser = new ArgumentParser({
-   description: 'Hellion Warden is a Discord Music Bot developed by Nashira Deer'
+const logger = createLogger({
+   level: args.verbose,
+   transports: [
+      new transports.Console({
+         format: format.combine(
+            format.colorize(),
+            format.splat(),
+            format.simple()
+         )
+      })
+   ]
 });
 
-argparser.add_argument('--token', {
-   type: 'str',
-   help: 'A token from the Discord used during login.',
-   default: process.env.TOKEN || ''
+logger.debug("[main] Checking if Discord Token isn't null...");
+if (!args.token) {
+   logger.error("[main] HELLION_TOKEN environment variable is null!");
+   process.exit(1);
+}
+
+logger.debug("[main] Initializing Hellion instance...");
+const DiscordBot = new Hellion(args.token, {
+   intents: Hellion.REQUIRED_INTENTS,
+   successColor: (/^[a-f0-9]{1,6}$/gi.test(args.successColor ?? '')) ? args.successColor : null,
+   failColor: (/^[a-f0-9]{1,6}$/gi.test(args.failColor ?? '')) ? args.failColor : null,
+   infoColor: (/^[a-f0-9]{1,6}$/gi.test(args.infoColor ?? '')) ? args.infoColor : null,
+   iconUrl: args.iconUrl || null
 });
 
-argparser.add_argument('--prefix', {
-   type: 'str',
-   help: 'Change the bot command prefix.',
-   default: process.env.PREFIX || 'h!'
+const discordLogger = logger.child({});
+
+DiscordBot.once('ready', (username: string) => {
+   discordLogger.info(`[discord] Hellion is ready and connected to: ${username}`);
 });
 
-argparser.add_argument('--verbose', {
-   type: 'str',
-   help: 'Set the verbose level of the console logger',
-   choices: ['debug', 'info', 'warn', 'error', 'none'],
-   default: 'info'
+DiscordBot.on('debug', (message: string, ...meta) => {
+   discordLogger.debug(`[discord] ${message}`, ...meta);
 });
 
-argparser.add_argument('--public', {
-   type: 'str',
-   help: 'Enable the invite command',
-   choices: ['yes', 'no'],
-   default: process.env.BOT_PUBLIC || 'no'
+DiscordBot.on('info', (message: string, ...meta) => {
+   discordLogger.debug(`[discord] ${message}`, ...meta);
 });
 
-argparser.add_argument('--botowner', {
-   type: 'str',
-   help: 'Set the bot owner ID.',
-   default: process.env.BOT_OWNER || ''
-});
-
-argparser.add_argument('--embedcolor', {
-   type: 'str',
-   help: 'Change the color used in the embeds.',
-   default: process.env.EMBED_COLOR || ''
-});
-
-argparser.add_argument('--icon', {
-   type: 'str',
-   help: 'Change the icon displayed in the about.',
-   default: process.env.ICON || ''
-});
-
-argparser.add_argument('-v', '--version', {
-   action: 'version',
-   version: HellionWardenInformation.VERSION
-});
-
-let args: HellionWardenArgs = argparser.parse_args();
-
-
-if (args.verbose && args.verbose != 'none')
-   logger.HellionLogger.addTransporter('console', new logger.transporters.HellionConsoleTransporter(
-      new logger.formatters.HellionColorizeFormatter(),
-      args.verbose
-   ));
-
-
-const DiscordBot = new discord.HellionWarden(args.token, args.prefix, {
-   botpublic: args.public == "yes",
-   botowner: args.botowner,
-   intents: discord.HellionWarden.REQUIRED_INTENTS,
-   embedColor: (/^[a-f0-9]{1,6}$/gi.test(args.embedcolor)) ? args.embedcolor : null,
-   iconUrl: args.icon || null
-});
-
-DiscordBot.once('ready', () => {
-   logger.HellionLogger.getLogger('Discord').info("Discord bot is ready.");
-});
-
-DiscordBot.once('logged', () => {
-   logger.HellionLogger.getLogger('Discord').info("Discord bot has connected.");
-});
-
-DiscordBot.on('debug', (type: "debug" | "info" | "warn", message: string) => {
-   logger.HellionLogger.getLogger('Discord').log(type, message);
-})
-
-DiscordBot.on('error', (err: Error) => {
-   logger.HellionLogger.getLogger('Discord').error("A error has occoured: ", err);
+DiscordBot.on('error', (message: string, ...meta) => {
+   discordLogger.error(`[discord] ${message}`, ...meta);
    process.exit(1);
 });
 
-DiscordBot.handler.on('ready', () => {
-   logger.HellionLogger.getLogger('Command Handler').info("Command handler initialized.");
-});
-
-DiscordBot.handler.on('debug', (type: "debug" | "info" | "warn", message: string) => {
-   logger.HellionLogger.getLogger('Command Handler').log(type, message);
-});
-
-DiscordBot.handler.on('error', (err: Error) => {
-   logger.HellionLogger.getLogger('Command Handler').error("A error has occoured: ", err);
-});
-
-DiscordBot.handler.on('cmdDebug', (command: string, type: "debug" | "info" | "warn", message: string) => {
-   logger.HellionLogger.getLogger(`Command '${command}'`).log(type, message);
-});
-
-DiscordBot.handler.on('cmdError', (command: string, err: Error) => {
-   logger.HellionLogger.getLogger(`Command '${command}'`).error("A error has occoured: ", err);
-});
-
-DiscordBot.start().catch((err) => {
-   logger.HellionLogger.getLogger('Discord').error("A error has occoured: ", err);
+DiscordBot.start(args.token).catch((err) => {
+   discordLogger.error("[discord] Can't login in Discord.", err);
 });

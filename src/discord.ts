@@ -1,237 +1,74 @@
-import { ActivityType, BitFieldResolvable, Client, ClientOptions, CommandInteraction, DMChannel, EmbedBuilder, GatewayIntentBits, GuildChannel, IntentsBitField, Interaction, Message, NonThreadGuildBasedChannel, VoiceState } from 'discord.js';
+import { ActivityType, Client, ClientOptions, IntentsBitField } from 'discord.js';
 import { EventEmitter } from 'events';
-import { commandHandler, HellionWardenInformation, logger, player } from '.';
-import { resolve } from 'path';
+import { HellionVersion } from '.';
 
-export interface HellionWardenOptions {
-    botpublic?: boolean | null;
-    botowner?: string | null;
-    embedColor?: string | null;
+export interface HellionOptions {
+    successColor?: string | null;
+    failColor?: string | null;
+    infoColor?: string | null;
     iconUrl?: string | null;
 }
 
-export interface HellionWardenData {
-    music: Map<string, player.HellionMusicPlayer>;
-    botpublic: boolean;
-    botowner: string;
-    prefix: string;
-    embedColor: number;
+export interface HellionContext {
+    successColor: number;
+    failColor: number;
+    infoColor: number;
     iconUrl: string;
+    logoUrl: string;
+    logoName: string;
 }
 
-export declare interface HellionWarden {
-    on(event: 'ready', listener: () => void): this;
-    once(event: 'ready', listener: () => void): this;
+export declare interface Hellion {
+    on(event: 'ready', listener: (username: string) => void): this;
+    on(event: 'debug', listener: (message: string, ...meta) => void): this;
+    on(event: 'info', listener: (message: string, ...meta) => void): this;
+    on(event: 'error', listener: (message: string, ...meta) => void): this;
 
-    on(event: 'logged', listener: () => void): this;
-    once(event: 'logged', listener: () => void): this;
-
-    on(event: 'error', listener: (err: Error) => void): this;
-    once(event: 'error', listener: (err: Error) => void): this;
-
-    on(event: 'debug', listener: (type: 'info' | 'debug' | 'warn', message: string) => void): this;
-    once(event: 'debug', listener: (type: 'info' | 'debug' | 'warn', message: string) => void): this;
+    once(event: 'ready', listener: (username: string) => void): this;
+    once(event: 'debug', listener: (message: string, ...meta) => void): this;
+    once(event: 'info', listener: (message: string, ...meta) => void): this;
+    once(event: 'error', listener: (message: string, ...meta) => void): this;
 }
 
-export class HellionWarden extends EventEmitter {
-    public static readonly REQUIRED_INTENTS: IntentsBitField = new IntentsBitField(['Guilds', 'GuildMessages', 'MessageContent']);
+export class Hellion extends EventEmitter {
+    public static readonly REQUIRED_INTENTS: IntentsBitField = new IntentsBitField([]);
 
-    private _data: HellionWardenData;
+    private _context: HellionContext;
     private _client: Client;
-    private _token: string;
 
-    public prefix: string;
-    public botpublic: boolean;
-    public botowner: string;
-    public handler: commandHandler.HellionCommandHandler;
-
-    constructor(token: string, prefix: string = "h!", options?: ClientOptions & HellionWardenOptions) {
+    constructor(token: string, options?: ClientOptions & HellionOptions) {
         super();
 
-        // Initialize
-        this._token = token;
-        this.prefix = prefix;
-        this.botpublic = options?.botpublic || false;
-        this.botowner = options?.botowner || '';
-        this._data = {
-            music: new Map<string, player.HellionMusicPlayer>(),
-            prefix: prefix,
-            botpublic: this.botpublic,
-            botowner: this.botowner,
-            embedColor: parseInt(options?.embedColor ?? "007dff", 16),
-            iconUrl: options?.iconUrl ?? "https://www.deersoftware.dev/assets/images/hellion.png"
+        // Initialize context
+        this._context = {
+            successColor: parseInt(options?.successColor || "4bb580", 16),
+            infoColor: parseInt(options?.infoColor || "4e74f7", 16),
+            failColor: parseInt(options?.failColor || "ee4040", 16),
+            iconUrl: options?.iconUrl ?? "https://www.deersoftware.dev/assets/images/hellion.png",
+            logoName: "DeerSoftware 2022-2023. All Rights Reserved.",
+            logoUrl: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png"
         };
 
-        // Initialize Discord Client
-        this._client = new Client(options || { intents: HellionWarden.REQUIRED_INTENTS });
+        // Initialize Discord.js Client
+        this._client = new Client(options || { intents: Hellion.REQUIRED_INTENTS });
 
-        // Register Discord Client events
-        this._client.on('messageCreate', (message) => this.message(message));
-
-        this._client.on('interactionCreate', (interaction) => this.interaction(interaction));
-
-        this._client.on('voiceStateUpdate', (oldState, newState) => {
-            this.autoexit(oldState, newState);
-        });
-
-        this._client.on('channelDelete', (channel) => this.channeldelete(channel));
-
+        // Register Discord.js events
         this._client.once('ready', async () => {
-            this.emit('logged');
+            this.emit('ready', `${this._client.user?.username}#${this._client.user?.discriminator}`);
             setInterval(async () => {
-                let messages = [
+                const messages = [
                     "with DeerSoftware",
                     `in ${await this.guildSize()} guilds`,
-                    `using Hellion v${HellionWardenInformation.VERSION}`
+                    `using Hellion v${HellionVersion}`
                 ];
                 this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.Listening });
             }, 60000);
         });
-
-        // Initialize Command Handler
-        this.handler = new commandHandler.HellionCommandHandler();
     }
 
-    private async message(message: Message): Promise<void> {
-        if (message.author.bot) return;
-        if (!message.guild) return;
-        if (!message.content.startsWith(this.prefix)) {
-            if (message.content.trim() == `<@${this._client.user?.id}>` || message.content.trim() == `<@!${this._client.user?.id}>`) {
-                message.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor(this._data.embedColor)
-                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: this._client.user?.avatarURL() || '' })
-                            .setTitle("Hellion // Mention")
-                            .setDescription(`My command prefix is: \`\`${this.prefix}\`\``)
-                    ]
-                }).catch((e: Error) => this.emit('debug', 'warn', "Send message error in 'message': " + e.stack || e.toString()));
-            }
-            return;
-        }
-
-        this.emit('debug', 'debug', 'Running command from a message.');
-        await this.handler.run(this._client, message, this.prefix, this._data);
-    }
-
-    private async interaction(interaction: Interaction): Promise<void> {
-        if (interaction.isCommand()) {
-            this.emit('debug', 'debug', 'Running command from a interaction.');
-            await this.handler.runInteraction(this._client, interaction as CommandInteraction, this._data);
-        }
-    }
-
-    private async autoexit(oldState: VoiceState, newState: VoiceState) {
-        let player = this._data.music.get(oldState?.guild.id || '');
-
-        if (player) {
-            if (newState.guild.members.me?.voice.channel && newState.guild.members.me.voice.channelId != player.voiceChannel.id)
-                player.voiceChannel = newState.guild.members.me.voice.channel;
-
-            if (player.voiceChannel.id == oldState.channelId) {
-                if (player.voiceChannel.members.size == 1) {
-                    if (!player.emptyCallTimer) {
-                        player.textChannel.send({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                    .setTitle("Hellion // Music Player")
-                                    .setDescription("Voice chat is empty, I'll be disconnecting in 10 seconds.")
-                            ]
-                        }).catch((e: Error) => {
-                            this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
-                        });
-
-                        player.emptyCallTimer = setTimeout(() => {
-                            if (player) {
-                                player.emptyCallTimer = null;
-
-                                player.textChannel.send({
-                                    embeds: [
-                                        new EmbedBuilder()
-                                            .setColor(this._data.embedColor)
-                                            .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                            .setTitle("Hellion // Music Player")
-                                            .setDescription("Voice chat was empty for more than 10 seconds, disconnecting...")
-                                    ]
-                                }).catch((e: Error) => {
-                                    this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
-                                });
-
-                                player.destroy();
-                            }
-                        }, 10000);
-                    }
-                } else {
-                    if (player.emptyCallTimer) {
-                        clearInterval(player.emptyCallTimer);
-
-                        player.textChannel.send({
-                            embeds: [
-                                new EmbedBuilder()
-                                    .setColor(this._data.embedColor)
-                                    .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                    .setTitle("Hellion // Music Player")
-                                    .setDescription("Someone joined voice chat, disconnection canceled.")
-                            ]
-                        }).catch((e: Error) => {
-                            this.emit('debug', 'warn', "Send message error in 'autoexit': " + (e.stack || e.toString()))
-                        });
-                    }
-
-                    player.emptyCallTimer = null;
-                }
-            }
-        }
-    }
-
-    /***
-     * The voice or text channel used by the music player has been deleted, I will disconnect to avoid possible problems
-     * 
-     * @param channel The deleted channel.
-     */
-    private async channeldelete(channel: DMChannel | NonThreadGuildBasedChannel): Promise<void> {
-        // Check if the deleted channel is a guild channel.
-        if (channel instanceof GuildChannel) {
-            // Get player from the memory.
-            let player = this._data.music.get(channel.guildId);
-
-            // Return if haven't a player.
-            if (!player) return;
-
-            // Check if the channel is the voice channel or the text channel of the music player.
-            if (channel.id == player.voiceChannel.id || channel.id == player.textChannel.id) {
-                // Send a message warning if the channel aren't the text channel.
-                if (channel.id == player.textChannel.id) {
-                    player.textChannel.send({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setColor(0xff0000)
-                                .setFooter({ text: "Hellion by DeerSoftware", iconURL: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png" })
-                                .setTitle("Hellion // Music Player")
-                                .setDescription("The voice or text channel used by the music player has been deleted, I will disconnect to avoid possible problems.")
-                        ]
-                    }).catch((e: Error) => {
-                        this.emit('debug', 'warn', "Send message error in 'channelDelete': " + (e.stack || e.toString()))
-                    });
-                }
-
-                // Destroys the music player to avoid problems with the others commands.
-                player.destroy();
-            }
-        }
-    }
-
-    public async start(): Promise<void> {
-        this.emit('debug', 'info', "Initializing Command Handler...");
-        await this.handler.init(resolve(__dirname, 'commands'));
-
-        this.emit('debug', 'info', "Logging to Discord...");
-        await this._client.login(this._token);
-
-        this.emit('debug', 'info', "Registering Slash Commands...");
-        await this.handler.initSlashCommand(this._client.user?.id || '', this._token);
+    public async start(token: string): Promise<void> {
+        this.emit('debug', "Logging into Discord...");
+        await this._client.login(token);
     }
 
     private async guildSize(): Promise<number> {
