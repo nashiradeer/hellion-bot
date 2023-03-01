@@ -4,9 +4,6 @@
 # Compiled TypeScript files
 !dist/
 
-# systemd unit files
-services/
-
 # Docker
 Dockerfile
 .dockerignore
