@@ -29,10 +29,10 @@ docker-build:
   tags:
     - docker
   before_script:
-    - DOCKER_BUILDKIT=1 docker build --platform=local -o . "https://github.com/docker/buildx.git"
-    - mkdir -p ~/.docker/cli-plugins
-    - mv buildx ~/.docker/cli-plugins/docker-buildx
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - wget https://github.com/docker/buildx/releases/download/v0.10.3/buildx-v0.10.3.linux-amd64 -O docker-buildx
+    - mv docker-buildx /usr/libexec/docker/cli-plugins
+    - chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
     - docker buildx create --use
   script:
     - |
