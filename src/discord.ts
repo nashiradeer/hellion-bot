@@ -1,6 +1,7 @@
 import { ActivityType, Client, ClientOptions, IntentsBitField, Interaction } from 'discord.js';
 import { EventEmitter } from 'events';
 import { HellionVersion } from '.';
+import { HellionDebugCommand } from './debug/command';
 import { HellionHandler } from './handler';
 
 export interface HellionOptions {
@@ -8,6 +9,7 @@ export interface HellionOptions {
     failColor?: string | null;
     infoColor?: string | null;
     iconUrl?: string | null;
+    debug?: boolean | null;
 }
 
 export interface HellionContext {
@@ -54,6 +56,11 @@ export class Hellion extends EventEmitter {
 
         // Initialize Hellion Handler
         this.handler = new HellionHandler(this._context);
+
+        // Initialize debug commands
+        if (options?.debug) {
+            this.handler.register(new HellionDebugCommand());
+        }
 
         // Initialize Discord.js Client
         this._client = new Client(options || { intents: Hellion.REQUIRED_INTENTS });
