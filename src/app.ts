@@ -36,7 +36,7 @@ if (!args.token) {
 }
 
 logger.debug("[main] Initializing Hellion instance...");
-const DiscordBot = new Hellion(args.token, {
+const DiscordBot = new Hellion({
    intents: Hellion.REQUIRED_INTENTS,
    successColor: (/^[a-f0-9]{1,6}$/gi.test(args.successColor ?? '')) ? args.successColor : null,
    failColor: (/^[a-f0-9]{1,6}$/gi.test(args.failColor ?? '')) ? args.failColor : null,
@@ -67,6 +67,7 @@ DiscordBot.on('error', (message: string, ...meta) => {
 
 DiscordBot.start(args.token).catch((err) => {
    discordLogger.error("[discord] Can't login in Discord.", err);
+   process.exit(1);
 });
 
 // Handler logger

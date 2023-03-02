@@ -45,7 +45,7 @@ export class Hellion extends EventEmitter {
     private _context: HellionContext;
     private _client: Client;
 
-    constructor(token: string, options?: ClientOptions & HellionOptions) {
+    constructor(options?: ClientOptions & HellionOptions) {
         super();
 
         // Initialize context
