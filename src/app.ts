@@ -43,6 +43,7 @@ const DiscordBot = new Hellion(args.token, {
    iconUrl: args.iconUrl || null
 });
 
+// Discord logger
 const discordLogger = logger.child({});
 
 DiscordBot.once('ready', (username: string) => {
@@ -64,4 +65,23 @@ DiscordBot.on('error', (message: string, ...meta) => {
 
 DiscordBot.start(args.token).catch((err) => {
    discordLogger.error("[discord] Can't login in Discord.", err);
+});
+
+// Handler logger
+const handlerLogger = logger.child({});
+
+DiscordBot.handler.on('debug', (message: string, ...meta) => {
+   handlerLogger.debug(`[handler] ${message}`, ...meta);
+});
+
+DiscordBot.handler.on('info', (message: string, ...meta) => {
+   handlerLogger.info(`[handler] ${message}`, ...meta);
+});
+
+DiscordBot.handler.on('warn', (message: string, ...meta) => {
+   handlerLogger.warn(`[handler] ${message}`, ...meta);
+});
+
+DiscordBot.handler.on('error', (message: string, ...meta) => {
+   handlerLogger.error(`[handler] ${message}`, ...meta);
 });

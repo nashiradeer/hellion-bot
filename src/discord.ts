@@ -1,6 +1,7 @@
-import { ActivityType, Client, ClientOptions, IntentsBitField } from 'discord.js';
+import { ActivityType, Client, ClientOptions, IntentsBitField, Interaction } from 'discord.js';
 import { EventEmitter } from 'events';
 import { HellionVersion } from '.';
+import { HellionHandler } from './handler';
 
 export interface HellionOptions {
     successColor?: string | null;
@@ -33,6 +34,8 @@ export declare interface Hellion {
 export class Hellion extends EventEmitter {
     public static readonly REQUIRED_INTENTS: IntentsBitField = new IntentsBitField([]);
 
+    public handler: HellionHandler;
+
     private _context: HellionContext;
     private _client: Client;
 
@@ -49,6 +52,9 @@ export class Hellion extends EventEmitter {
             logoUrl: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png"
         };
 
+        // Initialize Hellion Handler
+        this.handler = new HellionHandler(this._context);
+
         // Initialize Discord.js Client
         this._client = new Client(options || { intents: Hellion.REQUIRED_INTENTS });
 
@@ -64,6 +70,8 @@ export class Hellion extends EventEmitter {
                 this._client.user?.setActivity(messages[Math.floor(Math.random() * messages.length)], { type: ActivityType.Listening });
             }, 60000);
         });
+
+        this._client.on('interactionCreate', (interaction: Interaction) => this.handler.eventHandler(interaction));
     }
 
     public async start(token: string): Promise<void> {
