@@ -2,6 +2,10 @@ import { ActivityType, Client, ClientOptions, IntentsBitField, Interaction } fro
 import { EventEmitter } from 'events';
 import { HellionVersion } from '.';
 import { HellionDebugCommand } from './debug/command';
+import { HellionDebugButton, HellionDebugChannel, HellionDebugComponent, HellionDebugMentionable, HellionDebugRole, HellionDebugString, HellionDebugUser } from './debug/components';
+import { HellionDebugMessageContext } from './debug/messagecontext';
+import { HellionDebugModal, HellionDebugModalSubmit } from './debug/modal';
+import { HellionDebugUserContext } from './debug/usercontext';
 import { HellionHandler } from './handler';
 
 export interface HellionOptions {
@@ -60,6 +64,17 @@ export class Hellion extends EventEmitter {
         // Initialize debug commands
         if (options?.debug) {
             this.handler.register(new HellionDebugCommand());
+            this.handler.register(new HellionDebugUserContext());
+            this.handler.register(new HellionDebugMessageContext());
+            this.handler.register(new HellionDebugComponent());
+            this.handler.register(new HellionDebugButton());
+            this.handler.register(new HellionDebugString());
+            this.handler.register(new HellionDebugRole());
+            this.handler.register(new HellionDebugUser());
+            this.handler.register(new HellionDebugMentionable());
+            this.handler.register(new HellionDebugChannel());
+            this.handler.register(new HellionDebugModal());
+            this.handler.register(new HellionDebugModalSubmit());
         }
 
         // Initialize Discord.js Client
