@@ -1,6 +1,6 @@
-import { Client, Interaction, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from "discord.js";
+import { Client, Interaction, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from "discord.js";
 import { HellionContext } from "../discord";
-import { HellionCommand, HellionAutocomplete, HellionComponent, HellionModal, HellionListener } from "./types";
+import { HellionCommand, HellionAutocomplete, HellionComponent, HellionModal, HellionListener, HellionContextMenu } from "./types";
 import { EventEmitter } from 'events';
 
 export declare interface HellionHandler {
@@ -17,6 +17,7 @@ export declare interface HellionHandler {
 
 export class HellionHandler extends EventEmitter {
     public commands: { [name: string]: HellionCommand | HellionCommand & HellionAutocomplete };
+    public contextMenu: { [name: string]: HellionContextMenu };
     public components: { [customId: string]: HellionComponent };
     public modals: { [customId: string]: HellionModal };
     public context: HellionContext;
@@ -24,6 +25,7 @@ export class HellionHandler extends EventEmitter {
     constructor(context: HellionContext) {
         super();
         this.commands = {};
+        this.contextMenu = {};
         this.components = {};
         this.modals = {};
         this.context = context;
@@ -43,6 +45,11 @@ export class HellionHandler extends EventEmitter {
         } else if ('modalId' in listener) {
             if (!this.modals[listener.modalId]) {
                 this.modals[listener.modalId] = listener;
+                return true;
+            }
+        } else if ('contextMenuName' in listener) {
+            if (!this.contextMenu[listener.contextMenuName]) {
+                this.contextMenu[listener.contextMenuName] = listener;
                 return true;
             }
         } else
@@ -85,6 +92,16 @@ export class HellionHandler extends EventEmitter {
                 } else {
                     this.emit('warn', `It was not possible to find the modal: ${interaction.customId}`)
                 }
+            } else if (interaction.isContextMenuCommand()) {
+                const contextMenu = this.contextMenu[interaction.commandName];
+                if (contextMenu) {
+                    this.emit('info', `Executing 'ContextMenu': ${contextMenu.contextMenuName}`);
+                    contextMenu.execute(interaction, this);
+                } else {
+                    this.emit('warn', `It was not possible to find the context menu: ${interaction.commandName}`)
+                }
+            } else {
+                this.emit('warn', `A strange object was received: ${interaction}`)
             }
         } catch (e) {
             this.emit('error', "Unknown error occurred:", e);
@@ -95,10 +112,13 @@ export class HellionHandler extends EventEmitter {
         if (!client.application?.id)
             throw new TypeError("Client.application.id is null");
 
-        const data: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+        const data: RESTPostAPIChatInputApplicationCommandsJSONBody[] & RESTPostAPIContextMenuApplicationCommandsJSONBody[] = [];
 
         for (const cmdName in this.commands)
             data.push(this.commands[cmdName].data().toJSON());
+
+        for (const cmdName in this.contextMenu)
+            data.push(this.contextMenu[cmdName].data().toJSON());
 
         await client.rest.put(
             Routes.applicationCommands(client.application.id),

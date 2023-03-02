@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, AutocompleteInteraction, MessageComponentInteraction, ModalSubmitInteraction, ChatInputCommandInteraction } from "discord.js";
+import { SlashCommandBuilder, AutocompleteInteraction, MessageComponentInteraction, ModalSubmitInteraction, ChatInputCommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction } from "discord.js";
 import { HellionHandler } from "./handler";
 
 export interface HellionCommand {
@@ -11,6 +11,12 @@ export interface HellionAutocomplete {
     autocomplete: (interaction: AutocompleteInteraction, handler: HellionHandler) => void | PromiseLike<void>;
 }
 
+export interface HellionContextMenu {
+    contextMenuName: string;
+    data: () => ContextMenuCommandBuilder;
+    execute: (interaction: ContextMenuCommandInteraction, handler: HellionHandler) => void | PromiseLike<void>;
+}
+
 export interface HellionComponent {
     componentId: string;
     execute: (interaction: MessageComponentInteraction, handler: HellionHandler) => void | PromiseLike<void>;
@@ -21,4 +27,4 @@ export interface HellionModal {
     execute: (interaction: ModalSubmitInteraction, handler: HellionHandler) => void | PromiseLike<void>;
 }
 
-export type HellionListener = HellionCommand | HellionCommand & HellionAutocomplete | HellionComponent | HellionModal;
+export type HellionListener = HellionCommand | HellionCommand & HellionAutocomplete | HellionComponent | HellionModal | HellionContextMenu;
