@@ -64,4 +64,5 @@ DiscordBot.on('error', (message: string, ...meta) => {
 
 DiscordBot.start(args.token).catch((err) => {
    discordLogger.error("[discord] Can't login in Discord.", err);
+   process.exit(1);
 });
