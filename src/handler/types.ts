@@ -3,7 +3,7 @@ import { HellionHandler } from "./handler";
 
 export interface HellionCommand {
     name: string;
-    data: SlashCommandBuilder;
+    data: () => SlashCommandBuilder;
     execute: (interaction: ChatInputCommandInteraction, handler: HellionHandler) => void | PromiseLike<void>;
 }
 

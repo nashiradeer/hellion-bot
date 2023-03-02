@@ -77,6 +77,9 @@ export class Hellion extends EventEmitter {
     public async start(token: string): Promise<void> {
         this.emit('debug', "Logging into Discord...");
         await this._client.login(token);
+
+        this.emit('debug', "Registering application commands...");
+        await this.handler.registerCommands(this._client);
     }
 
     private async guildSize(): Promise<number> {

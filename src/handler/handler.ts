@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+import { Client, Interaction, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from "discord.js";
 import { HellionContext } from "../discord";
 import { HellionCommand, HellionAutocomplete, HellionComponent, HellionModal, HellionListener } from "./types";
 import { EventEmitter } from 'events';
@@ -89,5 +89,20 @@ export class HellionHandler extends EventEmitter {
         } catch (e) {
             this.emit('error', "Unknown error occurred:", e);
         }
+    }
+
+    public async registerCommands(client: Client): Promise<void> {
+        if (!client.application?.id)
+            throw new TypeError("Client.application.id is null");
+
+        const data: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+
+        for (const cmdName in this.commands)
+            data.push(this.commands[cmdName].data().toJSON());
+
+        await client.rest.put(
+            Routes.applicationCommands(client.application.id),
+            { body: data }
+        );
     }
 }
