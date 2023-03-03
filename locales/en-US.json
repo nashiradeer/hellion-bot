@@ -1,0 +1,9 @@
+{
+    "debug": {
+        "commandWordName": "word",
+        "commandWordDesc": "A word to be said.",
+        "commandDesc": "Tests the execution of commands in Hellion.",
+        "commandName": "debug-command",
+        "commandMessage": "The word to be said was: $WORD"
+    }
+}
