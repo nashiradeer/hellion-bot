@@ -1,9 +1,10 @@
 import { SlashCommandBuilder, AutocompleteInteraction, MessageComponentInteraction, ModalSubmitInteraction, ChatInputCommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction } from "discord.js";
 import { HellionHandler } from "./handler";
+import { HellionI18n } from "./i18n";
 
 export interface HellionCommand {
     name: string;
-    data: () => SlashCommandBuilder;
+    data: (i18n: HellionI18n) => SlashCommandBuilder;
     execute: (interaction: ChatInputCommandInteraction, handler: HellionHandler) => void | Promise<void>;
 }
 
@@ -13,7 +14,7 @@ export interface HellionAutocomplete {
 
 export interface HellionContextMenu {
     contextMenuName: string;
-    data: () => ContextMenuCommandBuilder;
+    data: (i18n: HellionI18n) => ContextMenuCommandBuilder;
     execute: (interaction: ContextMenuCommandInteraction, handler: HellionHandler) => void | Promise<void>;
 }
 

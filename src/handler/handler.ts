@@ -2,6 +2,7 @@ import { Client, Interaction, RESTPostAPIChatInputApplicationCommandsJSONBody, R
 import { HellionContext } from "../discord";
 import { HellionCommand, HellionAutocomplete, HellionComponent, HellionModal, HellionListener, HellionContextMenu } from "./types";
 import { EventEmitter } from 'events';
+import { HellionI18n } from "./i18n";
 
 export declare interface HellionHandler {
     on(event: 'debug', listener: (message: string, ...meta) => void): this;
@@ -21,14 +22,16 @@ export class HellionHandler extends EventEmitter {
     public components: { [customId: string]: HellionComponent };
     public modals: { [customId: string]: HellionModal };
     public context: HellionContext;
+    public i18n: HellionI18n;
 
-    constructor(context: HellionContext) {
+    constructor(context: HellionContext, i18n: HellionI18n) {
         super();
         this.commands = {};
         this.contextMenu = {};
         this.components = {};
         this.modals = {};
         this.context = context;
+        this.i18n = i18n;
     }
 
     public register(listener: HellionListener): boolean {
@@ -115,10 +118,10 @@ export class HellionHandler extends EventEmitter {
         const data: RESTPostAPIChatInputApplicationCommandsJSONBody[] & RESTPostAPIContextMenuApplicationCommandsJSONBody[] = [];
 
         for (const cmdName in this.commands)
-            data.push(this.commands[cmdName].data().toJSON());
+            data.push(this.commands[cmdName].data(this.i18n).toJSON());
 
         for (const cmdName in this.contextMenu)
-            data.push(this.contextMenu[cmdName].data().toJSON());
+            data.push(this.contextMenu[cmdName].data(this.i18n).toJSON());
 
         await client.rest.put(
             Routes.applicationCommands(client.application.id),

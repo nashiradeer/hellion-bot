@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { AutocompleteInteraction } from "discord.js";
-import { HellionCommand, HellionAutocomplete } from "../handler";
+import { HellionCommand, HellionAutocomplete, HellionHandler } from "../handler";
+import { HellionI18n } from "../handler/i18n";
 
 export class HellionDebugCommand implements HellionCommand, HellionAutocomplete {
     public name: string;
@@ -9,19 +10,25 @@ export class HellionDebugCommand implements HellionCommand, HellionAutocomplete 
         this.name = "debug-command"
     }
 
-    public data(): SlashCommandBuilder {
+    public data(i18n: HellionI18n): SlashCommandBuilder {
         return new SlashCommandBuilder()
             .addStringOption(option => option
-                .setAutocomplete(true)
-                .setName("word")
-                .setDescription("A word to be said.")
                 .setRequired(true)
+                .setAutocomplete(true)
+                .setNameLocalizations(i18n.getAll("debug", "commandWordName"))
+                .setDescriptionLocalizations(i18n.getAll("debug", "commandWordDesc"))
+                .setName(i18n.getDefault("debug", "commandWordName"))
+                .setDescription(i18n.getDefault("debug", "commandWordDesc"))
             )
-            .setDescription("Tests the execution of commands in Hellion.")
-            .setName(this.name)
+            .setNameLocalizations(i18n.getAll("debug", "commandName"))
+            .setDescriptionLocalizations(i18n.getAll("debug", "commandDesc"))
+            .setDescription(i18n.getDefault("debug", "commandDesc"))
+            .setName(this.name);
     }
-    public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.reply(`The word to be said was: ${interaction.options.getString("word", true)}`);
+    public async execute(interaction: ChatInputCommandInteraction, handler: HellionHandler): Promise<void> {
+        await interaction.reply(handler.i18n.get(interaction.locale, "debug", "commandMessage", {
+            WORD: interaction.options.getString("word", true)
+        }));
     }
 
     public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {

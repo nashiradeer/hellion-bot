@@ -13,7 +13,8 @@ const args = {
    infoColor: process.env.HELLION_INFO_COLOR,
    failColor: process.env.HELLION_FAIL_COLOR,
    iconUrl: process.env.HELLION_ICON_URL,
-   debug: process.env.HELLION_DEBUG
+   debug: process.env.HELLION_DEBUG,
+   localeDir: process.env.HELLION_LOCALES
 }
 
 const logger = createLogger({
@@ -42,7 +43,8 @@ const DiscordBot = new Hellion({
    failColor: (/^[a-f0-9]{1,6}$/gi.test(args.failColor ?? '')) ? args.failColor : null,
    infoColor: (/^[a-f0-9]{1,6}$/gi.test(args.infoColor ?? '')) ? args.infoColor : null,
    iconUrl: args.iconUrl || null,
-   debug: args.debug === "on" || args.debug === "true"
+   debug: args.debug === "on" || args.debug === "true",
+   localeDir: args.localeDir
 });
 
 // Discord logger

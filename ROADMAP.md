@@ -3,7 +3,7 @@
 ## [1.2.0]
 
 - [x] Module: Hellion Handler
-- [ ] Module: Hellion i18n
+- [x] Module: Hellion i18n
 - [ ] Module: Hellion Telemetry
 - [ ] Telemetry: Prometheus Driver
 - [ ] Module: Hellion Database

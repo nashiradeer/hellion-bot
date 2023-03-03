@@ -12,6 +12,11 @@
                 "test"
             ],
             "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "HELLION_LOCALES": "${workspaceFolder}/locales",
+                "HELLION_DEBUG": "on",
+                "HELLION_VERBOSE": "debug"
+            },
             "outputCapture": "std",
             "runtimeExecutable": "npm",
             "sourceMaps": true,
