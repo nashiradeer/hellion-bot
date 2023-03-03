@@ -15,5 +15,7 @@
 - [ ] Commands: About
 - [ ] Module: Hellion Lavalink
 - [ ] Commands: Music
+- [ ] Module: Economy
+- [ ] Commands: Economy
 - [ ] Module: Knucklebones
 - [ ] Commands: Knucklebones
