@@ -7,6 +7,7 @@ import { HellionDebugMessageContext } from './debug/messagecontext';
 import { HellionDebugModal, HellionDebugModalSubmit } from './debug/modal';
 import { HellionDebugUserContext } from './debug/usercontext';
 import { HellionHandler } from './handler';
+import { HellionI18n } from './handler/i18n';
 
 export interface HellionOptions {
     successColor?: string | null;
@@ -14,9 +15,11 @@ export interface HellionOptions {
     infoColor?: string | null;
     iconUrl?: string | null;
     debug?: boolean | null;
+    localeDir?: string | null;
 }
 
 export interface HellionContext {
+    localeDir: string;
     successColor: number;
     failColor: number;
     infoColor: number;
@@ -55,11 +58,13 @@ export class Hellion extends EventEmitter {
             failColor: parseInt(options?.failColor || "ee4040", 16),
             iconUrl: options?.iconUrl ?? "https://www.deersoftware.dev/assets/images/hellion.png",
             logoName: "DeerSoftware 2022-2023. All Rights Reserved.",
-            logoUrl: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png"
+            logoUrl: "https://www.deersoftware.dev/assets/images/deersoftware-roundsquare.png",
+            localeDir: options?.localeDir ?? "/usr/share/hellion/locale"
         };
 
         // Initialize Hellion Handler
-        this.handler = new HellionHandler(this._context);
+        const i18n = new HellionI18n();
+        this.handler = new HellionHandler(this._context, i18n);
 
         // Initialize debug commands
         if (options?.debug) {
@@ -97,6 +102,9 @@ export class Hellion extends EventEmitter {
     }
 
     public async start(token: string): Promise<void> {
+        this.emit('debug', "Loading translations...");
+        await this.handler.i18n.loadDir(this._context.localeDir);
+
         this.emit('debug', "Logging into Discord...");
         await this._client.login(token);
 
