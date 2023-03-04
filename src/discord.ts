@@ -125,8 +125,8 @@ export class HellionWarden extends EventEmitter {
         let player = this._data.music.get(oldState?.guild.id || '');
 
         if (player) {
-            if (newState.guild.me?.voice.channel && newState.guild.me.voice.channelId != player.voiceChannel.id)
-                player.voiceChannel = newState.guild.me.voice.channel;
+            if (newState.guild.members.me?.voice.channel && newState.guild.members.me?.voice.channelId != player.voiceChannel.id)
+                player.voiceChannel = newState.guild.members.me?.voice.channel;
 
             if (player.voiceChannel.id == oldState.channelId) {
                 if (player.voiceChannel.members.size == 1) {

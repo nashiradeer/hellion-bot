@@ -91,7 +91,7 @@ export class HellionCommand extends commandHandler.HellionCommandListener {
         }
 
         if (!music) {
-            if (event.guild?.me && !member.voice.channel.permissionsFor(event.guild.me).has(["CONNECT", "SPEAK"])) {
+            if (event.guild?.members.me && !member.voice.channel.permissionsFor(event.guild.members.me).has(["CONNECT", "SPEAK"])) {
                 await event.reply({
                     embeds: [
                         new MessageEmbed()
