@@ -155,6 +155,19 @@ export class HellionMusicPlayer extends EventEmitter {
             .on('error', (err) => {
                 this.emit('error', err);
                 this.destroy();
+            })
+            .on('stateChange', (oldState, newState) => {
+                // This is a fix from the play-dl community to fix the song not playing in full.
+                const oldNetworking = Reflect.get(oldState, 'networking');
+                const newNetworking = Reflect.get(newState, 'networking');
+
+                const networkStateChangeHandler = (_oldNetworkState: any, newNetworkState: any) => {
+                    const newUdp = Reflect.get(newNetworkState, 'udp');
+                    clearInterval(newUdp?.keepAliveInterval);
+                }
+
+                oldNetworking?.off('stateChange', networkStateChangeHandler);
+                newNetworking?.on('stateChange', networkStateChangeHandler);
             });
         this.emit('ready');
     }
