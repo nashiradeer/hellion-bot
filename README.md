@@ -25,7 +25,7 @@ Hellion can be built using Docker or Node.js directly, the Docker way is recomme
 | ------- | ---------- | ------- | ------------ |------------------- |
 | 1.0     | 13.x       | 16.x    | play-dl 1.9  | :x:                |
 | 1.1     | 13.x       | 16.x    | play-dl 1.9  | :white_check_mark: |
-| 1.2     | 14.x       | 18.x    |              | :white_check_mark: |
+| 2.0     | 14.x       | 18.x    |              | :white_check_mark: |
 
 ## Licensing
 

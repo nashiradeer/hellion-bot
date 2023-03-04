@@ -1,3 +1,3 @@
 export * as discord from './discord';
 
-export const HellionVersion = "1.2.0-alpha.3";
+export const HellionVersion = "2.0.0-alpha.1";
