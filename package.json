@@ -1,6 +1,6 @@
 {
   "name": "hellion",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A general purpose bot, created by DeerSoftware, to give your server more features, such as listening to music from YouTube and other media, playing minigames, saving system, among other features.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -46,7 +46,7 @@
     "@types/argparse": "^2.0.10",
     "argparse": "^2.0.1",
     "bufferutil": "^4.0.6",
-    "discord.js": "^13.13.1",
+    "discord.js": "^13.14.0",
     "erlpack": "github:discord/erlpack",
     "ffmpeg-static": "^5.1.0",
     "play-dl": "^1.9.5",
