@@ -4,6 +4,7 @@
 
 - [x] Module: Hellion Handler
 - [x] Module: Hellion i18n
+- [ ] Docker: 3 stage build [Experimental]
 - [ ] Module: Hellion Config
 - [ ] Config: Kubernetes support
 - [ ] Module: Hellion Telemetry
