@@ -12,15 +12,17 @@
 - [ ] Module: Hellion Database
 - [ ] Database: SQLite3 Driver
 - [ ] Database: MariaDB Driver
-- [ ] Module: Hellion Ads
 - [ ] Module: Hellion Utils
 - [ ] Utils: Embed Builder
-- [ ] Commands: Hellion Ads
-- [ ] Commands: About
-- [ ] Module: Hellion play-dl
 - [ ] Module: Hellion Lavalink
 - [ ] Commands: Music
 - [ ] Module: Economy
 - [ ] Commands: Economy
 - [ ] Module: Knucklebones
 - [ ] Commands: Knucklebones
+- [ ] Module: Poker
+- [ ] Commands: Poker
+- [ ] Module: Level
+- [ ] Commands: Level
+- [ ] Module: Markov
+- [ ] Module: Markov
