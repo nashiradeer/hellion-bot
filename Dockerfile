@@ -10,6 +10,7 @@ FROM deps AS builder
 RUN npm i
 COPY . .
 RUN npm run build
+RUN find . -not -name "*.js" -exec rm {} \;
 
 FROM deps
 COPY --from=builder /usr/src/app/dist ./dist
