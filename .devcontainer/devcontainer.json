@@ -1,0 +1,14 @@
+{
+	"name": "Node.js & TypeScript",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:0-16",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"GitLab.gitlab-workflow",
+				"redhat.vscode-yaml",
+				"DavidAnson.vscode-markdownlint"
+			]
+		}
+	}
+}
